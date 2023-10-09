@@ -37,4 +37,11 @@ class RedirectResponseTest extends TestCase
 
         self::assertEquals('https://zaphyr.org', $response->getHeaderLine('location'));
     }
+
+    public function testRedirectResponseWithHeaders(): void
+    {
+        $response = new RedirectResponse('https://zaphyr.org', headers: ['x-custom' => ['foo-bar']]);
+
+        self::assertEquals(['foo-bar'], $response->getHeader('x-custom'));
+    }
 }

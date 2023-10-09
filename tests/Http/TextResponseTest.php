@@ -21,8 +21,10 @@ class TextResponseTest extends TestCase
 
     public function testTextResponseWithCustomStatusCode(): void
     {
-        $response = new TextResponse('Foo', 404);
+        $response = new TextResponse($body = 'Foo', 404);
 
+        self::assertEquals($body, (string)$response->getBody());
+        self::assertEquals('text/plain; charset=utf-8', $response->getHeaderLine('Content-Type'));
         self::assertEquals(404, $response->getStatusCode());
     }
 
