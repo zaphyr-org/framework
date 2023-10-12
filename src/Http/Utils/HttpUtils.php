@@ -104,7 +104,7 @@ class HttpUtils
      * @param array<string, mixed>|null $files
      *
      * @throws HttpException if invalid files structure is provided
-     * @return array<int|string, UploadedFileInterface|UploadedFileInterface[]|array<UploadedFileInterface>>
+     * @return UploadedFileInterface[]
      */
     public static function normalizeFiles(array|null $files = null): array
     {
@@ -114,62 +114,20 @@ class HttpUtils
         foreach ($files as $key => $value) {
             if ($value instanceof UploadedFileInterface) {
                 $normalized[$key] = $value;
-            } elseif (is_array($value)) {
-                if (isset($value['tmp_name'])) {
-                    $normalized[$key] = self::createUploadedFileFromSpec($value);
-                } else {
-                    $normalized[$key] = self::normalizeFiles($value);
-                }
+            } elseif (is_array($value) && isset($value['tmp_name'])) {
+                $normalized[$key] = new UploadedFile(
+                    $value['tmp_name'],
+                    (int)$value['size'],
+                    (int)$value['error'],
+                    $value['name'],
+                    $value['type']
+                );
             } else {
                 throw new HttpException('Invalid value in files specification');
             }
         }
 
         return $normalized;
-    }
-
-    /**
-     * @param array<string, mixed> $value
-     *
-     * @return UploadedFileInterface|array<mixed>
-     */
-    protected static function createUploadedFileFromSpec(array $value): UploadedFileInterface|array
-    {
-        if (is_array($value['tmp_name'])) {
-            return self::normalizeNestedFileSpec($value);
-        }
-
-        return new UploadedFile(
-            $value['tmp_name'],
-            (int)$value['size'],
-            (int)$value['error'],
-            $value['name'],
-            $value['type']
-        );
-    }
-
-    /**
-     * @param array<string, string[]> $files
-     *
-     * @return array<UploadedFileInterface|UploadedFileInterface[]>.
-     */
-    protected static function normalizeNestedFileSpec(array $files = []): array
-    {
-        $normalizedFiles = [];
-
-        foreach (array_keys($files['tmp_name']) as $key) {
-            $spec = [
-                'tmp_name' => $files['tmp_name'][$key],
-                'size' => $files['size'][$key],
-                'error' => $files['error'][$key],
-                'name' => $files['name'][$key],
-                'type' => $files['type'][$key],
-            ];
-
-            $normalizedFiles[$key] = self::createUploadedFileFromSpec($spec);
-        }
-
-        return $normalizedFiles;
     }
 
     /**
