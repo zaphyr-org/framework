@@ -12,20 +12,33 @@ class TextResponseTest extends TestCase
 {
     public function testTextResponse(): void
     {
-        $response = new TextResponse($body = 'Foo');
+        $body = 'Foo';
+        $response = new TextResponse($body);
 
-        self::assertEquals($body, (string)$response->getBody());
-        self::assertEquals(200, $response->getStatusCode());
-        self::assertEquals('text/plain; charset=utf-8', $response->getHeaderLine('Content-Type'));
+        self::assertEquals($body, $response->getBody()->__toString());
+    }
+
+    public function testTextResponseReturnsTextContentTypeHeader(): void
+    {
+        self::assertEquals('text/plain; charset=utf-8', (new TextResponse(''))->getHeaderLine('Content-Type'));
+    }
+
+    public function testTextResponseWithCustomContentTypeHeader(): void
+    {
+        self::assertEquals(
+            'foo/plain',
+            (new TextResponse('', headers: ['content-type' => 'foo/plain']))->getHeaderLine('content-type')
+        );
+    }
+
+    public function testTextResponseReturnsDefaultStatusCode(): void
+    {
+        self::assertEquals(200, (new TextResponse(''))->getStatusCode());
     }
 
     public function testTextResponseWithCustomStatusCode(): void
     {
-        $response = new TextResponse($body = 'Foo', 404);
-
-        self::assertEquals($body, (string)$response->getBody());
-        self::assertEquals('text/plain; charset=utf-8', $response->getHeaderLine('Content-Type'));
-        self::assertEquals(404, $response->getStatusCode());
+        self::assertEquals(404, (new TextResponse('', 404))->getStatusCode());
     }
 
     public function testTextResponseWithHeaders(): void
@@ -33,7 +46,6 @@ class TextResponseTest extends TestCase
         $response = new TextResponse('Foo', headers: ['x-custom' => ['foo-bar']]);
 
         self::assertEquals(['foo-bar'], $response->getHeader('x-custom'));
-        self::assertEquals('text/plain; charset=utf-8', $response->getHeaderLine('content-type'));
     }
 
     public function testTextResponseWithStreamBody(): void

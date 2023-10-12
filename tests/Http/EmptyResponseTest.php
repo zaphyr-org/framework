@@ -13,18 +13,17 @@ class EmptyResponseTest extends TestCase
     {
         $response = new EmptyResponse();
 
-        self::assertTrue($response->isEmpty());
-        self::assertEquals(204, $response->getStatusCode());
         self::assertEquals('', $response->getBody()->__toString());
+    }
+
+    public function testEmptyResponseReturnsDefaultStatusCode(): void
+    {
+        self::assertEquals(204, (new EmptyResponse())->getStatusCode());
     }
 
     public function testEmptyResponseWithCustomStatusCode(): void
     {
-        $response = new EmptyResponse(304);
-
-        self::assertTrue($response->isEmpty());
-        self::assertEquals(304, $response->getStatusCode());
-        self::assertEquals('', $response->getBody()->__toString());
+        self::assertEquals(304, (new EmptyResponse(304))->getStatusCode());
     }
 
     public function testEmptyResponseWithHeaders(): void

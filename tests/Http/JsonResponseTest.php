@@ -52,6 +52,14 @@ class JsonResponseTest extends TestCase
         self::assertEquals('application/json', (new JsonResponse(null))->getHeaderLine('content-type'));
     }
 
+    public function testJsonResponseWithCustomContentTypeHeader(): void
+    {
+        self::assertEquals(
+            'foo/json',
+            (new JsonResponse(null, headers: ['content-type' => 'foo/json']))->getHeaderLine('content-type')
+        );
+    }
+
     public function testJsonResponseReturnsDefaultStatusCode(): void
     {
         self::assertEquals(200, (new JsonResponse(null))->getStatusCode());
@@ -67,14 +75,6 @@ class JsonResponseTest extends TestCase
         self::assertEquals(
             ['foo-bar'],
             (new JsonResponse(null, headers: ['x-custom' => ['foo-bar']]))->getHeader('x-custom')
-        );
-    }
-
-    public function testJsonResponseWithCustomContentTypeHeader(): void
-    {
-        self::assertEquals(
-            'foo/json',
-            (new JsonResponse(null, headers: ['content-type' => 'foo/json']))->getHeaderLine('content-type')
         );
     }
 

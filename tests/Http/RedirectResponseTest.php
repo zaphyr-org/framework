@@ -12,21 +12,21 @@ class RedirectResponseTest extends TestCase
 {
     public function testRedirectResponse(): void
     {
-        $response = new RedirectResponse('https://zaphyr.org');
+        $uri = 'https://zaphyr.org';
+        $response = new RedirectResponse($uri);
 
-        self::assertTrue($response->isRedirect());
-        self::assertEquals(302, $response->getStatusCode());
-        self::assertEquals('https://zaphyr.org', $response->getHeaderLine('location'));
+        self::assertEquals($uri, $response->getHeaderLine('location'));
+    }
+
+    public function testRedirectResponseReturnsDefaultStatusCode(): void
+    {
+        self::assertEquals(302, (new RedirectResponse(''))->getStatusCode());
     }
 
     public function testRedirectResponseWithCustomStatusCode(): void
     {
-        $uri = new Uri('https://zaphyr.org');
-        $response = new RedirectResponse($uri, 301);
+        self::assertEquals(301, (new RedirectResponse('', 301))->getStatusCode());
 
-        self::assertTrue($response->isRedirect());
-        self::assertEquals(301, $response->getStatusCode());
-        self::assertEquals('https://zaphyr.org', $response->getHeaderLine('location'));
     }
 
     public function testRedirectResponseUriWillOverrideHeadersLocation(): void

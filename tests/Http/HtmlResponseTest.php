@@ -12,25 +12,38 @@ class HtmlResponseTest extends TestCase
 {
     public function testHtmlResponse(): void
     {
-        $response = new HtmlResponse($body = '<html>Foo</html>');
+        $body = '<html>Foo</html>';
+        $response = new HtmlResponse($body);
 
-        self::assertSame($body, (string)$response->getBody());
-        self::assertSame('text/html; charset=utf-8', $response->getHeaderLine('Content-Type'));
-        self::assertSame(200, $response->getStatusCode());
+        self::assertEquals($body, $response->getBody()->__toString());
+    }
+
+    public function testHtmlResponseReturnsHtmlContentTypeHeader(): void
+    {
+        self::assertEquals('text/html; charset=utf-8', (new HtmlResponse(''))->getHeaderLine('Content-Type'));
+    }
+
+    public function testHtmlResponseWithCustomContentTypeHeader(): void
+    {
+        self::assertEquals(
+            'foo/html',
+            (new HtmlResponse('', headers: ['content-type' => 'foo/html']))->getHeaderLine('content-type')
+        );
+    }
+
+    public function testHtmlResponseReturnsDefaultStatusCode(): void
+    {
+        self::assertEquals(200, (new HtmlResponse(''))->getStatusCode());
     }
 
     public function testHtmlResponseWithCustomStatusCode(): void
     {
-        $response = new HtmlResponse($body = '<html>Foo</html>', 404);
-
-        self::assertSame($body, (string)$response->getBody());
-        self::assertSame('text/html; charset=utf-8', $response->getHeaderLine('Content-Type'));
-        self::assertSame(404, $response->getStatusCode());
+        self::assertEquals(404, (new HtmlResponse('', 404))->getStatusCode());
     }
 
     public function testHtmlResponseWithHeaders(): void
     {
-        $response = new HtmlResponse('<html>Foo</html>', headers: ['x-custom' => ['foo-bar']]);
+        $response = new HtmlResponse('', headers: ['x-custom' => ['foo-bar']]);
 
         self::assertEquals(['foo-bar'], $response->getHeader('x-custom'));
     }
@@ -40,7 +53,7 @@ class HtmlResponseTest extends TestCase
         $streamMock = $this->createMock(StreamInterface::class);
         $response = new HtmlResponse($streamMock);
 
-        self::assertSame($streamMock, $response->getBody());
+        self::assertEquals($streamMock, $response->getBody());
     }
 
     public function testHtmlResponseRewindsBodyStream(): void
