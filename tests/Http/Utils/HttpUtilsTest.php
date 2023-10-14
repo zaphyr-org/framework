@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Http\Utils;
 
 use PHPUnit\Framework\TestCase;
-use Zaphyr\Framework\Http\Exceptions\HttpException;
+use Zaphyr\Framework\Http\Exceptions\UploadedFileException;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
 use Zaphyr\HttpMessage\UploadedFile;
 use Zaphyr\HttpMessage\Uri;
@@ -147,7 +147,7 @@ class HttpUtilsTest extends TestCase
 
     public function testNormalizeFilesWithInvalidFilesThrowsException(): void
     {
-        $this->expectException(HttpException::class);
+        $this->expectException(UploadedFileException::class);
 
         HttpUtils::normalizeFiles(['invalid']);
     }

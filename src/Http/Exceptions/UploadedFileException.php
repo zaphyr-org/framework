@@ -9,6 +9,6 @@ use Exception;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-class HttpException extends Exception
+class UploadedFileException extends Exception
 {
 }

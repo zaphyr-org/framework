@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Http;
 
 use PHPUnit\Framework\TestCase;
-use Zaphyr\Framework\Http\Exceptions\HttpException;
+use Zaphyr\Framework\Http\Exceptions\ResponseException;
 use Zaphyr\Framework\Http\JsonResponse;
 
 class JsonResponseTest extends TestCase
@@ -117,14 +117,14 @@ class JsonResponseTest extends TestCase
 
     public function testJsonResponseThrowsExceptionOnInvalidResources(): void
     {
-        $this->expectException(HttpException::class);
+        $this->expectException(ResponseException::class);
 
         new JsonResponse(fopen('php://memory', 'r'));
     }
 
     public function testJsonResponseThrowsExceptionOnBadEmbeddedData(): void
     {
-        $this->expectException(HttpException::class);
+        $this->expectException(ResponseException::class);
 
         new JsonResponse([
             'stream' => fopen('php://memory', 'r'),
@@ -133,14 +133,14 @@ class JsonResponseTest extends TestCase
 
     public function testJsonResponseWithObjectWithoutToStringMethodThrowsException(): void
     {
-        $this->expectException(HttpException::class);
+        $this->expectException(ResponseException::class);
 
         new JsonResponse(new class {});
     }
 
     public function testJsonResponseThrowsExceptionOnInvalidJson(): void
     {
-        $this->expectException(HttpException::class);
+        $this->expectException(ResponseException::class);
 
         new JsonResponse("\xB1\x31");
     }

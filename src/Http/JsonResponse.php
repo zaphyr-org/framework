@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Http;
 
 use JsonException;
-use Zaphyr\Framework\Http\Exceptions\HttpException;
+use Zaphyr\Framework\Http\Exceptions\ResponseException;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
 use Zaphyr\HttpMessage\Stream;
 
@@ -20,7 +20,7 @@ class JsonResponse extends Response
      * @param array<string, string|string[]> $headers
      * @param int                            $encodingOptions
      *
-     * @throws HttpException
+     * @throws ResponseException if the JSON cannot be encoded
      */
     public function __construct(
         mixed $data,
@@ -39,9 +39,8 @@ class JsonResponse extends Response
      * @param mixed $data
      * @param int   $encodingOptions
      *
-     * @throws HttpException if the JSON cannot be encoded
+     * @throws ResponseException if the JSON cannot be encoded
      * @return string
-     *
      */
     protected function jsonEncode(mixed $data, int $encodingOptions): string
     {
@@ -49,18 +48,18 @@ class JsonResponse extends Response
             if (is_callable([$data, '__toString'])) {
                 $data = (string)$data;
             } else {
-                throw new HttpException('Objects must implement __toString() method');
+                throw new ResponseException('Objects must implement __toString() method');
             }
         }
 
         try {
             $data = json_encode($data, JSON_THROW_ON_ERROR | $encodingOptions);
         } catch (JsonException $e) {
-            throw new HttpException($e->getMessage(), $e->getCode(), $e);
+            throw new ResponseException($e->getMessage(), $e->getCode(), $e);
         }
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new HttpException(json_last_error_msg());
+            throw new ResponseException(json_last_error_msg());
         }
 
         return $data;

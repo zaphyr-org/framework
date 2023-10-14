@@ -6,7 +6,7 @@ namespace Zaphyr\Framework\Http\Utils;
 
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
-use Zaphyr\Framework\Http\Exceptions\HttpException;
+use Zaphyr\Framework\Http\Exceptions\UploadedFileException;
 use Zaphyr\HttpMessage\UploadedFile;
 use Zaphyr\HttpMessage\Uri;
 
@@ -103,7 +103,7 @@ class HttpUtils
     /**
      * @param array<string, mixed>|null $files
      *
-     * @throws HttpException if invalid files structure is provided
+     * @throws UploadedFileException if invalid files structure is provided
      * @return UploadedFileInterface[]
      */
     public static function normalizeFiles(array|null $files = null): array
@@ -123,7 +123,7 @@ class HttpUtils
                     $value['type']
                 );
             } else {
-                throw new HttpException('Invalid value in files specification');
+                throw new UploadedFileException('Invalid value in files specification');
             }
         }
 

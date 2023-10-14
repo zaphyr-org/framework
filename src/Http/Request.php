@@ -6,7 +6,7 @@ namespace Zaphyr\Framework\Http;
 
 use Psr\Http\Message\StreamInterface;
 use Zaphyr\Framework\Contracts\Http\RequestInterface;
-use Zaphyr\Framework\Http\Exceptions\HttpException;
+use Zaphyr\Framework\Http\Exceptions\UploadedFileException;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
 use Zaphyr\HttpMessage\ServerRequest as BaseRequest;
 
@@ -22,7 +22,7 @@ class Request extends BaseRequest implements RequestInterface
      * @param array<string, mixed> $cookies
      * @param array<string, mixed> $files
      *
-     * @throws HttpException if uploaded files could not be normalized
+     * @throws UploadedFileException if uploaded files could not be normalized
      * @return Request
      */
     public static function fromGlobals(
