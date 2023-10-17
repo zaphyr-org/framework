@@ -6,6 +6,7 @@ namespace Zaphyr\Framework\Http;
 
 use Psr\Http\Message\StreamInterface;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
+use Zaphyr\Framework\Http\Utils\StatusCode;
 use Zaphyr\HttpMessage\Stream;
 
 /**
@@ -18,7 +19,7 @@ class TextResponse extends Response
      * @param int                            $statusCode
      * @param array<string, string|string[]> $headers
      */
-    public function __construct(string|StreamInterface $text, int $statusCode = 200, array $headers = [])
+    public function __construct(string|StreamInterface $text, int $statusCode = StatusCode::OK, array $headers = [])
     {
         parent::__construct(
             $this->createBody($text),

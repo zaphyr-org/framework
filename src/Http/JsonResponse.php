@@ -7,6 +7,7 @@ namespace Zaphyr\Framework\Http;
 use JsonException;
 use Zaphyr\Framework\Http\Exceptions\ResponseException;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
+use Zaphyr\Framework\Http\Utils\StatusCode;
 use Zaphyr\HttpMessage\Stream;
 
 /**
@@ -24,7 +25,7 @@ class JsonResponse extends Response
      */
     public function __construct(
         mixed $data,
-        int $statusCode = 200,
+        int $statusCode = StatusCode::OK,
         array $headers = [],
         int $encodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
     ) {
