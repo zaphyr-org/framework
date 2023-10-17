@@ -22,6 +22,7 @@
         "zaphyr-org/config": "dev-master",
         "zaphyr-org/container": "^1.1",
         "zaphyr-org/http-message": "^1.0",
+        "zaphyr-org/router": "^1.1",
         "zaphyr-org/utils": "^2.2"
     },
     "require-dev": {
