@@ -68,9 +68,9 @@ class ApplicationTest extends TestCase
 
     public function testSetEnvironment(): void
     {
-        $this->application->setEnvironment('testing');
+        $this->application->setEnvironment('staging');
 
-        self::assertSame('testing', $this->application->getEnvironment());
+        self::assertSame('staging', $this->application->getEnvironment());
     }
 
     public function testIsEnvironment(): void
@@ -85,6 +85,15 @@ class ApplicationTest extends TestCase
         $this->application->setEnvironment('development');
 
         self::assertTrue($this->application->isDevelopmentEnvironment());
+    }
+
+    public function testIsTestingEnvironment(): void
+    {
+        self::assertFalse($this->application->isDevelopmentEnvironment());
+
+        $this->application->setEnvironment('testing');
+
+        self::assertTrue($this->application->isTestingEnvironment());
     }
 
     public function testIsProductionEnvironment(): void

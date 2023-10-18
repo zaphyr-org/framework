@@ -110,6 +110,14 @@ class Application implements ApplicationInterface
     /**
      * {@inheritdoc}
      */
+    public function isTestingEnvironment(): bool
+    {
+        return $this->isEnvironment('testing');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isProductionEnvironment(): bool
     {
         return $this->isEnvironment('production');

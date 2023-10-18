@@ -52,6 +52,11 @@ interface ApplicationInterface
     /**
      * @return bool
      */
+    public function isTestingEnvironment(): bool;
+
+    /**
+     * @return bool
+     */
     public function isProductionEnvironment(): bool;
 
     /**
