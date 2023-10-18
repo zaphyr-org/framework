@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests;
+namespace Zaphyr\FrameworkTests\Unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Http;
+namespace Zaphyr\FrameworkTests\Unit\Http;
 
-use Zaphyr\Framework\Http\Response;
 use PHPUnit\Framework\TestCase;
+use Zaphyr\Framework\Http\Response;
 
 class ResponseTest extends TestCase
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Http;
+namespace Zaphyr\FrameworkTests\Unit\Http;
 
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\StreamInterface;
 use Zaphyr\Framework\Http\HtmlResponse;
-use PHPUnit\Framework\TestCase;
 
 class HtmlResponseTest extends TestCase
 {

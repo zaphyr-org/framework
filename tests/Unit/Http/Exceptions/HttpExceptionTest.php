@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Http\Exceptions;
+namespace Zaphyr\FrameworkTests\Unit\Http\Exceptions;
 
 use Exception;
 use PHPUnit\Framework\TestCase;

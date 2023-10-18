@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Providers\Bootable;
+namespace Zaphyr\FrameworkTests\Unit\Providers\Bootable;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
-use PHPUnit\Framework\TestCase;
 
 class RegisterServicesBootProviderTest extends TestCase
 {

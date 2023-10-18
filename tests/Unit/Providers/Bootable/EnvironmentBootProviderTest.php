@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Providers\Bootable;
+namespace Zaphyr\FrameworkTests\Unit\Providers\Bootable;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
-use PHPUnit\Framework\TestCase;
 
 class EnvironmentBootProviderTest extends TestCase
 {
@@ -48,14 +48,14 @@ class EnvironmentBootProviderTest extends TestCase
 
         $this->applicationMock->expects(self::once())
             ->method('getRootPath')
-            ->willReturn(dirname(__DIR__, 2) . '/TestAssets/config');
+            ->willReturn(dirname(__DIR__, 3) . '/TestAssets');
 
         $this->environmentBootProvider->boot();
     }
 
     public function testBootWithConfig(): void
     {
-        $configCachePath = dirname(__DIR__, 2) . '/TestAssets/config/config.cache';
+        $configCachePath = dirname(__DIR__, 3) . '/TestAssets/config/config.cache';
 
         file_put_contents($configCachePath, serialize([
             'app' => [
@@ -66,7 +66,7 @@ class EnvironmentBootProviderTest extends TestCase
         $this->applicationMock->expects(self::once())
             ->method('getStoragePath')
             ->with('cache/config.cache')
-            ->willReturn(dirname(__DIR__, 2) . '/TestAssets/config');
+            ->willReturn(dirname(__DIR__, 3) . '/TestAssets/config');
 
         $this->applicationMock->expects(self::never())
             ->method('getRootPath');

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Config\Replacers;
+namespace Zaphyr\FrameworkTests\Unit\Config\Replacers;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

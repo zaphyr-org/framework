@@ -2,18 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Providers\Bootable;
+namespace Zaphyr\FrameworkTests\Unit\Providers\Bootable;
 
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Zaphyr\Config\Config;
 use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Config\Readers\YamlReader;
 use Zaphyr\Container\Contracts\ContainerInterface;
-use Zaphyr\Framework\Config\Replacers\PathReplacer;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
-use PHPUnit\Framework\TestCase;
 
 class ConfigBootProviderTest extends TestCase
 {
@@ -61,7 +59,7 @@ class ConfigBootProviderTest extends TestCase
         $this->applicationMock->expects(self::once())
             ->method('getRootPath')
             ->with('config')
-            ->willReturn(dirname(__DIR__, 2) . '/TestAssets/config');
+            ->willReturn(dirname(__DIR__, 3) . '/TestAssets/config');
 
         $this->containerMock->expects($this->once())
             ->method('bindInstance')
@@ -79,7 +77,7 @@ class ConfigBootProviderTest extends TestCase
 
     public function testBootWithCachedConfig(): void
     {
-        $configCachePath = dirname(__DIR__, 2) . '/TestAssets/config/config.cache';
+        $configCachePath = dirname(__DIR__, 3) . '/TestAssets/config/config.cache';
 
         file_put_contents($configCachePath, serialize([
             'app' => [

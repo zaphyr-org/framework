@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Http;
+namespace Zaphyr\FrameworkTests\Unit\Http;
 
-use Zaphyr\Framework\Http\RedirectResponse;
 use PHPUnit\Framework\TestCase;
-use Zaphyr\HttpMessage\Uri;
+use Zaphyr\Framework\Http\RedirectResponse;
 
 class RedirectResponseTest extends TestCase
 {

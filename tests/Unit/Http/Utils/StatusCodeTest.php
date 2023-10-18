@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Http\Utils;
+namespace Zaphyr\FrameworkTests\Unit\Http\Utils;
 
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Http\Utils\StatusCode;

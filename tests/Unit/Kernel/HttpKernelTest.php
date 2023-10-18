@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Kernel;
+namespace Zaphyr\FrameworkTests\Unit\Kernel;
 
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
