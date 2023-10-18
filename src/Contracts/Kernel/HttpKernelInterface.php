@@ -13,6 +13,11 @@ use Psr\Http\Message\ServerRequestInterface;
 interface HttpKernelInterface
 {
     /**
+     * @return void
+     */
+    public function bootstrap(): void;
+
+    /**
      * @param ServerRequestInterface $request
      *
      * @return ResponseInterface

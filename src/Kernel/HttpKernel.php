@@ -41,6 +41,16 @@ class HttpKernel implements HttpKernelInterface
     /**
      * {@inheritdoc}
      */
+    public function bootstrap(): void
+    {
+        if (!$this->application->isBootstrapped()) {
+            $this->application->bootstrapWith($this->bootServiceProvider);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $container = $this->application->getContainer();
@@ -52,16 +62,6 @@ class HttpKernel implements HttpKernelInterface
             return $container->get(RouterInterface::class)->handle($request);
         } catch (Throwable $exception) {
             return $this->handleException($request, $exception);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    protected function bootstrap(): void
-    {
-        if (!$this->application->isBootstrapped()) {
-            $this->application->bootstrapWith($this->bootServiceProvider);
         }
     }
 
