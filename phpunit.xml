@@ -16,8 +16,11 @@
         </report>
     </coverage>
     <testsuites>
-        <testsuite name="Unit Tests">
-            <directory suffix="Test.php">./tests</directory>
+        <testsuite name="Integration">
+            <directory suffix="Test.php">./tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Unit">
+            <directory suffix="Test.php">./tests/Unit</directory>
         </testsuite>
     </testsuites>
     <logging>
