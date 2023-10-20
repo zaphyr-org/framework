@@ -24,6 +24,7 @@
         "zaphyr-org/container": "^1.1",
         "zaphyr-org/encrypt": "^2.0",
         "zaphyr-org/http-message": "^1.0",
+        "zaphyr-org/logger": "^2.0",
         "zaphyr-org/router": "^1.1",
         "zaphyr-org/utils": "^2.2"
     },
@@ -39,7 +40,8 @@
         "psr/http-factory-implementation": "^1.0",
         "psr/http-message-implementation": "^2.0",
         "psr/http-server-handler-implementation": "^1.0",
-        "psr/http-server-middleware-implementation": "^1.0"
+        "psr/http-server-middleware-implementation": "^1.0",
+        "psr/logger-implementation": "^3.0"
     },
     "autoload": {
         "psr-4": {

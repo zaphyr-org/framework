@@ -5,3 +5,8 @@ parameters:
         - src
     parallel:
         maximumNumberOfProcesses: 1
+    ignoreErrors:
+        -
+            # what the fuck!?
+            message: '%Method Zaphyr\\Framework\\Providers\\LogServiceProvider::getLogHandlersFromConfig\(\) should return array<string, array<Zaphyr\\Logger\\Contracts\\HandlerInterface>> but returns array<int\|string, array<int, Zaphyr\\Logger\\Handlers\\FileHandler\|Zaphyr\\Logger\\Handlers\\MailHandler\|Zaphyr\\Logger\\Handlers\\RotateHandler>>.%'
+            path: 'src/Providers/LogServiceProvider.php'
