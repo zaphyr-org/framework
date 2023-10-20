@@ -28,4 +28,8 @@
             <directory suffix=".php">./src</directory>
         </include>
     </source>
+    <php>
+        <env name="ROOT_DIR" value="./tests/TestAssets"/>
+        <env name="APP_ENV" value="testing"/>
+    </php>
 </phpunit>
