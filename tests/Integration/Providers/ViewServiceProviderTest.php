@@ -24,9 +24,7 @@ class ViewServiceProviderTest extends IntegrationTestCase
 
     protected function setUp(): void
     {
-        static::bootApplication();
-
-        $this->container = static::$application->getContainer();
+        $this->container = static::getContainer();
 
         $this->viewServiceProvider = new ViewServiceProvider();
         $this->viewServiceProvider->setContainer($this->container);

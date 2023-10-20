@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Zaphyr\Container\Container;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Application;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
@@ -63,6 +62,9 @@ class IntegrationTestCase extends TestCase
             self::bootApplication();
         }
 
-        return static::$application->getContainer();
+        /** @var ApplicationInterface $application */
+        $application = static::$application;
+
+        return $application->getContainer();
     }
 }

@@ -26,9 +26,7 @@ class EncryptServiceProviderTest extends IntegrationTestCase
 
     protected function setUp(): void
     {
-        static::bootApplication();
-
-        $this->container = static::$application->getContainer();
+        $this->container = static::getContainer();
 
         $this->encryptServiceProvider = new EncryptServiceProvider();
         $this->encryptServiceProvider->setContainer($this->container);
