@@ -27,13 +27,13 @@ class ApplicationTest extends TestCase
      */
     protected Application $application;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->application = new Application($this->rootPath, $this->containerMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->containerMock, $this->application);
     }

@@ -21,14 +21,14 @@ class TwigRuntimeLoaderTest extends TestCase
      */
     protected TwigRuntimeLoader $twigRuntimeLoader;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->containerMock = $this->createMock(ContainerInterface::class);
 
         $this->twigRuntimeLoader = new TwigRuntimeLoader($this->containerMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->containerMock, $this->twigRuntimeLoader);
     }

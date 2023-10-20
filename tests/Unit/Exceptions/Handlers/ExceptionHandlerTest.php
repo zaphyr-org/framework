@@ -44,7 +44,7 @@ class ExceptionHandlerTest extends TestCase
      */
     protected ExceptionHandler $exceptionHandler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
@@ -54,7 +54,7 @@ class ExceptionHandlerTest extends TestCase
         $this->exceptionHandler = new ExceptionHandler($this->loggerMock, $this->configMock, $this->viewMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset(
             $this->loggerMock,

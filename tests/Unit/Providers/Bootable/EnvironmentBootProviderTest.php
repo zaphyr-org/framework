@@ -22,14 +22,14 @@ class EnvironmentBootProviderTest extends TestCase
      */
     protected EnvironmentBootProvider $environmentBootProvider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->applicationMock = $this->createMock(ApplicationInterface::class);
 
         $this->environmentBootProvider = new EnvironmentBootProvider($this->applicationMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->applicationMock, $this->environmentBootProvider);
     }

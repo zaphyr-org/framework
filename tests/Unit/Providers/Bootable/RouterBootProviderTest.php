@@ -29,7 +29,7 @@ class RouterBootProviderTest extends TestCase
      */
     protected RouterBootProvider $routerBootProvider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
@@ -38,7 +38,7 @@ class RouterBootProviderTest extends TestCase
         $this->routerBootProvider->setContainer($this->containerMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->applicationMock, $this->containerMock, $this->configMock, $this->routerBootProvider);
     }

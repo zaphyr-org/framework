@@ -33,7 +33,7 @@ class WhoopsDebugHandlerTest extends TestCase
      */
     protected WhoopsDebugHandler $whoopsDebugHandler;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->runMock = $this->createMock(RunInterface::class);
         $this->handlerMock = $this->createMock(HandlerInterface::class);
@@ -42,7 +42,7 @@ class WhoopsDebugHandlerTest extends TestCase
         $this->whoopsDebugHandler = new WhoopsDebugHandler($this->runMock, $this->handlerMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->runMock, $this->handlerMock, $this->serverRequestMock, $this->whoopsDebugHandler);
     }

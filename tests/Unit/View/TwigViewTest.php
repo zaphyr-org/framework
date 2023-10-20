@@ -22,14 +22,14 @@ class TwigViewTest extends TestCase
      */
     protected TwigView $twigView;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->environmentMock = $this->createMock(Environment::class);
 
         $this->twigView = new TwigView($this->environmentMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->environmentMock, $this->twigView);
     }

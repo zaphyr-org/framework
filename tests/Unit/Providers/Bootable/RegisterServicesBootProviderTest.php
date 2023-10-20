@@ -27,7 +27,7 @@ class RegisterServicesBootProviderTest extends TestCase
      */
     protected RegisterServicesBootProvider $registerServicesBootProvider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
@@ -36,7 +36,7 @@ class RegisterServicesBootProviderTest extends TestCase
         $this->registerServicesBootProvider->setContainer($this->containerMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->containerMock, $this->configMock, $this->registerServicesBootProvider);
     }

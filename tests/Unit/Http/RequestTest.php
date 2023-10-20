@@ -17,12 +17,12 @@ class RequestTest extends TestCase
      */
     protected Request $request;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->request = new Request();
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->request);
     }

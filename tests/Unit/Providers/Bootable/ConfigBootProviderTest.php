@@ -30,7 +30,7 @@ class ConfigBootProviderTest extends TestCase
      */
     protected ConfigBootProvider $configBootProvider;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->applicationMock = $this->createMock(ApplicationInterface::class);
         $this->containerMock = $this->createMock(ContainerInterface::class);
@@ -39,7 +39,7 @@ class ConfigBootProviderTest extends TestCase
         $this->configBootProvider->setContainer($this->containerMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->applicationMock, $this->containerMock, $this->configBootProvider);
     }

@@ -22,13 +22,13 @@ class PathReplacerTest extends TestCase
      */
     protected PathReplacer $pathReplacer;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->applicationMock = $this->createMock(ApplicationInterface::class);
         $this->pathReplacer = new PathReplacer($this->applicationMock);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->applicationMock, $this->pathReplacer);
     }
