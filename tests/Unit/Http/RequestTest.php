@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Unit\Http;
 
 use PHPUnit\Framework\TestCase;
+use Zaphyr\Framework\Http\Exceptions\RequestException;
 use Zaphyr\Framework\Http\Request;
 use Zaphyr\HttpMessage\Stream;
 use Zaphyr\HttpMessage\UploadedFile;
 use Zaphyr\HttpMessage\Uri;
+use Zaphyr\Session\Contracts\SessionInterface;
 
 class RequestTest extends TestCase
 {
@@ -289,6 +291,36 @@ class RequestTest extends TestCase
     public function testIsXhr(): void
     {
         self::assertTrue($this->request->withHeader('X-Requested-With', 'XMLHttpRequest')->isXhr());
+    }
+
+    /* -------------------------------------------------
+     * SESSION
+     * -------------------------------------------------
+     */
+
+    public function testHasSession(): void
+    {
+        self::assertFalse($this->request->hasSession());
+
+        $session = $this->createMock(SessionInterface::class);
+        $request = $this->request->withAttribute(SessionInterface::class, $session);
+
+        self::assertTrue($request->hasSession());
+    }
+
+    public function testGetSession(): void
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $request = $this->request->withAttribute(SessionInterface::class, $session);
+
+        self::assertInstanceOf(SessionInterface::class, $request->getSession());
+    }
+
+    public function testGetSessionThrowsExceptionOnMissingSessionAttribute(): void
+    {
+        $this->expectException(RequestException::class);
+
+        $this->request->getSession();
     }
 
     /* -------------------------------------------------

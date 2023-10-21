@@ -6,9 +6,11 @@ namespace Zaphyr\Framework\Http;
 
 use Psr\Http\Message\StreamInterface;
 use Zaphyr\Framework\Contracts\Http\RequestInterface;
+use Zaphyr\Framework\Http\Exceptions\RequestException;
 use Zaphyr\Framework\Http\Exceptions\UploadedFileException;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
 use Zaphyr\HttpMessage\ServerRequest as BaseRequest;
+use Zaphyr\Session\Contracts\SessionInterface;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -246,6 +248,26 @@ class Request extends BaseRequest implements RequestInterface
     public function isXhr(): bool
     {
         return $this->getHeaderLine('X-Requested-With') === 'XMLHttpRequest';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasSession(): bool
+    {
+        return $this->getAttribute(SessionInterface::class) instanceof SessionInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSession(): SessionInterface
+    {
+        if (!$this->hasSession()) {
+            throw new RequestException('Session has not been set');
+        }
+
+        return $this->getAttribute(SessionInterface::class);
     }
 
     /**

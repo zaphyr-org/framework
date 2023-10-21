@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Contracts\Http;
 
 use Psr\Http\Message\ServerRequestInterface as PsrServerRequestInterface;
+use Zaphyr\Framework\Http\Exceptions\RequestException;
+use Zaphyr\Session\Contracts\SessionInterface;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -104,6 +106,17 @@ interface RequestInterface extends PsrServerRequestInterface
      * @return bool
      */
     public function isXhr(): bool;
+
+    /**
+     * @return bool
+     */
+    public function hasSession(): bool;
+
+    /**
+     * @throws RequestException if the session is not set
+     * @return SessionInterface
+     */
+    public function getSession(): SessionInterface;
 
     /**
      * @return string|null
