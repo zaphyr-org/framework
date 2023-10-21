@@ -10,3 +10,6 @@ parameters:
             # what the fuck!?
             message: '%Method Zaphyr\\Framework\\Providers\\LogServiceProvider::getLogHandlersFromConfig\(\) should return array<string, array<Zaphyr\\Logger\\Contracts\\HandlerInterface>> but returns array<int\|string, array<int, Zaphyr\\Logger\\Handlers\\FileHandler\|Zaphyr\\Logger\\Handlers\\MailHandler\|Zaphyr\\Logger\\Handlers\\RotateHandler>>.%'
             path: 'src/Providers/LogServiceProvider.php'
+        -
+            message: '%Unable to resolve the template type TXssCleanInput in call to method voku\\helper\\AntiXSS::xss_clean\(\)%'
+            path: 'src/Middleware/XSSMiddleware.php'
