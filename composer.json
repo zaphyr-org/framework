@@ -26,6 +26,7 @@
         "zaphyr-org/http-message": "^1.0",
         "zaphyr-org/logger": "^2.0",
         "zaphyr-org/router": "^1.1",
+        "zaphyr-org/session": "^1.0",
         "zaphyr-org/utils": "^2.2"
     },
     "require-dev": {
