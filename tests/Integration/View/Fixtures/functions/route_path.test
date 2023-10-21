@@ -1,0 +1,8 @@
+--TEST--
+route_path test
+--TEMPLATE--
+{{ route_path('home') }}
+--DATA--
+return ['home' => '/home']
+--EXPECT--
+/home

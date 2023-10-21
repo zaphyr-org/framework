@@ -1,0 +1,8 @@
+--TEST--
+config_get test
+--TEMPLATE--
+{{ config_get('app.environment') }}
+--DATA--
+return ['app' => ['environment' => 'testing']]
+--EXPECT--
+testing

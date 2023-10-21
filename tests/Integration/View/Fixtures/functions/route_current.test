@@ -1,0 +1,8 @@
+--TEST--
+route_current test
+--TEMPLATE--
+{{ route_current() }}
+--DATA--
+return ['/home']
+--EXPECT--
+/home
