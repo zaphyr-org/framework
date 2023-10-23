@@ -12,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use stdClass;
 use voku\helper\AntiXSS;
+use Zaphyr\Framework\Http\Exceptions\HttpException;
 use Zaphyr\Framework\Middleware\XSSMiddleware;
 
 class XSSMiddlewareTest extends TestCase
@@ -133,8 +134,10 @@ class XSSMiddlewareTest extends TestCase
         $this->xssMiddleware->process($this->requestMock, $this->requestHandlerMock);
     }
 
-    public function testProcessReturnsBadRequestResponseIfErrorOccurred(): void
+    public function testProcessThrowsBadRequestExceptionIfErrorOccurred(): void
     {
+        $this->expectException(HttpException::class);
+
         $this->requestMock->expects(self::once())
             ->method('getMethod')
             ->willReturn('POST');
@@ -146,8 +149,6 @@ class XSSMiddlewareTest extends TestCase
         $this->requestHandlerMock->expects(self::never())
             ->method('handle');
 
-        $response = $this->xssMiddleware->process($this->requestMock, $this->requestHandlerMock);
-
-        self::assertEquals(400, $response->getStatusCode());
+        $this->xssMiddleware->process($this->requestMock, $this->requestHandlerMock);
     }
 }

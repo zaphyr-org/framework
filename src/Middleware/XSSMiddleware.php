@@ -10,7 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use voku\helper\AntiXSS;
-use Zaphyr\Framework\Http\Response;
+use Zaphyr\Framework\Http\Exceptions\HttpException;
 use Zaphyr\Framework\Http\Utils\StatusCode;
 
 /**
@@ -35,7 +35,7 @@ class XSSMiddleware implements MiddlewareInterface
                 $request = $this->cleanQueryParams($request);
                 $request = $this->cleanParsedBody($request);
             } catch (Exception) {
-                return new Response(statusCode: StatusCode::BAD_REQUEST);
+                throw new HttpException(StatusCode::BAD_REQUEST, 'Request with XSS detected');
             }
         }
 
