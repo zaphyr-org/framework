@@ -198,6 +198,7 @@ class ExceptionHandlerTest extends TestCase
             ->with('errors/500.twig', [
                 'status' => 500,
                 'message' => 'Internal Server Error',
+                'throwable' => $exception,
             ]);
 
         $this->exceptionHandler->render($this->serverRequestMock, $exception);

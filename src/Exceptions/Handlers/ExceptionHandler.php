@@ -132,15 +132,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
             return $throwable->buildJsonResponse($response);
         }
 
-        if ($throwable instanceof MethodNotAllowedException) {
-            return (new HttpException(StatusCode::METHOD_NOT_ALLOWED))->buildJsonResponse($response);
-        }
-
-        if ($throwable instanceof NotFoundException) {
-            return (new HttpException(StatusCode::NOT_FOUND))->buildJsonResponse($response);
-        }
-
-        return (new HttpException(StatusCode::INTERNAL_SERVER_ERROR))->buildJsonResponse($response);
+        return (new HttpException($this->getResponseStatusCode($throwable)))->buildJsonResponse($response);
     }
 
     /**
@@ -156,7 +148,10 @@ class ExceptionHandler implements ExceptionHandlerInterface
 
         if ($this->view->exists('errors/' . $status . '.twig')) {
             $response->getBody()->write(
-                $this->view->render('errors/' . $status . '.twig', compact('status', 'message'))
+                $this->view->render(
+                    'errors/' . $status . '.twig',
+                    compact('status', 'message', 'throwable')
+                )
             );
 
             return $response;
@@ -192,23 +187,23 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function getResponse(Throwable $throwable): ResponseInterface
     {
-        $statusCode = StatusCode::INTERNAL_SERVER_ERROR;
-        $headers = [];
+        $headers = $throwable instanceof HttpExceptionInterface ? $throwable->getHeaders() : [];
 
-        if ($throwable instanceof HttpExceptionInterface) {
-            /** @var  HttpExceptionInterface $throwable */
-            $statusCode = $throwable->getStatusCode();
-            $headers = $throwable->getHeaders();
-        }
+        return new Response(statusCode: $this->getResponseStatusCode($throwable), headers: $headers);
+    }
 
-        if ($throwable instanceof MethodNotAllowedException) {
-            $statusCode = StatusCode::METHOD_NOT_ALLOWED;
-        }
-
-        if ($throwable instanceof NotFoundException) {
-            $statusCode = StatusCode::NOT_FOUND;
-        }
-
-        return new Response(statusCode: $statusCode, headers: $headers);
+    /**
+     * @param mixed $throwable
+     *
+     * @return int
+     */
+    protected function getResponseStatusCode(mixed $throwable): int
+    {
+        return match (true) {
+            $throwable instanceof HttpExceptionInterface => $throwable->getStatusCode(),
+            $throwable instanceof MethodNotAllowedException => StatusCode::METHOD_NOT_ALLOWED,
+            $throwable instanceof NotFoundException => StatusCode::NOT_FOUND,
+            default => StatusCode::INTERNAL_SERVER_ERROR,
+        };
     }
 }
