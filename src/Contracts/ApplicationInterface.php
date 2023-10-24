@@ -60,6 +60,11 @@ interface ApplicationInterface
     public function isProductionEnvironment(): bool;
 
     /**
+     * @return bool
+     */
+    public function isRunningInConsole(): bool;
+
+    /**
      * @param string $path
      *
      * @return string

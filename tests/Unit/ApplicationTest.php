@@ -105,6 +105,11 @@ class ApplicationTest extends TestCase
         self::assertFalse($this->application->isProductionEnvironment());
     }
 
+    public function testIsRunningInConsole(): void
+    {
+        self::assertTrue($this->application->isRunningInConsole());
+    }
+
     /* -------------------------------------------------
      * PATHS
      * -------------------------------------------------

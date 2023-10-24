@@ -126,6 +126,14 @@ class Application implements ApplicationInterface
     /**
      * {@inheritdoc}
      */
+    public function isRunningInConsole(): bool
+    {
+        return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getRootPath(string $path = ''): string
     {
         return $this->rootPath . $this->appendPath($path);
