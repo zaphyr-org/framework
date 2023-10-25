@@ -1,0 +1,14 @@
+--TEST--
+session_get test
+--TEMPLATE--
+{% for input in session_get_input() %}
+    <div>{{ input }}</div>
+{% endfor %}
+{{ session_get_input('fooInput') }}
+{{ session_get_input('defaultInput', 'defaultInput') }}
+--DATA--
+return []
+--EXPECT--
+<div>barInput</div>
+barInput
+defaultInput

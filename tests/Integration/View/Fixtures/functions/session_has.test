@@ -1,0 +1,9 @@
+--TEST--
+session_has test
+--TEMPLATE--
+{{ session_has('foo') }}
+{{ session_has('nope') }}
+--DATA--
+return []
+--EXPECT--
+1

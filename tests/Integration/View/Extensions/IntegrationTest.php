@@ -12,8 +12,12 @@ use Zaphyr\Framework\View\Extensions\ConfigExtension;
 use Zaphyr\Framework\View\Extensions\ConfigRuntime;
 use Zaphyr\Framework\View\Extensions\RouterExtension;
 use Zaphyr\Framework\View\Extensions\RouterRuntime;
+use Zaphyr\Framework\View\Extensions\SessionExtension;
+use Zaphyr\Framework\View\Extensions\SessionRuntime;
 use Zaphyr\HttpMessage\Uri;
 use Zaphyr\Router\Router;
+use Zaphyr\Session\Handler\FileHandler;
+use Zaphyr\Session\Session;
 
 class IntegrationTest extends IntegrationTestCase
 {
@@ -22,6 +26,7 @@ class IntegrationTest extends IntegrationTestCase
         return [
             new ConfigExtension(),
             new RouterExtension(),
+            new SessionExtension(),
         ];
     }
 
@@ -39,6 +44,11 @@ class IntegrationTest extends IntegrationTestCase
             ]
         ]);
 
+        $fileHandler = new FileHandler(__DIR__ . '/sessions');
+        $session = new Session('integration_test', $fileHandler);
+        $session->set('foo', 'bar');
+        $session->flashInput(['fooInput' => 'barInput']);
+
         $request = new Request();
         $request = $request->withUri(new Uri('/home'));
 
@@ -53,6 +63,9 @@ class IntegrationTest extends IntegrationTestCase
             },
             RouterRuntime::class => function () use ($router, $request): RouterRuntime {
                 return new RouterRuntime($router, $request);
+            },
+            SessionRuntime::class => function () use ($session): SessionRuntime {
+                return new SessionRuntime($session);
             },
         ]);
     }

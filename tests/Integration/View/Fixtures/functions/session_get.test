@@ -1,0 +1,11 @@
+--TEST--
+session_get test
+--TEMPLATE--
+{{ session_get('foo') }}
+{{ session_get('default', 'default') }}
+{{ session_get('null') }}
+--DATA--
+return []
+--EXPECT--
+bar
+default
