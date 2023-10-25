@@ -3,6 +3,6 @@ route_current test
 --TEMPLATE--
 {{ route_current() }}
 --DATA--
-return ['/home']
+return []
 --EXPECT--
 /home

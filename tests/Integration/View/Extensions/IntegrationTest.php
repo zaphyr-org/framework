@@ -10,6 +10,8 @@ use Zaphyr\Config\Config;
 use Zaphyr\Framework\Http\Request;
 use Zaphyr\Framework\View\Extensions\ConfigExtension;
 use Zaphyr\Framework\View\Extensions\ConfigRuntime;
+use Zaphyr\Framework\View\Extensions\CSRFExtension;
+use Zaphyr\Framework\View\Extensions\CSRFRuntime;
 use Zaphyr\Framework\View\Extensions\RouterExtension;
 use Zaphyr\Framework\View\Extensions\RouterRuntime;
 use Zaphyr\Framework\View\Extensions\SessionExtension;
@@ -25,6 +27,7 @@ class IntegrationTest extends IntegrationTestCase
     {
         return [
             new ConfigExtension(),
+            new CSRFExtension(),
             new RouterExtension(),
             new SessionExtension(),
         ];
@@ -46,6 +49,7 @@ class IntegrationTest extends IntegrationTestCase
 
         $fileHandler = new FileHandler(__DIR__ . '/sessions');
         $session = new Session('integration_test', $fileHandler);
+        $session->setToken('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
         $session->set('foo', 'bar');
         $session->flashInput(['fooInput' => 'barInput']);
 
@@ -60,6 +64,9 @@ class IntegrationTest extends IntegrationTestCase
         yield new FactoryRuntimeLoader([
             ConfigRuntime::class => function () use ($config): ConfigRuntime {
                 return new ConfigRuntime($config);
+            },
+            CSRFRuntime::class => function () use ($session): CSRFRuntime {
+                return new CSRFRuntime($session);
             },
             RouterRuntime::class => function () use ($router, $request): RouterRuntime {
                 return new RouterRuntime($router, $request);
