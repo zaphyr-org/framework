@@ -16,7 +16,7 @@ use Zaphyr\Framework\Middleware\CookieMiddleware;
 class CookieMiddlewareTest extends TestCase
 {
     /**
-     * @var
+     * @var CookieManagerInterface&MockObject
      */
     protected CookieManagerInterface&MockObject $cookieManagerMock;
 
