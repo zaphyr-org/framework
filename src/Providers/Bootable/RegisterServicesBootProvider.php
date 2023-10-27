@@ -22,7 +22,7 @@ class RegisterServicesBootProvider extends AbstractServiceProvider implements Bo
         $container = $this->getContainer();
         $config = $container->get(ConfigInterface::class);
 
-        foreach ($config->get('app.providers', []) as $provider) {
+        foreach ($config->get('services.providers', []) as $provider) {
             /** @var ServiceProviderInterface $provider */
             $container->registerServiceProvider(new $provider());
         }
