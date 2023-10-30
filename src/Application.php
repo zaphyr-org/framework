@@ -15,6 +15,11 @@ use Zaphyr\Framework\Contracts\ApplicationInterface;
 class Application implements ApplicationInterface
 {
     /**
+     * @const string
+     */
+    public const VERSION = '';
+
+    /**
      * @var bool
      */
     protected bool $isBootstrapped = false;
