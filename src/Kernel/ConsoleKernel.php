@@ -69,8 +69,9 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
      */
     public function handle(InputInterface $input = null, OutputInterface $output = null): int
     {
+        $this->bootstrap();
+
         try {
-            $this->bootstrap();
             $this->registerFrameworkCommands();
             $this->registerApplicationCommands();
 
