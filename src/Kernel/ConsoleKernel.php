@@ -12,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Framework\Application as Zaphyr;
+use Zaphyr\Framework\Commands;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
@@ -41,7 +42,15 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
     /**
      * @var class-string[]
      */
-    protected array $frameworkCommands = [];
+    protected array $frameworkCommands = [
+        Commands\App\EnvironmentCommand::class,
+        Commands\Cache\ClearCommand::class,
+        Commands\Config\CacheCommand::class,
+        Commands\Config\ClearCommand::class,
+        Commands\Config\ListCommand::class,
+        Commands\Logs\ClearCommand::class,
+        Commands\Views\ClearCommand::class,
+    ];
 
     /**
      * @param ApplicationInterface $application
