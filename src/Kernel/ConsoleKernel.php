@@ -44,6 +44,7 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
      */
     protected array $frameworkCommands = [
         Commands\App\EnvironmentCommand::class,
+        Commands\App\KeyGenerateCommand::class,
         Commands\Cache\ClearCommand::class,
         Commands\Config\CacheCommand::class,
         Commands\Config\ClearCommand::class,
