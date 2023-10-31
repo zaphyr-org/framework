@@ -53,12 +53,12 @@ class HttpKernel implements HttpKernelInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $container = $this->application->getContainer();
+        $container->bindInstance(ServerRequestInterface::class, $request);
+
+        $this->bootstrap();
+
         try {
-            $container = $this->application->getContainer();
-            $container->bindInstance(ServerRequestInterface::class, $request);
-
-            $this->bootstrap();
-
             return $container->get(RouterInterface::class)->handle($request);
         } catch (Throwable $exception) {
             return $this->handleException($request, $exception);
