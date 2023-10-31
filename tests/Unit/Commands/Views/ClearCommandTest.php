@@ -52,6 +52,8 @@ class ClearCommandTest extends TestCase
         $commandTester = new CommandTester($this->clearCommand);
         $commandTester->execute([]);
 
-        self::assertEquals("Views cache directory cleared successfully.\n", $commandTester->getDisplay());
+        self::assertEquals("Views cache files cleared successfully.\n", $commandTester->getDisplay());
+
+        rmdir($cacheDir);
     }
 }
