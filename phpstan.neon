@@ -14,7 +14,5 @@ parameters:
             message: '%Unable to resolve the template type TXssCleanInput in call to method voku\\helper\\AntiXSS::xss_clean\(\)%'
             path: 'src/Middleware/XSSMiddleware.php'
         -
-            message: '%Method [a-zA-Z,\\]::execute() should return int but returns int|null.%'
-        -
             message: '%Ternary operator condition is always true.%'
             path: 'src/Commands/Config/ListCommand.php'
