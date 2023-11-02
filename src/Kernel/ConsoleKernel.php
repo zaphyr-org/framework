@@ -55,6 +55,8 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
         Commands\Create\ProviderCommand::class,
         Commands\Create\ExtensionCommand::class,
         Commands\Logs\ClearCommand::class,
+        Commands\Maintenance\DownCommand::class,
+        Commands\Maintenance\UpCommand::class,
         Commands\Views\ClearCommand::class,
     ];
 
