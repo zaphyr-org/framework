@@ -172,7 +172,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
 
         $response->getBody()->write(
             Template::render(
-                dirname(__DIR__, 3) . '/templates/errors/fallback.html',
+                dirname(__DIR__, 3) . '/views/errors/fallback.html',
                 compact('status', 'message')
             )
         );

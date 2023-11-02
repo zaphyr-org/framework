@@ -41,8 +41,8 @@ class ClearCommandTest extends TestCase
 
     public function testExecute(): void
     {
-        $cacheDir = 'directory';
-        $cacheFile = 'file.cache';
+        $cacheDir = __DIR__ . '/directory';
+        $cacheFile = __DIR__ . '/directory/file.cache';
         mkdir($cacheDir);
         file_put_contents($cacheFile, '');
 
@@ -57,6 +57,5 @@ class ClearCommandTest extends TestCase
         self::assertEquals("Cache files cleared successfully.\n", $commandTester->getDisplay());
 
         rmdir($cacheDir);
-        unlink($cacheFile);
     }
 }

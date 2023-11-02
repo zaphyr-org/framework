@@ -41,7 +41,7 @@ class ClearCommandTest extends TestCase
 
     public function testExecute(): void
     {
-        $cacheDir = 'views';
+        $cacheDir = __DIR__ . '/views';
         mkdir($cacheDir);
 
         $this->applicationMock->expects(self::once())

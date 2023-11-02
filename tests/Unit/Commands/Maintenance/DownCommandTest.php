@@ -84,7 +84,7 @@ class DownCommandTest extends TestCase
         $this->applicationMock->expects(self::once())
             ->method('getPublicPath')
             ->with('maintenance.html')
-            ->willReturn(dirname(__DIR__, 4) . '/templates/maintenance.html');
+            ->willReturn(dirname(__DIR__, 4) . '/views/maintenance.html');
 
         $commandTester = new CommandTester($this->downCommand);
         $commandTester->execute([]);

@@ -43,7 +43,7 @@ class ViewServiceProvider extends AbstractServiceProvider
         $application = $container->get(ApplicationInterface::class);
         $config = $container->get(ConfigInterface::class);
 
-        $loader = new FilesystemLoader($application->getResourcesPath('templates', []));
+        $loader = new FilesystemLoader($application->getResourcesPath('views', []));
 
         $environment = new Environment($loader, $config->get('views.options', []));
         $environment->addRuntimeLoader(new TwigRuntimeLoader($container));

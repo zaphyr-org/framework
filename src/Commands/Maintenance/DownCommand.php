@@ -27,7 +27,7 @@ class DownCommand extends AbstractCommand
             't',
             InputOption::VALUE_OPTIONAL,
             'Custom template that should be rendered for display during maintenance mode',
-            dirname(__DIR__, 3) . '/templates/maintenance.html'
+            dirname(__DIR__, 3) . '/views/maintenance.html'
         );
     }
 
