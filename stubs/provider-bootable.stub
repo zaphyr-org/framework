@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Zaphyr\Container\AbstractServiceProvider;
+use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
+
+class %class% extends AbstractServiceProvider implements BootableServiceProviderInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected array $provides = [
+        // …
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boot(): void
+    {
+        // …
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function register(): void
+    {
+        // …
+    }
+}

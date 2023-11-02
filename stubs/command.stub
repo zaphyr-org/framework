@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Zaphyr\Framework\Commands\AbstractCommand;
+
+#[AsCommand(name: 'app:example', description: 'An example command')]
+class %class% extends AbstractCommand
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure(): void
+    {
+        $this->addArgument('name', InputOption::VALUE_REQUIRED, 'The name');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $name = $input->getArgument('name');
+
+        $output->writeln('<info>Hello ' . $name . '.</info>');
+
+        return self::SUCCESS;
+    }
+}

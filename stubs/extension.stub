@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
+
+class %class% extends AbstractExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('example', [%class%Runtime::class, 'example']),
+        ];
+    }
+}

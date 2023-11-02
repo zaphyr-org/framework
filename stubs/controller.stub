@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Zaphyr\Framework\Http\HtmlResponse;
+use Zaphyr\Framework\Http\JsonResponse;
+use Zaphyr\Framework\Http\Request;
+use Zaphyr\Framework\Http\Response;
+use Zaphyr\Framework\Http\TextResponse;
+use Zaphyr\Router\Attributes\Delete;
+use Zaphyr\Router\Attributes\Get;
+use Zaphyr\Router\Attributes\Post;
+
+class %class%
+{
+    /**
+     * @return Response
+     */
+    #[Get(path: '/get', name: 'get')]
+    public function getAction(): Response
+    {
+        return new HtmlResponse('<h1>Hello World!</h1>');
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     */
+    #[Post(path: '/post', name: 'post')]
+    public function postAction(Request $request): Response
+    {
+        return new JsonResponse(['username' => $request->getParam('username')]);
+    }
+
+    /**
+     * @param Request               $request
+     * @param array<string, string> $params
+     *
+     * @return Response
+     */
+    #[Delete(path: '/delete/{id:numeric}', name: 'delete')]
+    public function deleteAction(Request $request, array $params): Response
+    {
+        return new TextResponse('User with id ' . (int)$params['id'] . ' deleted');
+    }
+}

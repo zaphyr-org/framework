@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Zaphyr\Container\AbstractServiceProvider;
+
+class %class% extends AbstractServiceProvider
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected array $provides = [
+        // …
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function register(): void
+    {
+        // …
+    }
+}
