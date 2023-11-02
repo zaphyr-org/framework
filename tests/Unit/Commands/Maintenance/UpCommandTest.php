@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Unit\Commands\Maintenance;
+namespace Zaphyr\FrameworkTests\Unit\Commands\Maintenance;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
-use Zaphyr\Framework\Commands\Logs\ClearCommand;
 use Zaphyr\Framework\Commands\Maintenance\UpCommand;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 

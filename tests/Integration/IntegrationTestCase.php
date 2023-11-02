@@ -10,9 +10,6 @@ use Zaphyr\Framework\Application;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Kernel\HttpKernel;
 
-/**
- * @author merloxx <merloxx@zaphyr.org>
- */
 class IntegrationTestCase extends TestCase
 {
     /**

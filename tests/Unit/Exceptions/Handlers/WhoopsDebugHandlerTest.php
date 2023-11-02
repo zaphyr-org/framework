@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zaphyr\FrameworkTests\Unit\Exceptions\Handlers;
 
 use Exception;
