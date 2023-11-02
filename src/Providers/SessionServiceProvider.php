@@ -41,13 +41,13 @@ class SessionServiceProvider extends AbstractServiceProvider
         $this->getContainer()->bindSingleton(SessionManagerInterface::class, function ($container) {
             $config = $container->get(ConfigInterface::class);
 
-            $name = $config->get('session.name', 'session');
-            $handler = $config->get('session.handler', []);
-            $expire = $config->get('session.expire', 60);
-            $defaultHandler = $config->get('session.default', SessionManager::FILE_HANDLER);
-            $encrypt = $config->get('session.encrypt', false) ? $container->get(EncryptInterface::class) : null;
+            $name = $config->get('sessions.name', 'session');
+            $handlers = $config->get('sessions.handlers', []);
+            $expire = $config->get('sessions.expire', 60);
+            $defaultHandler = $config->get('sessions.default', SessionManager::FILE_HANDLER);
+            $encrypt = $config->get('sessions.encrypt', false) ? $container->get(EncryptInterface::class) : null;
 
-            return new SessionManager($name, $handler, $expire, $defaultHandler, $encrypt);
+            return new SessionManager($name, $handlers, $expire, $defaultHandler, $encrypt);
         });
     }
 

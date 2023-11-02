@@ -48,7 +48,7 @@ class ViewServiceProviderTest extends IntegrationTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'view' => [
+            'views' => [
                 'extensions' => [DebugExtension::class],
                 'globals' => $globals = ['foo' => 'bar'],
             ],

@@ -115,7 +115,7 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
      */
     protected function registerApplicationCommands(): void
     {
-        $commands = $this->container->get(ConfigInterface::class)->get('console.commands', []);
+        $commands = $this->container->get(ConfigInterface::class)->get('commands.commands', []);
 
         foreach ($commands as $command) {
             $this->addCommand($command);

@@ -55,7 +55,7 @@ class LogServiceProviderTest extends IntegrationTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'logging' => [
+            'logs' => [
                 'default' => 'test',
                 'channels' => [
                     'test' => [
@@ -84,7 +84,7 @@ class LogServiceProviderTest extends IntegrationTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'logging' => [
+            'logs' => [
                 'default' => 'test',
                 'channels' => [
                     'test' => [
@@ -112,7 +112,7 @@ class LogServiceProviderTest extends IntegrationTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'logging' => [
+            'logs' => [
                 'default' => 'test',
                 'channels' => [
                     'test' => [

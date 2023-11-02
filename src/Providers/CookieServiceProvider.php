@@ -38,18 +38,18 @@ class CookieServiceProvider extends AbstractServiceProvider
         $this->getContainer()->bindSingleton(CookieManagerInterface::class, function ($container) {
             $config = $container->get(ConfigInterface::class);
 
-            $expire = $config->get('session.expire', 0);
+            $expire = $config->get('sessions.expire', 0);
 
             if ($expire !== 0) {
-                $expire = time() + $config->get('session.expire') * 60;
+                $expire = time() + $config->get('sessions.expire') * 60;
             }
 
-            $path = $config->get('session.cookie_path', '/');
-            $domain = $config->get('session.cookie_domain');
-            $secure = $config->get('session.cookie_secure', false);
-            $httpOnly = $config->get('session.cookie_http_only', true);
-            $raw = $config->get('session.cookie_raw', false);
-            $sameSite = $config->get('session.cookie_same_site', Cookie::RESTRICTION_LAX);
+            $path = $config->get('cookies.path', '/');
+            $domain = $config->get('cookies.domain');
+            $secure = $config->get('cookies.secure', false);
+            $httpOnly = $config->get('cookies.http_only', true);
+            $raw = $config->get('cookies.raw', false);
+            $sameSite = $config->get('cookies.same_site', Cookie::RESTRICTION_LAX);
 
             return new CookieManager($expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
         });

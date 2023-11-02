@@ -50,16 +50,16 @@ class CookieServiceProviderTest extends IntegrationTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'session' => [
+            'sessions' => [
                 'expire' => 60,
-                'cookie' => [
-                    'path' => '/',
-                    'domain' => 'example.com',
-                    'secure' => true,
-                    'http_only' => true,
-                    'raw' => false,
-                    'same_site' => Cookie::RESTRICTION_STRICT,
-                ],
+            ],
+            'cookies' => [
+                'path' => '/',
+                'domain' => 'example.com',
+                'secure' => true,
+                'http_only' => true,
+                'raw' => false,
+                'same_site' => Cookie::RESTRICTION_STRICT,
             ],
         ]);
 

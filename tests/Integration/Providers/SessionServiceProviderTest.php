@@ -51,9 +51,9 @@ class SessionServiceProviderTest extends IntegrationTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'session' => [
+            'sessions' => [
                 'name' => 'foo',
-                'handler' => [
+                'handlers' => [
                     'file' => [
                         'path' => 'sessions',
                         'expire' => 60,

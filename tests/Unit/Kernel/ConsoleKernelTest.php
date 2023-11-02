@@ -103,7 +103,7 @@ class ConsoleKernelTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('console.commands', [])
+            ->with('commands.commands', [])
             ->willReturn([FooCommand::class]);
 
         self::assertEquals(0, $this->consoleKernel->handle(new ArrayInput(['command' => 'foo']), $this->output));
@@ -122,7 +122,7 @@ class ConsoleKernelTest extends TestCase
                     return $this->exceptionHandlerMock;
                 }
 
-               if ($id === ConfigInterface::class) {
+                if ($id === ConfigInterface::class) {
                     throw new Exception('Whoops');
                 }
 

@@ -50,7 +50,7 @@ class LogServiceProvider extends AbstractServiceProvider
             $config = $container->get(ConfigInterface::class);
             $logHandlers = $this->getLogHandlersFromConfig($config);
 
-            return new LogManager($config->get('logging.default', ''), $logHandlers);
+            return new LogManager($config->get('logs.default', ''), $logHandlers);
         });
     }
 
@@ -74,7 +74,7 @@ class LogServiceProvider extends AbstractServiceProvider
     {
         $logHandlers = [];
 
-        foreach ($config->get('logging.channels', []) as $name => $channel) {
+        foreach ($config->get('logs.channels', []) as $name => $channel) {
             foreach ($channel['handlers'] as $handler => $handlerConfig) {
                 $logHandlers[$name][] = match ($handler) {
                     'file' => $this->prepareFileHandlerInstance($name, $config),
@@ -96,7 +96,7 @@ class LogServiceProvider extends AbstractServiceProvider
      */
     protected function prepareFileHandlerInstance(string $name, ConfigInterface $config): FileHandler
     {
-        $filename = $config->get('logging.channels.' . $name . '.handlers.file.filename');
+        $filename = $config->get('logs.channels.' . $name . '.handlers.file.filename');
 
         return new FileHandler($filename);
     }
@@ -109,10 +109,10 @@ class LogServiceProvider extends AbstractServiceProvider
      */
     protected function prepareMailHandlerInstance(string $name, ConfigInterface $config): MailHandler
     {
-        $dsn = $config->get('logging.channels.' . $name . '.handlers.mail.dsn');
-        $from = $config->get('logging.channels.' . $name . '.handlers.mail.from');
-        $to = $config->get('logging.channels.' . $name . '.handlers.mail.to');
-        $subject = $config->get('logging.channels.' . $name . '.handlers.mail.subject');
+        $dsn = $config->get('logs.channels.' . $name . '.handlers.mail.dsn');
+        $from = $config->get('logs.channels.' . $name . '.handlers.mail.from');
+        $to = $config->get('logs.channels.' . $name . '.handlers.mail.to');
+        $subject = $config->get('logs.channels.' . $name . '.handlers.mail.subject');
 
         $transport = Transport::fromDsn($dsn);
         $mailer = new Mailer($transport);
@@ -129,8 +129,8 @@ class LogServiceProvider extends AbstractServiceProvider
      */
     protected function prepareRotateHandlerInstance(string $name, ConfigInterface $config): RotateHandler
     {
-        $directory = $config->get('logging.channels.' . $name . '.handlers.rotate.directory');
-        $interval = $config->get('logging.channels.' . $name . '.handlers.rotate.interval');
+        $directory = $config->get('logs.channels.' . $name . '.handlers.rotate.directory');
+        $interval = $config->get('logs.channels.' . $name . '.handlers.rotate.interval');
 
         return new RotateHandler($directory, $interval);
     }

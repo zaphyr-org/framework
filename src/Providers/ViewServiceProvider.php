@@ -45,14 +45,14 @@ class ViewServiceProvider extends AbstractServiceProvider
 
         $loader = new FilesystemLoader($application->getResourcesPath('templates', []));
 
-        $environment = new Environment($loader, $config->get('view.options', []));
+        $environment = new Environment($loader, $config->get('views.options', []));
         $environment->addRuntimeLoader(new TwigRuntimeLoader($container));
 
-        foreach ($config->get('view.extensions', []) as $extension) {
+        foreach ($config->get('views.extensions', []) as $extension) {
             $environment->addExtension($container->get($extension));
         }
 
-        foreach ($config->get('view.globals', []) as $name => $value) {
+        foreach ($config->get('views.globals', []) as $name => $value) {
             $environment->addGlobal($name, $value);
         }
 
