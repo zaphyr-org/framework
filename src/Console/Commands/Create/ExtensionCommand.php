@@ -35,11 +35,19 @@ class ExtensionCommand extends AbstractCreateCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $name = trim($input->getArgument('name'));
+        $name = $input->getArgument('name');
+        $stubName = $this->getStubName();
+
+        if ($name === null) {
+            $output->writeln('<error>Missing required ' . $stubName . ' name argument</error>');
+
+            return self::FAILURE;
+        }
+
         $namespace = $this->prepareNamespace($input->getOption('namespace'));
 
-        $extensionContents = $this->prepareContents($this->getStubName(), $name, $namespace);
-        $runtimeContents = $this->prepareContents($this->getStubName() . '-runtime', $name, $namespace);
+        $extensionContents = $this->prepareContents($stubName, $name, $namespace);
+        $runtimeContents = $this->prepareContents($stubName . '-runtime', $name, $namespace);
 
         $directory = $this->prepareDestinationDirectory($namespace);
 

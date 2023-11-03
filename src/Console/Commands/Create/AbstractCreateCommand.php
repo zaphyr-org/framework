@@ -58,7 +58,14 @@ abstract class AbstractCreateCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $name = trim($input->getArgument('name'));
+        $name = $input->getArgument('name');
+
+        if ($name === null) {
+            $output->writeln('<error>Missing required ' . $this->getStubName() . ' name argument</error>');
+
+            return self::FAILURE;
+        }
+
         $namespace = $this->prepareNamespace($input->getOption('namespace'));
 
         $contents = $this->prepareContents($this->getStubName(), $name, $namespace);
@@ -79,7 +86,7 @@ abstract class AbstractCreateCommand extends AbstractCommand
      */
     protected function prepareNamespace(string $namespace): string
     {
-        return str_replace(['\\', '\\\\', '/', '//'], '\\', $namespace);
+        return trim(str_replace(['\\', '\\\\', '/', '//'], '\\', $namespace));
     }
 
     /**
@@ -93,7 +100,7 @@ abstract class AbstractCreateCommand extends AbstractCommand
     {
         $contents = $this->getStubContent($stub);
 
-        return str_replace(['%class%', '%namespace%'], [$name, $namespace], $contents);
+        return str_replace(['%class%', '%namespace%'], [trim($name), $namespace], $contents);
     }
 
     /**

@@ -36,14 +36,14 @@ class ProviderCommand extends AbstractCreateCommand
      */
     protected function configure(): void
     {
+        parent::configure();
+
         $this->addOption(
             'bootable',
             'b',
             InputOption::VALUE_NONE,
             'Make the provider bootable'
         );
-
-        parent::configure();
     }
 
     /**
@@ -51,10 +51,16 @@ class ProviderCommand extends AbstractCreateCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $name = trim($input->getArgument('name'));
-        $namespace = $this->prepareNamespace($input->getOption('namespace'));
-
+        $name = $input->getArgument('name');
         $stubName = $this->getStubName();
+
+        if ($name === null) {
+            $output->writeln('<error>Missing required ' . $stubName . ' name argument</error>');
+
+            return self::FAILURE;
+        }
+
+        $namespace = $this->prepareNamespace($input->getOption('namespace'));
 
         if ($input->hasOption('bootable') && $input->getOption('bootable')) {
             $stubName .= '-bootable';

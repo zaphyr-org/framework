@@ -151,6 +151,29 @@ class CreateCommandTest extends TestCase
     }
 
     /**
+     * @param string       $name
+     * @param class-string $command
+     *
+     * @dataProvider createCommandsDataProvider
+     */
+    public function testExecuteThrowsExceptionOnMissingNameArgument(string $name, string $command): void
+    {
+        $this->applicationMock->expects(self::never())
+            ->method('getRootPath');
+
+        $command = new $command($this->applicationMock);
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([]);
+
+        self::assertStringContainsString(
+            'Missing required ' .  strtolower($name) . " name argument\n",
+            $commandTester->getDisplay()
+        );
+        self::assertEquals(1, $commandTester->getStatusCode());
+    }
+
+    /**
      * @return array<string, array<string, class-string>>
      */
     public static function createCommandsDataProvider(): array
