@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+class %class%
+{
+    /**
+     * @param %event% $event
+     */
+    public function __invoke(%event% $event): void
+    {
+    }
+}

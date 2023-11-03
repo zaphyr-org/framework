@@ -1,0 +1,14 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Zaphyr\EventDispatcher\AbstractStoppableEvent;
+
+class %class% extends AbstractStoppableEvent
+{
+    public function __construct()
+    {
+    }
+}
