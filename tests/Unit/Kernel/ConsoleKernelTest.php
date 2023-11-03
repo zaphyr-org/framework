@@ -103,7 +103,7 @@ class ConsoleKernelTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('commands.commands', [])
+            ->with('console.commands', [])
             ->willReturn([FooCommand::class]);
 
         self::assertEquals(0, $this->consoleKernel->handle(new ArrayInput(['command' => 'foo']), $this->output));

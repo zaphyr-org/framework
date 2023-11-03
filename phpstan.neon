@@ -15,4 +15,4 @@ parameters:
             path: 'src/Middleware/XSSMiddleware.php'
         -
             message: '%Ternary operator condition is always true.%'
-            path: 'src/Commands/Config/ListCommand.php'
+            path: 'src/Console/Commands/Config/ListCommand.php'

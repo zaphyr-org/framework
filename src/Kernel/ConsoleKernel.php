@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Framework\Application as Zaphyr;
-use Zaphyr\Framework\Commands;
+use Zaphyr\Framework\Console\Commands;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
@@ -51,9 +51,9 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
         Commands\Config\ListCommand::class,
         Commands\Create\CommandCommand::class,
         Commands\Create\ControllerCommand::class,
+        Commands\Create\ExtensionCommand::class,
         Commands\Create\MiddlewareCommand::class,
         Commands\Create\ProviderCommand::class,
-        Commands\Create\ExtensionCommand::class,
         Commands\Logs\ClearCommand::class,
         Commands\Maintenance\DownCommand::class,
         Commands\Maintenance\UpCommand::class,
@@ -115,7 +115,7 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
      */
     protected function registerApplicationCommands(): void
     {
-        $commands = $this->container->get(ConfigInterface::class)->get('commands.commands', []);
+        $commands = $this->container->get(ConfigInterface::class)->get('console.commands', []);
 
         foreach ($commands as $command) {
             $this->addCommand($command);

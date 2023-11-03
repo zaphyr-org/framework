@@ -176,9 +176,9 @@ class ExceptionHandlerTest extends TestCase
                 'app.debug_blacklist' => [],
             });
 
-        $output = $this->exceptionHandler->render($this->serverRequestMock, $exception);
+        $response = $this->exceptionHandler->render($this->serverRequestMock, $exception);
 
-        self::assertStringContainsString('Whoops! There was an error.', $output);
+        self::assertStringContainsString('Whoops! There was an error.', $response->__toString());
     }
 
     public function testRenderHtmlException(): void
@@ -223,10 +223,10 @@ class ExceptionHandlerTest extends TestCase
         $this->viewMock->expects(self::never())
             ->method('render');
 
-        $output = $this->exceptionHandler->render($this->serverRequestMock, $exception);
+        $response = $this->exceptionHandler->render($this->serverRequestMock, $exception);
 
-        self::assertStringContainsString('500', $output);
-        self::assertStringContainsString('Internal Server Error', $output);
+        self::assertStringContainsString('500', $response->__toString());
+        self::assertStringContainsString('Internal Server Error', $response->__toString());
     }
 
     public function testRenderJsonView(): void
