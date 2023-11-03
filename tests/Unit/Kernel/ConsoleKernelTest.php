@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Kernel;
 
+use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Zaphyr\Config\Contracts\ConfigInterface;
@@ -38,6 +40,11 @@ class ConsoleKernelTest extends TestCase
     protected ExceptionHandlerInterface&MockObject $exceptionHandlerMock;
 
     /**
+     * @var EventDispatcherInterface&MockObject
+     */
+    protected EventDispatcherInterface&MockObject $eventDispatcherMock;
+
+    /**
      * @var ConsoleKernel
      */
     protected ConsoleKernel $consoleKernel;
@@ -53,6 +60,8 @@ class ConsoleKernelTest extends TestCase
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
         $this->exceptionHandlerMock = $this->createMock(ExceptionHandlerInterface::class);
+        $this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+
         $this->applicationMock->expects(self::once())
             ->method('getContainer')
             ->willReturn($this->containerMock);
@@ -87,18 +96,13 @@ class ConsoleKernelTest extends TestCase
 
     public function testHandle(): void
     {
-        $this->containerMock->expects(self::exactly(3))
+        $this->containerMock->expects(self::exactly(4))
             ->method('get')
-            ->willReturnCallback(function (string $id) {
-                if ($id === FooCommand::class) {
-                    return new FooCommand();
-                }
-
-                if ($id === ConfigInterface::class) {
-                    return $this->configMock;
-                }
-
-                return $id;
+            ->willReturnCallback(fn ($key) => match ($key) {
+                EventDispatcherInterface::class => $this->eventDispatcherMock,
+                FooCommand::class => new FooCommand(),
+                ExceptionHandlerInterface::class => $this->exceptionHandlerMock,
+                ConfigInterface::class => $this->configMock,
             });
 
         $this->configMock->expects(self::once())
@@ -111,22 +115,13 @@ class ConsoleKernelTest extends TestCase
 
     public function testHandleException(): void
     {
-        $this->containerMock->expects(self::exactly(3))
+        $this->containerMock->expects(self::exactly(4))
             ->method('get')
-            ->willReturnCallback(function (string $id) {
-                if ($id === FooCommand::class) {
-                    return new FooCommand();
-                }
-
-                if ($id === ExceptionHandlerInterface::class) {
-                    return $this->exceptionHandlerMock;
-                }
-
-                if ($id === ConfigInterface::class) {
-                    throw new Exception('Whoops');
-                }
-
-                return $id;
+            ->willReturnCallback(fn ($key) => match ($key) {
+                EventDispatcherInterface::class => $this->eventDispatcherMock,
+                FooCommand::class => new FooCommand(),
+                ExceptionHandlerInterface::class => $this->exceptionHandlerMock,
+                ConfigInterface::class => throw new Exception('Whoops'),
             });
 
         $inputMock = $this->createMock(ArrayInput::class);

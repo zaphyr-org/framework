@@ -7,11 +7,15 @@ namespace Zaphyr\FrameworkTests\Unit\Kernel;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
+use Zaphyr\Framework\Events\Http\RequestFailedEvent;
+use Zaphyr\Framework\Events\Http\RequestFinishedEvent;
+use Zaphyr\Framework\Events\Http\RequestStartingEvent;
 use Zaphyr\Framework\Kernel\HttpKernel;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
@@ -52,6 +56,11 @@ class HttpKernelTest extends TestCase
     protected ResponseInterface&MockObject $responseMock;
 
     /**
+     * @var EventDispatcherInterface&MockObject
+     */
+    protected EventDispatcherInterface&MockObject $eventDispatcherMock;
+
+    /**
      * @var HttpKernel
      */
     protected HttpKernel $httpKernel;
@@ -64,6 +73,11 @@ class HttpKernelTest extends TestCase
         $this->exceptionHandlerMock = $this->createMock(ExceptionHandlerInterface::class);
         $this->requestMock = $this->createMock(ServerRequestInterface::class);
         $this->responseMock = $this->createMock(ResponseInterface::class);
+        $this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
+
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
 
         $this->httpKernel = new HttpKernel($this->applicationMock);
     }
@@ -77,6 +91,7 @@ class HttpKernelTest extends TestCase
             $this->exceptionHandlerMock,
             $this->requestMock,
             $this->responseMock,
+            $this->eventDispatcherMock,
             $this->httpKernel
         );
     }
@@ -88,10 +103,6 @@ class HttpKernelTest extends TestCase
 
     public function testHandle(): void
     {
-        $this->applicationMock->expects(self::once())
-            ->method('getContainer')
-            ->willReturn($this->containerMock);
-
         $this->containerMock->expects(self::once())
             ->method('bindInstance')
             ->with(ServerRequestInterface::class, $this->requestMock);
@@ -109,10 +120,19 @@ class HttpKernelTest extends TestCase
                 RegisterServicesBootProvider::class,
             ]);
 
-        $this->containerMock
+        $this->containerMock->expects(self::exactly(2))
             ->method('get')
-            ->with(RouterInterface::class)
-            ->willReturn($this->routerMock);
+            ->willReturnCallback(fn($key) => match ($key) {
+                EventDispatcherInterface::class => $this->eventDispatcherMock,
+                RouterInterface::class => $this->routerMock,
+            });
+
+        $this->eventDispatcherMock->expects(self::exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(fn($key) => match (true) {
+                $key instanceof RequestStartingEvent => new RequestStartingEvent($this->requestMock),
+                $key instanceof RequestFinishedEvent => new RequestFinishedEvent($this->requestMock, $this->responseMock),
+            });
 
         $this->routerMock->expects(self::once())
             ->method('handle')
@@ -124,19 +144,26 @@ class HttpKernelTest extends TestCase
 
     public function testHandleException(): void
     {
-        $this->applicationMock->expects(self::exactly(2))
-            ->method('getContainer')
-            ->willReturn($this->containerMock);
+        $exception = new Exception('Whoops!');
 
         $this->containerMock->expects(self::once())
             ->method('bindInstance')
             ->with(ServerRequestInterface::class, $this->requestMock);
 
-        $this->containerMock->expects(self::exactly(2))
+        $this->containerMock->expects(self::exactly(4))
             ->method('get')
             ->willReturnCallback(fn ($key) => match ($key) {
+                EventDispatcherInterface::class => $this->eventDispatcherMock,
                 RouterInterface::class => $this->routerMock,
                 ExceptionHandlerInterface::class => $this->exceptionHandlerMock,
+            });
+
+        $this->eventDispatcherMock->expects(self::exactly(3))
+            ->method('dispatch')
+            ->willReturnCallback(fn ($key) => match (true) {
+                $key instanceof RequestStartingEvent => new RequestStartingEvent($this->requestMock),
+                $key instanceof RequestFinishedEvent => new RequestFinishedEvent($this->requestMock, $this->responseMock),
+                $key instanceof RequestFailedEvent => new RequestFailedEvent($this->requestMock, $exception),
             });
 
         $this->applicationMock->expects(self::once())
@@ -155,7 +182,7 @@ class HttpKernelTest extends TestCase
         $this->routerMock->expects(self::once())
             ->method('handle')
             ->with($this->requestMock)
-            ->willThrowException($exception = new Exception('Whoopsie!'));
+            ->willThrowException($exception);
 
         $this->exceptionHandlerMock->expects(self::once())
             ->method('report')

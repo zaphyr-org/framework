@@ -6,9 +6,12 @@ namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Maintenance;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Console\Commands\Maintenance\DownCommand;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Events\Maintenance\MaintenanceEnabledEvent;
 
 class DownCommandTest extends TestCase
 {
@@ -18,6 +21,16 @@ class DownCommandTest extends TestCase
     protected ApplicationInterface&MockObject $applicationMock;
 
     /**
+     * @var ContainerInterface&MockObject
+     */
+    protected ContainerInterface&MockObject $containerMock;
+
+    /**
+     * @var EventDispatcherInterface&MockObject
+     */
+    protected EventDispatcherInterface&MockObject $eventDispatcherMock;
+
+    /**
      * @var DownCommand
      */
     protected DownCommand $downCommand;
@@ -25,13 +38,20 @@ class DownCommandTest extends TestCase
     protected function setUp(): void
     {
         $this->applicationMock = $this->createMock(ApplicationInterface::class);
+        $this->containerMock = $this->createMock(ContainerInterface::class);
+        $this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
 
         $this->downCommand = new DownCommand($this->applicationMock);
     }
 
     protected function tearDown(): void
     {
-        unset($this->applicationMock, $this->downCommand);
+        unset(
+            $this->applicationMock,
+            $this->containerMock,
+            $this->eventDispatcherMock,
+            $this->downCommand
+        );
     }
 
     /* -------------------------------------------------
@@ -47,6 +67,19 @@ class DownCommandTest extends TestCase
             ->method('getPublicPath')
             ->with('maintenance.html')
             ->willReturn($maintenanceFile);
+
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(EventDispatcherInterface::class)
+            ->willReturn($this->eventDispatcherMock);
+
+        $this->eventDispatcherMock->expects(self::once())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(MaintenanceEnabledEvent::class));
 
         $commandTester = new CommandTester($this->downCommand);
         $commandTester->execute([]);
@@ -69,6 +102,19 @@ class DownCommandTest extends TestCase
             ->with('maintenance.html')
             ->willReturn($maintenanceFile);
 
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(EventDispatcherInterface::class)
+            ->willReturn($this->eventDispatcherMock);
+
+        $this->eventDispatcherMock->expects(self::once())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(MaintenanceEnabledEvent::class));
+
         $commandTester = new CommandTester($this->downCommand);
         $commandTester->execute(['--template' => $customTemplate]);
 
@@ -85,6 +131,9 @@ class DownCommandTest extends TestCase
             ->method('getPublicPath')
             ->with('maintenance.html')
             ->willReturn(dirname(__DIR__, 5) . '/views/maintenance.html');
+
+        $this->eventDispatcherMock->expects(self::never())
+            ->method('dispatch');
 
         $commandTester = new CommandTester($this->downCommand);
         $commandTester->execute([]);

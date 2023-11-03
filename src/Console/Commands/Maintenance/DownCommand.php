@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Console\Commands\Maintenance;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zaphyr\Framework\Console\Commands\AbstractCommand;
+use Zaphyr\Framework\Events\Maintenance\MaintenanceEnabledEvent;
 use Zaphyr\Utils\File;
 
 /**
@@ -44,6 +46,10 @@ class DownCommand extends AbstractCommand
             File::copy($input->getOption('template'), $maintenanceFile);
 
             $output->writeln('<info>Application is now in maintenance mode.</info>');
+
+            $this->zaphyr->getContainer()
+                ->get(EventDispatcherInterface::class)
+                ->dispatch(new MaintenanceEnabledEvent());
         }
 
         return self::SUCCESS;

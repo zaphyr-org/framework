@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Kernel;
 
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Throwable;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Framework\Application as Zaphyr;
@@ -16,6 +22,9 @@ use Zaphyr\Framework\Console\Commands;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
+use Zaphyr\Framework\Events\Console\Commands\CommandFailedEvent;
+use Zaphyr\Framework\Events\Console\Commands\CommandFinishedEvent;
+use Zaphyr\Framework\Events\Console\Commands\CommandStartingEvent;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
@@ -29,6 +38,11 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
      * @var ContainerInterface
      */
     protected ContainerInterface $container;
+
+    /**
+     * @var EventDispatcher|null
+     */
+    protected EventDispatcher|null $symfonyEventDispatcher = null;
 
     /**
      * @var class-string[]
@@ -87,6 +101,7 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
     public function handle(InputInterface $input = null, OutputInterface $output = null): int
     {
         $this->bootstrap();
+        $this->registerEvents();
 
         try {
             $this->registerFrameworkCommands();
@@ -97,6 +112,61 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
             $output ??= new ConsoleOutput();
 
             return $this->handleException($exception, $output);
+        }
+    }
+
+    /**
+     * @return void
+     */
+    protected function registerEvents(): void
+    {
+        if ($this->symfonyEventDispatcher === null) {
+            $this->symfonyEventDispatcher = new EventDispatcher();
+            $zaphyrEventDispatcher = $this->container->get(EventDispatcherInterface::class);
+
+            $this->symfonyEventDispatcher->addListener(
+                ConsoleEvents::COMMAND,
+                function (ConsoleCommandEvent $event) use ($zaphyrEventDispatcher) {
+                    $zaphyrEventDispatcher->dispatch(
+                        new CommandStartingEvent(
+                            $event->getCommand()?->getName(),
+                            $event->getInput(),
+                            $event->getOutput()
+                        )
+                    );
+                }
+            );
+
+            $this->symfonyEventDispatcher->addListener(
+                ConsoleEvents::ERROR,
+                function (ConsoleErrorEvent $event) use ($zaphyrEventDispatcher) {
+                    $zaphyrEventDispatcher->dispatch(
+                        new CommandFailedEvent(
+                            $event->getCommand()?->getName(),
+                            $event->getInput(),
+                            $event->getOutput(),
+                            $event->getExitCode(),
+                            $event->getError()
+                        )
+                    );
+                }
+            );
+
+            $this->symfonyEventDispatcher->addListener(
+                ConsoleEvents::TERMINATE,
+                function (ConsoleTerminateEvent $event) use ($zaphyrEventDispatcher) {
+                    $zaphyrEventDispatcher->dispatch(
+                        new CommandFinishedEvent(
+                            $event->getCommand()?->getName(),
+                            $event->getInput(),
+                            $event->getOutput(),
+                            $event->getExitCode()
+                        )
+                    );
+                }
+            );
+
+            $this->setDispatcher($this->symfonyEventDispatcher);
         }
     }
 

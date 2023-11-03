@@ -26,6 +26,7 @@
         "zaphyr-org/container": "^1.1",
         "zaphyr-org/cookie": "^1.0",
         "zaphyr-org/encrypt": "^2.0",
+        "zaphyr-org/event-dispatcher": "^1.0",
         "zaphyr-org/http-message": "^1.0",
         "zaphyr-org/logger": "^2.0",
         "zaphyr-org/router": "^1.1",
