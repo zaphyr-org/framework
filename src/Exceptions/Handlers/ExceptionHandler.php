@@ -61,7 +61,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function dontReport(Throwable $throwable): bool
     {
-        $dontReport = $this->config->get('logging.report_ignore', []);
+        $dontReport = $this->config->get('logs.report_ignore', []);
 
         foreach ($dontReport as $type) {
             if ($throwable instanceof $type) {
