@@ -19,6 +19,7 @@ use Zaphyr\Framework\Events\Http\RequestStartingEvent;
 use Zaphyr\Framework\Kernel\HttpKernel;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
+use Zaphyr\Framework\Providers\Bootable\ExceptionBootProvider;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
 use Zaphyr\Framework\Providers\Bootable\RouterBootProvider;
 use Zaphyr\Router\Contracts\RouterInterface;
@@ -116,6 +117,7 @@ class HttpKernelTest extends TestCase
             ->with([
                 EnvironmentBootProvider::class,
                 ConfigBootProvider::class,
+                ExceptionBootProvider::class,
                 RouterBootProvider::class,
                 RegisterServicesBootProvider::class,
             ]);
@@ -175,6 +177,7 @@ class HttpKernelTest extends TestCase
             ->with([
                 EnvironmentBootProvider::class,
                 ConfigBootProvider::class,
+                ExceptionBootProvider::class,
                 RouterBootProvider::class,
                 RegisterServicesBootProvider::class,
             ]);

@@ -4,23 +4,37 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Exceptions\Handlers;
 
+use ErrorException;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Zaphyr\Config\Contracts\ConfigInterface;
+use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Http\Exceptions\HttpExceptionInterface;
-use Zaphyr\Framework\Contracts\View\ViewInterface;
 use Zaphyr\Framework\Exceptions\Handlers\ExceptionHandler;
 use Zaphyr\Framework\Http\Exceptions\HttpException;
 use Zaphyr\Framework\Http\Response;
+use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
 use Zaphyr\Router\Exceptions\MethodNotAllowedException;
 use Zaphyr\Router\Exceptions\NotFoundException;
 
 class ExceptionHandlerTest extends TestCase
 {
+    /**
+     * @var ApplicationInterface&MockObject
+     */
+    protected ApplicationInterface&MockObject $applicationMock;
+
+    /**
+     * @var ContainerInterface&MockObject
+     */
+    protected ContainerInterface&MockObject $containerMock;
+
     /**
      * @var LoggerInterface&MockObject
      */
@@ -32,14 +46,14 @@ class ExceptionHandlerTest extends TestCase
     protected ConfigInterface&MockObject $configMock;
 
     /**
-     * @var ViewInterface&MockObject
-     */
-    protected ViewInterface&MockObject $viewMock;
-
-    /**
      * @var ServerRequestInterface&MockObject
      */
     protected ServerRequestInterface&MockObject $serverRequestMock;
+
+    /**
+     * @var EmitterInterface&MockObject
+     */
+    protected EmitterInterface&MockObject $emitterMock;
 
     /**
      * @var ExceptionHandler
@@ -48,23 +62,106 @@ class ExceptionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->applicationMock = $this->createMock(ApplicationInterface::class);
+        $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
-        $this->viewMock = $this->createMock(ViewInterface::class);
         $this->serverRequestMock = $this->createMock(ServerRequestInterface::class);
+        $this->emitterMock = $this->createMock(EmitterInterface::class);
 
-        $this->exceptionHandler = new ExceptionHandler($this->loggerMock, $this->configMock, $this->viewMock);
+        $this->exceptionHandler = new ExceptionHandler($this->applicationMock);
     }
 
     protected function tearDown(): void
     {
         unset(
+            $this->applicationMock,
             $this->loggerMock,
             $this->configMock,
-            $this->viewMock,
             $this->serverRequestMock,
+            $this->emitterInterface,
             $this->exceptionHandler
         );
+    }
+
+    /* -------------------------------------------------
+     * HANDLE ERROR
+     * -------------------------------------------------
+     */
+
+    public function testHandleError(): void
+    {
+        $this->expectException(ErrorException::class);
+
+        $this->exceptionHandler->handleError(E_ERROR, 'Whoops', 'file.php', 1);
+    }
+
+    /* -------------------------------------------------
+     * HANDLE EXCEPTION
+     * -------------------------------------------------
+     */
+
+    public function testHandleException(): void
+    {
+        $exception = new Exception('Whoops');
+
+        $this->applicationMock->expects(self::once())
+            ->method('isRunningInConsole')
+            ->willReturn(false);
+
+        $this->applicationMock->expects(self::exactly(2))
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match($key) {
+                EmitterInterface::class => $this->emitterMock,
+                ConfigInterface::class => $this->configMock,
+                ServerRequestInterface::class => $this->serverRequestMock,
+            });
+
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('app.debug')
+            ->willReturn(false);
+
+        $this->emitterMock->expects(self::once())
+            ->method('emit');
+
+        $this->exceptionHandler->handleException($exception);
+    }
+
+    public function testHandleExceptionInConsole(): void
+    {
+        $exception = new Exception('Whoops');
+
+        $this->applicationMock->expects(self::once())
+            ->method('isRunningInConsole')
+            ->willReturn(true);
+
+        $this->emitterMock->expects(self::never())
+            ->method('emit');
+
+        set_exception_handler(null);
+        $this->exceptionHandler->handleException($exception, new BufferedOutput());
+    }
+
+    /* -------------------------------------------------
+     * HANDLE SHUTDOWN
+     * -------------------------------------------------
+     */
+
+    public function testHandleShutdown(): void
+    {
+        $this->expectException(ErrorException::class);
+
+        $this->exceptionHandler->handleShutdown([
+            'type' => E_ERROR,
+            'message' => 'Whoops',
+            'file' => 'file.php',
+            'line' => 1,
+        ]);
     }
 
     /* -------------------------------------------------
@@ -76,9 +173,20 @@ class ExceptionHandlerTest extends TestCase
     {
         $exception = new Exception('Whoops');
 
+        $this->applicationMock->expects(self::exactly(2))
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::exactly(2))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match($key) {
+                ConfigInterface::class => $this->configMock,
+                LoggerInterface::class => $this->loggerMock
+            });
+
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('logging.report_ignore')
+            ->with('logs.ignore')
             ->willReturn([]);
 
         $this->loggerMock->expects(self::once())
@@ -98,9 +206,18 @@ class ExceptionHandlerTest extends TestCase
             }
         };
 
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('logging.report_ignore')
+            ->with('logs.ignore')
             ->willReturn([]);
 
         $this->loggerMock->expects(self::never())->method('error');
@@ -116,9 +233,18 @@ class ExceptionHandlerTest extends TestCase
      */
     public function testReportShouldNotReportWithInternalDontReport(Exception $exception, string $reportIgnore): void
     {
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('logging.report_ignore')
+            ->with('logs.ignore')
             ->willReturn([$reportIgnore]);
 
         $this->loggerMock->expects(self::never())->method('error');
@@ -169,6 +295,15 @@ class ExceptionHandlerTest extends TestCase
     {
         $exception = new Exception('Whoops');
 
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -185,53 +320,40 @@ class ExceptionHandlerTest extends TestCase
     {
         $exception = new Exception('Whoops');
 
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
         $this->configMock->expects(self::once())
             ->method('get')
             ->with('app.debug')
             ->willReturn(false);
-
-        $this->viewMock->expects(self::once())
-            ->method('exists')
-            ->with('errors/500.twig')
-            ->willReturn(true);
-
-        $this->viewMock->expects(self::once())
-            ->method('render')
-            ->with('errors/500.twig', [
-                'status' => 500,
-                'message' => 'Internal Server Error',
-                'throwable' => $exception,
-            ]);
 
         $this->exceptionHandler->render($this->serverRequestMock, $exception);
-    }
-
-    public function testRenderHtmlFallbackView(): void
-    {
-        $exception = new Exception('Whoops');
-
-        $this->configMock->expects(self::once())
-            ->method('get')
-            ->with('app.debug')
-            ->willReturn(false);
-
-        $this->viewMock->expects(self::once())
-            ->method('exists')
-            ->with('errors/500.twig')
-            ->willReturn(false);
-
-        $this->viewMock->expects(self::never())
-            ->method('render');
-
-        $response = $this->exceptionHandler->render($this->serverRequestMock, $exception);
-
-        self::assertStringContainsString('500', $response->__toString());
-        self::assertStringContainsString('Internal Server Error', $response->__toString());
     }
 
     public function testRenderJsonView(): void
     {
         $exception = new Exception('Whoops');
+
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('app.debug')
+            ->willReturn(false);
 
         $this->serverRequestMock->expects(self::once())
             ->method('getHeaderLine')
@@ -257,6 +379,20 @@ class ExceptionHandlerTest extends TestCase
     {
         $exception = new HttpException(402);
 
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('app.debug')
+            ->willReturn(false);
+
         $this->serverRequestMock->expects(self::once())
             ->method('getHeaderLine')
             ->with('Content-Type')
@@ -281,6 +417,20 @@ class ExceptionHandlerTest extends TestCase
     {
         $exception = new MethodNotAllowedException();
 
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('app.debug')
+            ->willReturn(false);
+
         $this->serverRequestMock->expects(self::once())
             ->method('getHeaderLine')
             ->with('Content-Type')
@@ -304,6 +454,20 @@ class ExceptionHandlerTest extends TestCase
     public function testRenderJsonViewWithNotFoundException(): void
     {
         $exception = new NotFoundException();
+
+        $this->applicationMock->expects(self::once())
+            ->method('getContainer')
+            ->willReturn($this->containerMock);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('app.debug')
+            ->willReturn(false);
 
         $this->serverRequestMock->expects(self::once())
             ->method('getHeaderLine')

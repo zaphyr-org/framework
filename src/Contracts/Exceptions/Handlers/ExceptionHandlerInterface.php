@@ -14,6 +14,11 @@ use Throwable;
 interface ExceptionHandlerInterface
 {
     /**
+     * @return void
+     */
+    public function register(): void;
+
+    /**
      * @param Throwable $throwable
      */
     public function report(Throwable $throwable): void;

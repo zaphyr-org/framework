@@ -27,6 +27,7 @@ use Zaphyr\Framework\Events\Console\Commands\CommandFinishedEvent;
 use Zaphyr\Framework\Events\Console\Commands\CommandStartingEvent;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
+use Zaphyr\Framework\Providers\Bootable\ExceptionBootProvider;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
 
 /**
@@ -50,6 +51,7 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
     protected array $bootServiceProvider = [
         EnvironmentBootProvider::class,
         ConfigBootProvider::class,
+        ExceptionBootProvider::class,
         RegisterServicesBootProvider::class,
     ];
 

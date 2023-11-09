@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Exceptions\Handlers;
 
+use ErrorException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Zaphyr\Config\Contracts\ConfigInterface;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Http\Exceptions\HttpExceptionInterface;
-use Zaphyr\Framework\Contracts\View\ViewInterface;
 use Zaphyr\Framework\Http\Exceptions\HttpException;
 use Zaphyr\Framework\Http\Response;
 use Zaphyr\Framework\Http\Utils\StatusCode;
+use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
 use Zaphyr\Router\Exceptions\MethodNotAllowedException;
 use Zaphyr\Router\Exceptions\NotFoundException;
 use Zaphyr\Utils\Template;
@@ -25,15 +30,92 @@ use Zaphyr\Utils\Template;
 class ExceptionHandler implements ExceptionHandlerInterface
 {
     /**
-     * @param LoggerInterface $logger
-     * @param ConfigInterface $config
-     * @param ViewInterface   $view
+     * @var string|null
      */
-    public function __construct(
-        protected LoggerInterface $logger,
-        protected ConfigInterface $config,
-        protected ViewInterface $view
-    ) {
+    protected static string|null $reservedMemory;
+
+    /**
+     * @param ApplicationInterface $application
+     */
+    public function __construct(protected ApplicationInterface $application)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function register(): void
+    {
+        self::$reservedMemory = str_repeat('x', 10240);
+
+        error_reporting(-1);
+
+        // The phpstan-ignore-next-line should not be here.
+        // But it is fucking freaky to escape ignore messages
+        // in neon files
+        // @phpstan-ignore-next-line
+        set_error_handler([$this, 'handleError']);
+
+        set_exception_handler([$this, 'handleException']);
+
+        register_shutdown_function([$this, 'handleShutdown']);
+    }
+
+    /**
+     * @param int    $level
+     * @param string $message
+     * @param string $file
+     * @param int    $line
+     *
+     * @throws ErrorException
+     * @return void
+     */
+    public function handleError(int $level, string $message, string $file, int $line): void
+    {
+        if (error_reporting() & $level) {
+            throw new ErrorException($message, 0, $level, $file, $line);
+        }
+    }
+
+    /**
+     * @param Throwable $throwable
+     *
+     * @return void
+     */
+    public function handleException(Throwable $throwable, OutputInterface|null $output = null): void
+    {
+        self::$reservedMemory = null;
+
+        if ($this->application->isRunningInConsole()) {
+            (new Application())->renderThrowable($throwable, $output ?? new ConsoleOutput());
+        } else {
+            $container = $this->application->getContainer();
+            $container->get(EmitterInterface::class)->emit(
+                $this->render($container->get(ServerRequestInterface::class), $throwable)
+            );
+        }
+    }
+
+    /**
+     * @param array<string, mixed>|null $error
+     */
+    public function handleShutdown(array $error = null): void
+    {
+        $error ??= error_get_last();
+
+        if ($error !== null && $this->isFatal($error['type'])) {
+            $this->handleError($error['type'], $error['message'], $error['file'], $error['line']);
+        }
+    }
+
+    /**
+     * @param int $type
+     *
+     * @return bool
+     */
+    protected function isFatal(int $type): bool
+    {
+        return in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE], true);
     }
 
     /**
@@ -41,7 +123,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     public function report(Throwable $throwable): void
     {
-        if ($this->dontReport($throwable)) {
+        if ($this->ignore($throwable)) {
             return;
         }
 
@@ -51,7 +133,10 @@ class ExceptionHandler implements ExceptionHandlerInterface
             return;
         }
 
-        $this->logger->error($throwable->getMessage(), ['exception' => $throwable]);
+        $this->application->getContainer()->get(LoggerInterface::class)->error(
+            $throwable->getMessage(),
+            ['exception' => $throwable]
+        );
     }
 
     /**
@@ -59,11 +144,11 @@ class ExceptionHandler implements ExceptionHandlerInterface
      *
      * @return bool
      */
-    protected function dontReport(Throwable $throwable): bool
+    protected function ignore(Throwable $throwable): bool
     {
-        $dontReport = $this->config->get('logs.report_ignore', []);
+        $ignore = $this->application->getContainer()->get(ConfigInterface::class)->get('logs.ignore', []);
 
-        foreach ($dontReport as $type) {
+        foreach ($ignore as $type) {
             if ($throwable instanceof $type) {
                 return true;
             }
@@ -81,23 +166,28 @@ class ExceptionHandler implements ExceptionHandlerInterface
             return $response;
         }
 
-        if ($this->config->get('app.debug', false)) {
-            return $this->renderDebugException($request, $throwable);
+        $config = $this->application->getContainer()->get(ConfigInterface::class);
+        $debug = $config->get('app.debug', false);
+
+        if ($debug) {
+            return $this->renderDebugException($request, $throwable, $config->get('app.debug_blacklist', []));
         }
 
         return $this->renderHttpException($request, $throwable);
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @param Throwable              $throwable
+     * @param ServerRequestInterface  $request
+     * @param Throwable               $throwable
+     * @param array<string, string[]> $blacklist
      *
      * @return ResponseInterface
      */
-    protected function renderDebugException(ServerRequestInterface $request, Throwable $throwable): ResponseInterface
-    {
-        $blacklist = $this->config->get('app.debug_blacklist', []);
-
+    protected function renderDebugException(
+        ServerRequestInterface $request,
+        Throwable $throwable,
+        array $blacklist = []
+    ): ResponseInterface {
         $response = $this->getResponse($throwable);
         $response->getBody()->write((new WhoopsDebugHandler(blacklist: $blacklist))->render($request, $throwable));
 
@@ -143,37 +233,13 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function renderHtmlView(ResponseInterface $response, Throwable $throwable): ResponseInterface
     {
-        $status = (string)$response->getStatusCode();
-        $message = $response->getReasonPhrase();
-
-        if ($this->view->exists('errors/' . $status . '.twig')) {
-            $response->getBody()->write(
-                $this->view->render(
-                    'errors/' . $status . '.twig',
-                    compact('status', 'message', 'throwable')
-                )
-            );
-
-            return $response;
-        }
-
-        return $this->renderHtmlFallbackView($response);
-    }
-
-    /**
-     * @param ResponseInterface $response
-     *
-     * @return ResponseInterface
-     */
-    protected function renderHtmlFallbackView(ResponseInterface $response): ResponseInterface
-    {
-        $status = (string)$response->getStatusCode();
-        $message = $response->getReasonPhrase();
-
         $response->getBody()->write(
             Template::render(
-                dirname(__DIR__, 3) . '/views/errors/fallback.html',
-                compact('status', 'message')
+                dirname(__DIR__, 3) . '/views/errors.html',
+                [
+                    'status' => (string)$response->getStatusCode(),
+                    'message' => $response->getReasonPhrase(),
+                ]
             )
         );
 
