@@ -1,8 +1,0 @@
---TEST--
-config_get test
---TEMPLATE--
-{{ config_get('app.environment') }}
---DATA--
-return []
---EXPECT--
-testing

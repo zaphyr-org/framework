@@ -1,8 +1,0 @@
---TEST--
-csrf_token test
---TEMPLATE--
-{{ csrf_token() }}
---DATA--
-return []
---EXPECT--
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

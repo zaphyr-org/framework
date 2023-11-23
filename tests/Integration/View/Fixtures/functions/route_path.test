@@ -1,8 +1,0 @@
---TEST--
-route_path test
---TEMPLATE--
-{{ route_path('home') }}
---DATA--
-return []
---EXPECT--
-/home

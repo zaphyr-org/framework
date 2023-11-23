@@ -1,8 +1,0 @@
---TEST--
-csrf_field test
---TEMPLATE--
-{{ csrf_field() }}
---DATA--
-return []
---EXPECT--
-<input name="_token" type="hidden" value="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa">
