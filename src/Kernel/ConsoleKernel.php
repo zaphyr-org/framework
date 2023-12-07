@@ -68,7 +68,6 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
         Commands\Create\CommandCommand::class,
         Commands\Create\ControllerCommand::class,
         Commands\Create\EventCommand::class,
-        Commands\Create\ExtensionCommand::class,
         Commands\Create\ListenerCommand::class,
         Commands\Create\MiddlewareCommand::class,
         Commands\Create\ProviderCommand::class,
