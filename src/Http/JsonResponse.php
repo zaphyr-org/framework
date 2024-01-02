@@ -59,10 +59,6 @@ class JsonResponse extends Response
             throw new ResponseException($e->getMessage(), $e->getCode(), $e);
         }
 
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new ResponseException(json_last_error_msg());
-        }
-
         return $data;
     }
 
