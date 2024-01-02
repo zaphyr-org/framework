@@ -10,7 +10,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Framework\Console\Commands\Create\CommandCommand;
 use Zaphyr\Framework\Console\Commands\Create\ControllerCommand;
 use Zaphyr\Framework\Console\Commands\Create\EventCommand;
-use Zaphyr\Framework\Console\Commands\Create\ExtensionCommand;
 use Zaphyr\Framework\Console\Commands\Create\ListenerCommand;
 use Zaphyr\Framework\Console\Commands\Create\MiddlewareCommand;
 use Zaphyr\Framework\Console\Commands\Create\ProviderCommand;
@@ -184,7 +183,6 @@ class CreateCommandTest extends TestCase
             'command' => ['Command', CommandCommand::class],
             'controller' => ['Controller', ControllerCommand::class],
             'event' => ['Event', EventCommand::class],
-            'extension' => ['Extension', ExtensionCommand::class],
             'listener' => ['Listener', ListenerCommand::class],
             'middleware' => ['Middleware', MiddlewareCommand::class],
             'provider' => ['Provider', ProviderCommand::class],
