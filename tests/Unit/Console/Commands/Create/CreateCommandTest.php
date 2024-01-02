@@ -7,6 +7,7 @@ namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Create;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use Zaphyr\Framework\Console\Commands\Create\AbstractCreateCommand;
 use Zaphyr\Framework\Console\Commands\Create\CommandCommand;
 use Zaphyr\Framework\Console\Commands\Create\ControllerCommand;
 use Zaphyr\Framework\Console\Commands\Create\EventCommand;
@@ -14,6 +15,7 @@ use Zaphyr\Framework\Console\Commands\Create\ListenerCommand;
 use Zaphyr\Framework\Console\Commands\Create\MiddlewareCommand;
 use Zaphyr\Framework\Console\Commands\Create\ProviderCommand;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Utils\File;
 
 class CreateCommandTest extends TestCase
@@ -152,29 +154,6 @@ class CreateCommandTest extends TestCase
     }
 
     /**
-     * @param string       $name
-     * @param class-string $command
-     *
-     * @dataProvider createCommandsDataProvider
-     */
-    public function testExecuteThrowsExceptionOnMissingNameArgument(string $name, string $command): void
-    {
-        $this->applicationMock->expects(self::never())
-            ->method('getRootPath');
-
-        $command = new $command($this->applicationMock);
-
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([]);
-
-        self::assertStringContainsString(
-            'Missing required ' .  strtolower($name) . " name argument\n",
-            $commandTester->getDisplay()
-        );
-        self::assertEquals(1, $commandTester->getStatusCode());
-    }
-
-    /**
      * @return array<string, array<string, class-string>>
      */
     public static function createCommandsDataProvider(): array
@@ -187,5 +166,25 @@ class CreateCommandTest extends TestCase
             'middleware' => ['Middleware', MiddlewareCommand::class],
             'provider' => ['Provider', ProviderCommand::class],
         ];
+    }
+
+    public function testExecuteThrowsExceptionOnMissingStubFile(): void
+    {
+        $this->expectException(FrameworkException::class);
+
+        $command = new class($this->applicationMock) extends AbstractCreateCommand {
+            public function getStubName(): string
+            {
+                return 'invalid';
+            }
+
+            public function getDefaultNamespace(): string
+            {
+                return 'Foo\Bar';
+            }
+        };
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(['name' => 'invalid']);
     }
 }

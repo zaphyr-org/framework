@@ -54,13 +54,6 @@ class ListenerCommand extends AbstractCreateCommand
     {
         $name = $input->getArgument('name');
         $stubName = $this->getStubName();
-
-        if ($name === null) {
-            $output->writeln('<error>Missing required ' . $stubName . ' name argument</error>');
-
-            return self::FAILURE;
-        }
-
         $namespace = $this->prepareNamespace($input->getOption('namespace'));
 
         $contents = $this->prepareContents($stubName, $name, $namespace);

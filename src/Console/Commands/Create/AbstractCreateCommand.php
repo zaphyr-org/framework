@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Console\Commands\Create;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -33,7 +34,7 @@ abstract class AbstractCreateCommand extends AbstractCommand
     {
         $this->addArgument(
             'name',
-            InputOption::VALUE_REQUIRED,
+            InputArgument::REQUIRED,
             'The name of the ' . $this->getStubName() . ' class'
         );
 
@@ -59,15 +60,7 @@ abstract class AbstractCreateCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getArgument('name');
-
-        if ($name === null) {
-            $output->writeln('<error>Missing required ' . $this->getStubName() . ' name argument</error>');
-
-            return self::FAILURE;
-        }
-
         $namespace = $this->prepareNamespace($input->getOption('namespace'));
-
         $contents = $this->prepareContents($this->getStubName(), $name, $namespace);
         $directory = $this->prepareDestinationDirectory($namespace);
         $file = $this->getDestinationFile($directory, $name);

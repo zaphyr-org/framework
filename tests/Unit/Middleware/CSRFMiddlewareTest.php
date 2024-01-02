@@ -452,8 +452,7 @@ class CSRFMiddlewareTest extends TestCase
         $this->serverRequestMock->expects(self::never())
             ->method('getParsedBody');
 
-        $csrfMiddleware = new class ($this->applicationMock, $this->encryptMock, $this->cookieManagerMock) extends
-            CSRFMiddleware {
+        $csrfMiddleware = new class ($this->applicationMock, $this->encryptMock, $this->cookieManagerMock) extends CSRFMiddleware {
             protected array $exclude = ['https://example.com/foo'];
         };
 
@@ -484,6 +483,76 @@ class CSRFMiddlewareTest extends TestCase
         $csrfMiddleware = new class ($this->applicationMock, $this->encryptMock, $this->cookieManagerMock) extends
             CSRFMiddleware {
             protected array $exclude = ['https://example.com/foo/*'];
+        };
+
+        $csrfMiddleware->process($this->serverRequestMock, $this->requestHandlerMock);
+    }
+
+    public function testExcludeWithPatternWithoutMatch(): void
+    {
+        $token = 'cSrfToKEn123';
+        $encryptedToken = 'eNcrYptEdCsRfToKeN123';
+
+        $this->serverRequestMock->expects(self::once())
+            ->method('getMethod')
+            ->willReturn('POST');
+
+        $this->applicationMock->expects(self::once())
+            ->method('isRunningInConsole')
+            ->willReturn(false);
+
+        $this->uriMock->expects(self::once())
+            ->method('__toString')
+            ->willReturn('https://example.com/foo/bar');
+
+        $this->serverRequestMock->expects(self::once())
+            ->method('getUri')
+            ->willReturn($this->uriMock);
+
+        $this->serverRequestMock->expects(self::once())
+            ->method('getParsedBody')
+            ->willReturn([
+                '_token' => $token,
+            ]);
+
+        $this->serverRequestMock->expects(self::exactly(2))
+            ->method('getAttribute')
+            ->with(SessionInterface::class)
+            ->willReturn($this->sessionMock);
+
+        $this->sessionMock->expects(self::exactly(2))
+            ->method('getToken')
+            ->willReturn($token);
+
+        $this->encryptMock->expects(self::once())
+            ->method('encrypt')
+            ->with($token)
+            ->willReturn($encryptedToken);
+
+        $this->cookieManagerMock->expects(self::once())
+            ->method('create')
+            ->with(
+                'XSRF-TOKEN',
+                $encryptedToken
+            )
+            ->willReturn($this->cookieMock);
+
+        $this->cookieMock->expects(self::once())
+            ->method('__toString')
+            ->willReturn($cookieString = 'XSRF-TOKEN=' . $encryptedToken);
+
+        $this->responseMock->expects(self::once())
+            ->method('withAddedHeader')
+            ->with('Set-Cookie', $cookieString)
+            ->willReturn($this->responseMock);
+
+        $this->requestHandlerMock->expects(self::once())
+            ->method('handle')
+            ->with($this->serverRequestMock)
+            ->willReturn($this->responseMock);
+
+        $csrfMiddleware = new class ($this->applicationMock, $this->encryptMock, $this->cookieManagerMock) extends CSRFMiddleware {
+            protected array $exclude = ['https://example.com/bar/*'];
         };
 
         $csrfMiddleware->process($this->serverRequestMock, $this->requestHandlerMock);

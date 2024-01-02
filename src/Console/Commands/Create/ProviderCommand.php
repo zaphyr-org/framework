@@ -54,18 +54,11 @@ class ProviderCommand extends AbstractCreateCommand
         $name = $input->getArgument('name');
         $stubName = $this->getStubName();
 
-        if ($name === null) {
-            $output->writeln('<error>Missing required ' . $stubName . ' name argument</error>');
-
-            return self::FAILURE;
-        }
-
-        $namespace = $this->prepareNamespace($input->getOption('namespace'));
-
         if ($input->hasOption('bootable') && $input->getOption('bootable')) {
             $stubName .= '-bootable';
         }
 
+        $namespace = $this->prepareNamespace($input->getOption('namespace'));
         $contents = $this->prepareContents($stubName, $name, $namespace);
         $directory = $this->prepareDestinationDirectory($namespace);
         $file = $this->getDestinationFile($directory, $name);
