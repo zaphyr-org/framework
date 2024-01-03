@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Integration;
+namespace Zaphyr\Framework\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Container\Contracts\ContainerInterface;
@@ -35,7 +35,7 @@ class IntegrationTestCase extends TestCase
      *
      * @return ApplicationInterface
      */
-    protected static function bootApplication(array $options = []): ApplicationInterface
+    public static function bootApplication(array $options = []): ApplicationInterface
     {
         $_ENV['APP_ENV'] ??= $options['environment'] ?? 'testing';
         $_ENV['EXCEPTION_HANDLER'] ??= $options['exception_handler'] ?? ExceptionHandler::class;
@@ -62,7 +62,7 @@ class IntegrationTestCase extends TestCase
     /**
      * @return ContainerInterface
      */
-    protected static function getContainer(): ContainerInterface
+    public static function getContainer(): ContainerInterface
     {
         if (!static::$isBooted) {
             self::bootApplication();

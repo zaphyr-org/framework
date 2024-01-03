@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Providers\LogServiceProvider;
-use Zaphyr\FrameworkTests\Integration\IntegrationTestCase;
+use Zaphyr\Framework\Tests\IntegrationTestCase;
 use Zaphyr\Logger\Contracts\LogManagerInterface;
 use Zaphyr\Logger\Handlers\FileHandler;
 use Zaphyr\Logger\Handlers\MailHandler;

@@ -7,7 +7,7 @@ namespace Zaphyr\FrameworkTests\Integration\Providers;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Providers\SessionServiceProvider;
-use Zaphyr\FrameworkTests\Integration\IntegrationTestCase;
+use Zaphyr\Framework\Tests\IntegrationTestCase;
 use Zaphyr\Session\Contracts\SessionInterface;
 use Zaphyr\Session\Contracts\SessionManagerInterface;
 use Zaphyr\Session\SessionManager;

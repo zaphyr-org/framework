@@ -11,7 +11,7 @@ use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\EventDispatcher\EventDispatcher;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\EventServiceProvider;
-use Zaphyr\FrameworkTests\Integration\IntegrationTestCase;
+use Zaphyr\Framework\Tests\IntegrationTestCase;
 use Zaphyr\FrameworkTests\TestAssets\Events\TestEvent;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerOne;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerTwo;

@@ -10,7 +10,7 @@ use Zaphyr\Encrypt\Contracts\EncryptInterface;
 use Zaphyr\Encrypt\Encrypt;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\EncryptServiceProvider;
-use Zaphyr\FrameworkTests\Integration\IntegrationTestCase;
+use Zaphyr\Framework\Tests\IntegrationTestCase;
 
 class EncryptServiceProviderTest extends IntegrationTestCase
 {
