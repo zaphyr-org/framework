@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": ">=8.1",
+        "filp/whoops": "^2.15",
         "symfony/console": "^6.3",
         "vlucas/phpdotenv": "^5.5",
         "voku/anti-xss": "^4.1",
@@ -33,7 +34,6 @@
         "zaphyr-org/utils": "^2.2"
     },
     "require-dev": {
-        "filp/whoops": "^2.15",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.0",
         "roave/security-advisories": "dev-latest",
