@@ -32,7 +32,7 @@ class SessionMiddlewareTest extends TestCase
     /**
      * @var SessionHandlerInterface&MockObject
      */
-    protected SessionHandlerInterface&MockObject $sessionHandler;
+    protected SessionHandlerInterface&MockObject $sessionHandlerMock;
 
     /**
      * @var CookieManagerInterface&MockObject
