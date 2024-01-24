@@ -10,9 +10,9 @@ use Zaphyr\Encrypt\Contracts\EncryptInterface;
 use Zaphyr\Encrypt\Encrypt;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\EncryptServiceProvider;
-use Zaphyr\Framework\Tests\IntegrationTestCase;
+use Zaphyr\Framework\Testing\HttpTestCase;
 
-class EncryptServiceProviderTest extends IntegrationTestCase
+class EncryptServiceProviderTest extends HttpTestCase
 {
     /**
      * @var ContainerInterface

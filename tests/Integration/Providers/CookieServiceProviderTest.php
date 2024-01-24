@@ -10,9 +10,9 @@ use Zaphyr\Cookie\Contracts\CookieManagerInterface;
 use Zaphyr\Cookie\Cookie;
 use Zaphyr\Cookie\CookieManager;
 use Zaphyr\Framework\Providers\CookieServiceProvider;
-use Zaphyr\Framework\Tests\IntegrationTestCase;
+use Zaphyr\Framework\Testing\HttpTestCase;
 
-class CookieServiceProviderTest extends IntegrationTestCase
+class CookieServiceProviderTest extends HttpTestCase
 {
     /**
      * @var ContainerInterface

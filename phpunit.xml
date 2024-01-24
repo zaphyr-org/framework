@@ -22,8 +22,6 @@
         <testdoxHtml outputFile="./tests/report/testdox.html"/>
     </logging>
     <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="EXCEPTION_HANDLER" value="Zaphyr\Framework\Exceptions\Handlers\ExceptionHandler"/>
         <env name="ROOT_DIR" value="./tests/TestAssets"/>
     </php>
 </phpunit>

@@ -7,12 +7,12 @@ namespace Zaphyr\FrameworkTests\Integration\Providers;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Providers\SessionServiceProvider;
-use Zaphyr\Framework\Tests\IntegrationTestCase;
+use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\Session\Contracts\SessionInterface;
 use Zaphyr\Session\Contracts\SessionManagerInterface;
 use Zaphyr\Session\SessionManager;
 
-class SessionServiceProviderTest extends IntegrationTestCase
+class SessionServiceProviderTest extends HttpTestCase
 {
     /**
      * @var ContainerInterface
