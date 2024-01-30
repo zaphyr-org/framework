@@ -6,6 +6,9 @@ namespace Zaphyr\Framework\Testing\Traits;
 
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * @author merloxx <merloxx@zaphyr.org>
+ */
 trait ResponseTrait
 {
     /**

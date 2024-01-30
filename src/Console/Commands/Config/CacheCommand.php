@@ -37,7 +37,7 @@ class CacheCommand extends AbstractCommand
         }
 
         File::serialize(
-            $this->zaphyr->getStoragePath('cache' . DIRECTORY_SEPARATOR . 'config.cache'),
+            $this->zaphyr->getStoragePath('cache/config.cache'),
             $this->config->getItems()
         );
 

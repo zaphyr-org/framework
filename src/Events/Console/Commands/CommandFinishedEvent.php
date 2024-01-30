@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
-
  */
 class CommandFinishedEvent extends AbstractCommandEvent
 {

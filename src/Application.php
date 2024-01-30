@@ -223,7 +223,7 @@ class Application implements ApplicationInterface
      */
     protected function appendPath(string $path): string
     {
-        return ($path !== '' ? DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR) : '');
+        return ($path !== '' ? '/' . trim($path, '/') : '');
     }
 
     /**

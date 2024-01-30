@@ -73,7 +73,7 @@ class ListCommand extends AbstractCommand
 
     /**
      * @param array<string, mixed> $array
-     * @param string $prepend
+     * @param string               $prepend
      *
      * @return array<string, string>
      */
@@ -82,7 +82,7 @@ class ListCommand extends AbstractCommand
         $results = [];
 
         foreach ($array as $key => $value) {
-            if (is_array($value) && ! empty($value)) {
+            if (is_array($value) && !empty($value)) {
                 $results = array_merge($results, $this->flattenItems($value, $prepend . $key . '.'));
             } else {
                 $results[$prepend . $key] = $value;

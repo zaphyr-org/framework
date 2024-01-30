@@ -25,7 +25,6 @@ class RedirectResponseTest extends TestCase
     public function testRedirectResponseWithCustomStatusCode(): void
     {
         self::assertEquals(301, (new RedirectResponse('', 301))->getStatusCode());
-
     }
 
     public function testRedirectResponseUriWillOverrideHeadersLocation(): void

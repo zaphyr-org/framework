@@ -153,7 +153,7 @@ abstract class AbstractCreateCommand extends AbstractCommand
      */
     protected function getDestinationDirectory(string $namespace): string
     {
-        return $this->zaphyr->getRootPath(str_replace('\\', DIRECTORY_SEPARATOR, lcfirst($namespace)));
+        return $this->zaphyr->getRootPath(str_replace('\\', '/', lcfirst($namespace)));
     }
 
     /**
@@ -165,7 +165,7 @@ abstract class AbstractCreateCommand extends AbstractCommand
      */
     protected function getDestinationFile(string $directory, string $name, string $extension = 'php'): string
     {
-        return $directory . DIRECTORY_SEPARATOR . $name . '.' . ltrim($extension, '.');
+        return $directory . '/' . $name . '.' . ltrim($extension, '.');
     }
 
     /**

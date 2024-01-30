@@ -177,7 +177,7 @@ class SessionMiddlewareTest extends TestCase
         $this->responseMock->expects(self::once())
             ->method('withAddedHeader')
             ->with('Set-Cookie', (string)$this->cookieMock)
-        ->willReturn($this->responseMock);
+            ->willReturn($this->responseMock);
 
         $this->sessionMock->expects(self::once())
             ->method('save');

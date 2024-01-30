@@ -9,6 +9,9 @@ use Zaphyr\Framework\Testing\Traits\RequestTrait;
 use Zaphyr\Framework\Testing\Traits\ResponseTrait;
 use Zaphyr\Framework\Testing\Traits\StatusCodesTrait;
 
+/**
+ * @author merloxx <merloxx@zaphyr.org>
+ */
 class HttpTestCase extends AbstractTestCase
 {
     use RequestTrait;

@@ -154,7 +154,7 @@ class HttpKernelTest extends TestCase
 
         $this->containerMock->expects(self::exactly(4))
             ->method('get')
-            ->willReturnCallback(fn ($key) => match ($key) {
+            ->willReturnCallback(fn($key) => match ($key) {
                 EventDispatcherInterface::class => $this->eventDispatcherMock,
                 RouterInterface::class => $this->routerMock,
                 ExceptionHandlerInterface::class => $this->exceptionHandlerMock,
@@ -162,7 +162,7 @@ class HttpKernelTest extends TestCase
 
         $this->eventDispatcherMock->expects(self::exactly(3))
             ->method('dispatch')
-            ->willReturnCallback(fn ($key) => match (true) {
+            ->willReturnCallback(fn($key) => match (true) {
                 $key instanceof RequestStartingEvent => new RequestStartingEvent($this->requestMock),
                 $key instanceof RequestFinishedEvent => new RequestFinishedEvent($this->requestMock, $this->responseMock),
                 $key instanceof RequestFailedEvent => new RequestFailedEvent($this->requestMock, $exception),

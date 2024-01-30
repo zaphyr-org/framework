@@ -21,7 +21,7 @@ class ClearCommandTest extends ConsoleTestCase
 
         $this->applicationMock->expects(self::once())
             ->method('getStoragePath')
-            ->with('cache' . DIRECTORY_SEPARATOR . 'config.cache')
+            ->with('cache/config.cache')
             ->willReturn($cacheFile);
 
         $command = $this->execute(new ClearCommand($this->applicationMock));

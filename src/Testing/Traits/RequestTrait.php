@@ -9,6 +9,9 @@ use Psr\Http\Message\UriInterface;
 use Zaphyr\Framework\Http\Request;
 use Zaphyr\Framework\Kernel\HttpKernel;
 
+/**
+ * @author merloxx <merloxx@zaphyr.org>
+ */
 trait RequestTrait
 {
     /**

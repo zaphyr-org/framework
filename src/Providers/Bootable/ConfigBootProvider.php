@@ -79,7 +79,7 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
      */
     protected function getCachedConfigFile(): string
     {
-        return $this->application->getStoragePath('cache' . DIRECTORY_SEPARATOR . 'config.cache');
+        return $this->application->getStoragePath('cache/config.cache');
     }
 
     /**
@@ -100,7 +100,7 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
 
         if (
             File::glob(
-                $configPath . DIRECTORY_SEPARATOR . 'app.{php,ini,json,xml,yml,yaml,neon}',
+                $configPath . '/app.{php,ini,json,xml,yml,yaml,neon}',
                 GLOB_BRACE
             ) === null
         ) {

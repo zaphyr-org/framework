@@ -51,7 +51,7 @@ class HttpTestCaseTest extends HttpTestCase
                     'testing' => [
                         'handlers' => [
                             'file' => [
-                                'filename' => $this->testLogDir . DIRECTORY_SEPARATOR . $this->testLogFilename,
+                                'filename' => $this->testLogDir . '/' . $this->testLogFilename,
                             ],
                         ],
                     ],
@@ -67,8 +67,8 @@ class HttpTestCaseTest extends HttpTestCase
     {
         parent::tearDown();
 
-        if (is_file($this->testLogDir . DIRECTORY_SEPARATOR . $this->testLogFilename)) {
-            unlink($this->testLogDir . DIRECTORY_SEPARATOR . $this->testLogFilename);
+        if (is_file($this->testLogDir . '/' . $this->testLogFilename)) {
+            unlink($this->testLogDir . '/' . $this->testLogFilename);
         }
 
         rmdir($this->testLogDir);

@@ -132,7 +132,7 @@ class RequestTest extends TestCase
 
     public function testGetServerParam(): void
     {
-        $key =  'SERVER_NAME';
+        $key = 'SERVER_NAME';
         $value = 'localhost';
 
         self::assertNull($this->request->getServerParam($key));

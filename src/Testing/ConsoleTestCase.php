@@ -10,6 +10,9 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Kernel\ConsoleKernel;
 
+/**
+ * @author merloxx <merloxx@zaphyr.org>
+ */
 class ConsoleTestCase extends AbstractTestCase
 {
     /**

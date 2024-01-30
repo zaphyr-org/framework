@@ -23,7 +23,7 @@ class CacheCommandTest extends ConsoleTestCase
 
         $this->applicationMock->expects(self::once())
             ->method('getStoragePath')
-            ->with('cache' . DIRECTORY_SEPARATOR . 'config.cache')
+            ->with('cache/config.cache')
             ->willReturn($cacheFile);
 
         $configMock = $this->createMock(ConfigInterface::class);

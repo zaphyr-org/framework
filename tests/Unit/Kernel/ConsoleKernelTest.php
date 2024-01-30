@@ -117,7 +117,7 @@ class ConsoleKernelTest extends TestCase
     {
         $this->containerMock->expects(self::exactly(4))
             ->method('get')
-            ->willReturnCallback(fn ($key) => match ($key) {
+            ->willReturnCallback(fn($key) => match ($key) {
                 EventDispatcherInterface::class => $this->eventDispatcherMock,
                 FooCommand::class => new FooCommand(),
                 ExceptionHandlerInterface::class => $this->exceptionHandlerMock,

@@ -115,7 +115,7 @@ class ExceptionHandlerTest extends TestCase
 
         $this->containerMock->expects(self::exactly(3))
             ->method('get')
-            ->willReturnCallback(fn($key) => match($key) {
+            ->willReturnCallback(fn($key) => match ($key) {
                 EmitterInterface::class => $this->emitterMock,
                 ConfigInterface::class => $this->configMock,
                 ServerRequestInterface::class => $this->serverRequestMock,
@@ -179,7 +179,7 @@ class ExceptionHandlerTest extends TestCase
 
         $this->containerMock->expects(self::exactly(2))
             ->method('get')
-            ->willReturnCallback(fn($key) => match($key) {
+            ->willReturnCallback(fn($key) => match ($key) {
                 ConfigInterface::class => $this->configMock,
                 LoggerInterface::class => $this->loggerMock
             });

@@ -7,6 +7,9 @@ namespace Zaphyr\Framework\Testing\Traits;
 use Psr\Http\Message\ResponseInterface;
 use Zaphyr\Framework\Http\Utils\StatusCode;
 
+/**
+ * @author merloxx <merloxx@zaphyr.org>
+ */
 trait StatusCodesTrait
 {
     /**

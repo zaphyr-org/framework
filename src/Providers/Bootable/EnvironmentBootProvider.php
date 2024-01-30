@@ -29,13 +29,13 @@ class EnvironmentBootProvider extends AbstractServiceProvider implements Bootabl
      */
     public function boot(): void
     {
-        if (file_exists($this->application->getStoragePath('cache' . DIRECTORY_SEPARATOR . 'config.cache'))) {
+        if (file_exists($this->application->getStoragePath('cache/config.cache'))) {
             return;
         }
 
         $rootPath = $this->application->getRootPath();
 
-        if (!file_exists($rootPath . DIRECTORY_SEPARATOR . '.env')) {
+        if (!file_exists($rootPath . '/.env')) {
             throw new FrameworkException('Unable to load the ".env" file');
         }
 
