@@ -4,36 +4,11 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Config;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Framework\Console\Commands\Config\ClearCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 
-class ClearCommandTest extends TestCase
+class ClearCommandTest extends ConsoleTestCase
 {
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
-
-    /**
-     * @var ClearCommand
-     */
-    protected ClearCommand $clearCommand;
-
-    protected function setUp(): void
-    {
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
-
-        $this->clearCommand = new ClearCommand($this->applicationMock);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->applicationMock, $this->clearCommand);
-    }
-
     /* -------------------------------------------------
      * EXECUTE
      * -------------------------------------------------
@@ -49,9 +24,8 @@ class ClearCommandTest extends TestCase
             ->with('cache' . DIRECTORY_SEPARATOR . 'config.cache')
             ->willReturn($cacheFile);
 
-        $commandTester = new CommandTester($this->clearCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new ClearCommand($this->applicationMock));
 
-        self::assertEquals("Configuration cache cleared successfully.\n", $commandTester->getDisplay());
+        self::assertDisplayEquals("Configuration cache cleared successfully.\n", $command);
     }
 }

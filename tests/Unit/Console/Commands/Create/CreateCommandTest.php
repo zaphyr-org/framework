@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Create;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Framework\Console\Commands\Create\AbstractCreateCommand;
 use Zaphyr\Framework\Console\Commands\Create\CommandCommand;
 use Zaphyr\Framework\Console\Commands\Create\ControllerCommand;
@@ -14,32 +11,22 @@ use Zaphyr\Framework\Console\Commands\Create\EventCommand;
 use Zaphyr\Framework\Console\Commands\Create\ListenerCommand;
 use Zaphyr\Framework\Console\Commands\Create\MiddlewareCommand;
 use Zaphyr\Framework\Console\Commands\Create\ProviderCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 use Zaphyr\Utils\File;
 
-class CreateCommandTest extends TestCase
+class CreateCommandTest extends ConsoleTestCase
 {
     /**
      * @var string
      */
     protected string $destinationPath = __DIR__ . '/test/Directory';
 
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
-
-    protected function setUp(): void
-    {
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
-    }
-
     protected function tearDown(): void
     {
-        File::deleteDirectory(dirname($this->destinationPath));
+        parent::tearDown();
 
-        unset($this->applicationMock);
+        File::deleteDirectory(dirname($this->destinationPath));
     }
 
     /* -------------------------------------------------
@@ -59,14 +46,11 @@ class CreateCommandTest extends TestCase
             ->method('getRootPath')
             ->willReturn($this->destinationPath);
 
-        $command = new $command($this->applicationMock);
-
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['name' => $name]);
-
         $filename = $this->destinationPath . '/' . $name . '.php';
 
-        self::assertEquals("$name created successfully.\n", $commandTester->getDisplay());
+        $command = $this->execute(new $command($this->applicationMock), ['name' => $name]);
+
+        self::assertDisplayEquals("$name created successfully.\n", $command);
         self::assertFileExists($filename);
     }
 
@@ -82,14 +66,14 @@ class CreateCommandTest extends TestCase
             ->method('getRootPath')
             ->willReturn($this->destinationPath . '/CustomNamespace');
 
-        $command = new $command($this->applicationMock);
-
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['name' => $name, '--namespace' => 'Test\Directory\CustomNamespace']);
-
         $filename = $this->destinationPath . '/CustomNamespace/' . $name . '.php';
 
-        self::assertEquals("$name created successfully.\n", $commandTester->getDisplay());
+        $command = $this->execute(
+            new $command($this->applicationMock),
+            ['name' => $name, '--namespace' => 'Test\Directory\CustomNamespace']
+        );
+
+        self::assertDisplayEquals("$name created successfully.\n", $command);
         self::assertFileExists($filename);
     }
 
@@ -110,15 +94,9 @@ class CreateCommandTest extends TestCase
             ->method('getRootPath')
             ->willReturn($this->destinationPath);
 
-        $command = new $command($this->applicationMock);
+        $command = $this->execute(new $command($this->applicationMock), ['name' => $name]);
 
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['name' => $name]);
-
-        self::assertStringContainsString(
-            "Do you really wish to run this command? (yes/no) [no]:\n",
-            $commandTester->getDisplay()
-        );
+        self::assertDisplayContains("Do you really wish to run this command? (yes/no) [no]:\n", $command);
     }
 
     /**
@@ -138,16 +116,14 @@ class CreateCommandTest extends TestCase
             ->method('getRootPath')
             ->willReturn($this->destinationPath);
 
-        $command = new $command($this->applicationMock);
-
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['name' => $name, '--force' => true]);
-
-        self::assertStringNotContainsString(
-            "Do you really wish to run this command? (yes/no) [no]:\n",
-            $commandTester->getDisplay()
+        $command = $this->execute(
+            new $command($this->applicationMock),
+            ['name' => $name, '--force' => true]
         );
-        self::assertEquals("$name created successfully.\n", $commandTester->getDisplay());
+
+
+        self::assertDisplayNotContains("Do you really wish to run this command? (yes/no) [no]:\n", $command);
+        self::assertDisplayEquals("$name created successfully.\n", $command);
         self::assertFileExists($filename);
 
         File::deleteDirectory($this->destinationPath);
@@ -184,7 +160,6 @@ class CreateCommandTest extends TestCase
             }
         };
 
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['name' => 'invalid']);
+        $this->execute($command, ['name' => 'invalid']);
     }
 }

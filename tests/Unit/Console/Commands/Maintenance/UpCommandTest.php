@@ -5,21 +5,14 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Maintenance;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Console\Commands\Maintenance\UpCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Events\Maintenance\MaintenanceDisabledEvent;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 
-class UpCommandTest extends TestCase
+class UpCommandTest extends ConsoleTestCase
 {
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
-
     /**
      * @var ContainerInterface&MockObject
      */
@@ -30,28 +23,19 @@ class UpCommandTest extends TestCase
      */
     protected EventDispatcherInterface&MockObject $eventDispatcherMock;
 
-    /**
-     * @var UpCommand
-     */
-    protected UpCommand $upCommand;
-
     protected function setUp(): void
     {
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
+        parent::setUp();
+
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
-
-        $this->upCommand = new UpCommand($this->applicationMock);
     }
 
     protected function tearDown(): void
     {
-        unset(
-            $this->applicationMock,
-            $this->containerMock,
-            $this->eventDispatcherMock,
-            $this->upCommand
-        );
+        parent::tearDown();
+
+        unset($this->containerMock, $this->eventDispatcherMock);
     }
 
     /* -------------------------------------------------
@@ -83,10 +67,9 @@ class UpCommandTest extends TestCase
             ->method('dispatch')
             ->with($this->isInstanceOf(MaintenanceDisabledEvent::class));
 
-        $commandTester = new CommandTester($this->upCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new UpCommand($this->applicationMock));
 
-        self::assertEquals("Application is now live.\n", $commandTester->getDisplay());
+        self::assertDisplayEquals("Application is now live.\n", $command);
         self::assertFileDoesNotExist($maintenanceFile);
     }
 
@@ -100,9 +83,8 @@ class UpCommandTest extends TestCase
         $this->eventDispatcherMock->expects(self::never())
             ->method('dispatch');
 
-        $commandTester = new CommandTester($this->upCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new UpCommand($this->applicationMock));
 
-        self::assertEquals("Application is already up.\n", $commandTester->getDisplay());
+        self::assertDisplayEquals("Application is already up.\n", $command);
     }
 }

@@ -4,35 +4,11 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\App;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Framework\Console\Commands\App\EnvironmentCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 
-class EnvironmentCommandTest extends TestCase
+class EnvironmentCommandTest extends ConsoleTestCase
 {
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
-
-    /**
-     * @var EnvironmentCommand
-     */
-    protected EnvironmentCommand $environmentCommand;
-
-    protected function setUp(): void
-    {
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
-        $this->environmentCommand = new EnvironmentCommand($this->applicationMock);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->applicationMock, $this->environmentCommand);
-    }
-
     /* -------------------------------------------------
      * EXECUTE
      * -------------------------------------------------
@@ -46,9 +22,8 @@ class EnvironmentCommandTest extends TestCase
             ->method('getEnvironment')
             ->willReturn($environment);
 
-        $commandTester = new CommandTester($this->environmentCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new EnvironmentCommand($this->applicationMock));
 
-        self::assertEquals('Current application environment: ' . $environment . "\n", $commandTester->getDisplay());
+        self::assertDisplayEquals('Current application environment: ' . $environment . "\n", $command);
     }
 }

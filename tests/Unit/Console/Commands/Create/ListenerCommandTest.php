@@ -4,37 +4,12 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Create;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Framework\Console\Commands\Create\ListenerCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 use Zaphyr\Utils\File;
 
-class ListenerCommandTest extends TestCase
+class ListenerCommandTest extends ConsoleTestCase
 {
-    /**
-     * @var string
-     */
-    protected string $destinationPath = __DIR__ . '/test/Directory';
-
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
-
-    protected function setUp(): void
-    {
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
-    }
-
-    protected function tearDown(): void
-    {
-        File::deleteDirectory(dirname($this->destinationPath));
-
-        unset($this->applicationMock);
-    }
-
     /* -------------------------------------------------
      * EXECUTE
      * -------------------------------------------------
@@ -42,20 +17,23 @@ class ListenerCommandTest extends TestCase
 
     public function testExecute(): void
     {
+        $destinationPath = __DIR__ . '/test/Directory';
+
         $this->applicationMock->expects(self::once())
             ->method('getRootPath')
-            ->willReturn($this->destinationPath);
+            ->willReturn($destinationPath);
 
-        $command = new ListenerCommand($this->applicationMock);
-
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(['name' => 'Test', '--event' => 'TestEvent']);
-
-        $listener = $this->destinationPath . '/Test.php';
-
-        self::assertStringContainsString(
-            'public function __invoke(\TestEvent $event)',
-            file_get_contents($listener)
+        $command = $this->execute(
+            new ListenerCommand($this->applicationMock),
+            ['name' => 'Test', '--event' => 'TestEvent']
         );
+
+
+        $listener = $destinationPath . '/Test.php';
+
+        self::assertDisplayEquals("Listener created successfully.\n", $command);
+        self::assertStringContainsString('public function __invoke(\TestEvent $event)', file_get_contents($listener));
+
+        File::deleteDirectory(dirname($destinationPath));
     }
 }

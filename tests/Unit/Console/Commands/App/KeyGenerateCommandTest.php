@@ -5,48 +5,36 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\App;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Framework\Console\Commands\App\KeyGenerateCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 
-class KeyGenerateCommandTest extends TestCase
+class KeyGenerateCommandTest extends ConsoleTestCase
 {
     /**
      * @var string
      */
-    protected $env = '.envTest';
-
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
+    protected string $env = '.envTest';
 
     /**
      * @var ConfigInterface&MockObject
      */
     protected ConfigInterface&MockObject $configMock;
 
-    /**
-     * @var KeyGenerateCommand
-     */
-    protected KeyGenerateCommand $keyGenerateCommand;
-
     protected function setUp(): void
     {
+        parent::setUp();
+
         file_put_contents($this->env, '');
-
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
-
-        $this->keyGenerateCommand = new KeyGenerateCommand($this->applicationMock, $this->configMock);
     }
 
     protected function tearDown(): void
     {
+        parent::tearDown();
+
         unlink($this->env);
-        unset($this->applicationMock, $this->configMock, $this->keyGenerateCommand);
+        unset($this->configMock);
     }
 
     /* -------------------------------------------------
@@ -61,10 +49,12 @@ class KeyGenerateCommandTest extends TestCase
             ->with('app.cipher')
             ->willReturn('AES-128-CBC');
 
-        $commandTester = new CommandTester($this->keyGenerateCommand);
-        $commandTester->execute(['--show' => 1]);
+        $command = $this->execute(
+            new KeyGenerateCommand($this->applicationMock, $this->configMock),
+            ['--show' => 1]
+        );
 
-        self::assertEquals(32, strlen($commandTester->getDisplay()));
+        self::assertEquals(32, strlen($command->getDisplay()));
     }
 
     public function testExecuteWriteKeyToEnvFile(): void
@@ -78,10 +68,9 @@ class KeyGenerateCommandTest extends TestCase
             ->with('.env')
             ->willReturn($this->env);
 
-        $commandTester = new CommandTester($this->keyGenerateCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new KeyGenerateCommand($this->applicationMock, $this->configMock));
 
-        self::assertStringContainsString("Application key set successfully.", $commandTester->getDisplay());
+        self::assertDisplayContains('Application key set successfully.', $command);
     }
 
     public function testExecuteDoesNotWriteKeyToEnvFileWhenInProductionMode(): void
@@ -93,16 +82,12 @@ class KeyGenerateCommandTest extends TestCase
         $this->applicationMock->expects(self::never())
             ->method('getRootPath');
 
-        $commandTester = new CommandTester($this->keyGenerateCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new KeyGenerateCommand($this->applicationMock, $this->configMock));
 
-        self::assertStringContainsString(
-            "Do you really wish to run this command? (yes/no) [no]",
-            $commandTester->getDisplay()
-        );
+        self::assertDisplayContains('Do you really wish to run this command? (yes/no) [no]', $command);
     }
 
-    public function testExecutWritesKeyToEnvFileWhenInProductionModeAndForced(): void
+    public function testExecuteWritesKeyToEnvFileWhenInProductionModeAndForced(): void
     {
         $this->applicationMock->expects(self::once())
             ->method('isProductionEnvironment')
@@ -113,13 +98,12 @@ class KeyGenerateCommandTest extends TestCase
             ->with('.env')
             ->willReturn($this->env);
 
-        $commandTester = new CommandTester($this->keyGenerateCommand);
-        $commandTester->execute(['--force' => 1]);
-
-        self::assertStringNotContainsString(
-            "Do you really wish to run this command? (yes/no) [no]",
-            $commandTester->getDisplay()
+        $command = $this->execute(
+            new KeyGenerateCommand($this->applicationMock, $this->configMock),
+            ['--force' => 1]
         );
-        self::assertStringContainsString("Application key set successfully.", $commandTester->getDisplay());
+
+        self::assertDisplayNotContains('Do you really wish to run this command? (yes/no) [no]', $command);
+        self::assertDisplayContains('Application key set successfully.', $command);
     }
 }

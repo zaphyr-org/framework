@@ -5,21 +5,14 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Maintenance;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Console\Commands\Maintenance\DownCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Events\Maintenance\MaintenanceEnabledEvent;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 
-class DownCommandTest extends TestCase
+class DownCommandTest extends ConsoleTestCase
 {
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
-
     /**
      * @var ContainerInterface&MockObject
      */
@@ -30,28 +23,19 @@ class DownCommandTest extends TestCase
      */
     protected EventDispatcherInterface&MockObject $eventDispatcherMock;
 
-    /**
-     * @var DownCommand
-     */
-    protected DownCommand $downCommand;
-
     protected function setUp(): void
     {
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
+        parent::setUp();
+
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
-
-        $this->downCommand = new DownCommand($this->applicationMock);
     }
 
     protected function tearDown(): void
     {
-        unset(
-            $this->applicationMock,
-            $this->containerMock,
-            $this->eventDispatcherMock,
-            $this->downCommand
-        );
+        parent::tearDown();
+
+        unset($this->containerMock, $this->eventDispatcherMock);
     }
 
     /* -------------------------------------------------
@@ -81,10 +65,9 @@ class DownCommandTest extends TestCase
             ->method('dispatch')
             ->with($this->isInstanceOf(MaintenanceEnabledEvent::class));
 
-        $commandTester = new CommandTester($this->downCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new DownCommand($this->applicationMock));
 
-        self::assertEquals("Application is now in maintenance mode.\n", $commandTester->getDisplay());
+        self::assertDisplayEquals("Application is now in maintenance mode.\n", $command);
         self::assertStringContainsString('Down for maintenance!', file_get_contents($maintenanceFile));
 
         unlink($maintenanceFile);
@@ -115,10 +98,9 @@ class DownCommandTest extends TestCase
             ->method('dispatch')
             ->with($this->isInstanceOf(MaintenanceEnabledEvent::class));
 
-        $commandTester = new CommandTester($this->downCommand);
-        $commandTester->execute(['--template' => $customTemplate]);
+        $command = $this->execute(new DownCommand($this->applicationMock), ['--template' => $customTemplate]);
 
-        self::assertEquals("Application is now in maintenance mode.\n", $commandTester->getDisplay());
+        self::assertDisplayEquals("Application is now in maintenance mode.\n", $command);
         self::assertStringContainsString('I\'ll be back!', file_get_contents($maintenanceFile));
 
         unlink($maintenanceFile);
@@ -135,9 +117,8 @@ class DownCommandTest extends TestCase
         $this->eventDispatcherMock->expects(self::never())
             ->method('dispatch');
 
-        $commandTester = new CommandTester($this->downCommand);
-        $commandTester->execute([]);
+        $command = $this->execute(new DownCommand($this->applicationMock));
 
-        self::assertEquals("Application is already down.\n", $commandTester->getDisplay());
+        self::assertDisplayEquals("Application is already down.\n", $command);
     }
 }

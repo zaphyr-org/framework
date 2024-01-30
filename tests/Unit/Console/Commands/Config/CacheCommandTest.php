@@ -4,56 +4,13 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Config;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Framework\Console\Commands\Config\CacheCommand;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Testing\ConsoleTestCase;
 
-class CacheCommandTest extends TestCase
+class CacheCommandTest extends ConsoleTestCase
 {
-    /**
-     * @var ApplicationInterface&MockObject
-     */
-    protected ApplicationInterface&MockObject $applicationMock;
-
-    /**
-     * @var Application&MockObject
-     */
-    protected Application&MockObject $consoleApplicationMock;
-
-    /**
-     * @var ConfigInterface&MockObject
-     */
-    protected ConfigInterface&MockObject $configMock;
-
-    /**
-     * @var CacheCommand
-     */
-    protected CacheCommand $cacheCommand;
-
-    protected function setUp(): void
-    {
-        $this->applicationMock = $this->createMock(ApplicationInterface::class);
-        $this->consoleApplicationMock = $this->createMock(Application::class);
-        $this->configMock = $this->createMock(ConfigInterface::class);
-
-        $this->cacheCommand = new CacheCommand($this->applicationMock, $this->configMock);
-        $this->cacheCommand->setApplication($this->consoleApplicationMock);
-    }
-
-    protected function tearDown(): void
-    {
-        unset(
-            $this->applicationMock,
-            $this->consoleApplicationMock,
-            $this->configMock,
-            $this->cacheCommand
-        );
-    }
-
     /* -------------------------------------------------
      * EXECUTE
      * -------------------------------------------------
@@ -69,19 +26,22 @@ class CacheCommandTest extends TestCase
             ->with('cache' . DIRECTORY_SEPARATOR . 'config.cache')
             ->willReturn($cacheFile);
 
-        $this->configMock->expects(self::once())
+        $configMock = $this->createMock(ConfigInterface::class);
+        $configMock->expects(self::once())
             ->method('getItems')
             ->willReturn(['foo' => 'bar']);
 
-        $this->consoleApplicationMock->expects(self::once())
+        $consoleApplicationMock = $this->createMock(Application::class);
+        $consoleApplicationMock->expects(self::once())
             ->method('find')
             ->with('config:clear')
             ->willReturn($this->createMock(CacheCommand::class));
 
-        $commandTester = new CommandTester($this->cacheCommand);
-        $commandTester->execute([]);
+        $cacheCommand = new CacheCommand($this->applicationMock, $configMock);
+        $cacheCommand->setApplication($consoleApplicationMock);
+        $command = $this->execute($cacheCommand);
 
-        self::assertEquals("Configuration cached successfully.\n", $commandTester->getDisplay());
+        self::assertDisplayEquals("Configuration cached successfully.\n", $command);
 
         unlink($cacheFile);
     }
