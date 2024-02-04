@@ -4,11 +4,23 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit;
 
+use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\Application;
+use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
+use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
+use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
+use Zaphyr\Framework\Exceptions\Handlers\ExceptionHandler;
+use Zaphyr\Framework\Kernel\ConsoleKernel;
+use Zaphyr\Framework\Kernel\HttpKernel;
+use Zaphyr\FrameworkTests\TestAssets\Exceptions\ExceptionHandler as TestExceptionHandler;
+use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
+use Zaphyr\HttpEmitter\SapiEmitter;
 
 class ApplicationTest extends TestCase
 {
@@ -36,6 +48,32 @@ class ApplicationTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->containerMock, $this->application);
+    }
+
+    /* -------------------------------------------------
+     * INITIAL BINDINGS
+     * -------------------------------------------------
+     */
+
+    public function testWithInitialBindings(): void
+    {
+        $application = new Application($this->rootPath);
+        $container = $application->getContainer();
+
+        self::assertInstanceOf(HttpKernel::class, $container->get(HttpKernelInterface::class));
+        self::assertInstanceOf(ConsoleKernel::class, $container->get(ConsoleKernelInterface::class));
+        self::assertInstanceOf(SapiEmitter::class, $container->get(EmitterInterface::class));
+        self::assertInstanceOf(ExceptionHandler::class, $container->get(ExceptionHandlerInterface::class));
+    }
+
+    public function testWithInitialBindingsOverwrites(): void
+    {
+        $application = new Application($this->rootPath, initBindingsOverwrites: [
+            ExceptionHandlerInterface::class => TestExceptionHandler::class,
+        ]);
+        $container = $application->getContainer();
+
+        self::assertInstanceOf(TestExceptionHandler::class, $container->get(ExceptionHandlerInterface::class));
     }
 
     /* -------------------------------------------------
@@ -203,5 +241,78 @@ class ApplicationTest extends TestCase
     public function testGetContainer(): void
     {
         self::assertSame($this->containerMock, $this->application->getContainer());
+    }
+
+    /* -------------------------------------------------
+     * RUN HTTP REQUEST
+     * -------------------------------------------------
+     */
+
+    public function testRunHttpRequest(): void
+    {
+        $requestMock = $this->createMock(ServerRequestInterface::class);
+        $responseMock = $this->createMock(ResponseInterface::class);
+        $httpKernelMock = $this->createMock(HttpKernelInterface::class);
+        $emitterMock = $this->createMock(EmitterInterface::class);
+
+        $this->containerMock->expects(self::exactly(2))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                HttpKernelInterface::class => $httpKernelMock,
+                EmitterInterface::class => $emitterMock,
+            });
+
+        $httpKernelMock->expects(self::once())
+            ->method('handle')
+            ->with($requestMock)
+            ->willReturn($responseMock);
+
+        $emitterMock->expects(self::once())
+            ->method('emit')
+            ->with($responseMock)
+            ->willReturn(true);
+
+
+        self::assertTrue($this->application->runHttpRequest($requestMock));
+    }
+
+    public function testRunHttpRequestReturnsFalseIfAnErrorOccurs(): void
+    {
+        $requestMock = $this->createMock(ServerRequestInterface::class);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->willThrowException(new Exception('Whoops'));
+
+        self::assertFalse($this->application->runHttpRequest($requestMock));
+    }
+
+    /* -------------------------------------------------
+     * RUN CONSOLE COMMAND
+     * -------------------------------------------------
+     */
+
+    public function testRunConsoleCommand(): void
+    {
+        $consoleKernelMock = $this->createMock(ConsoleKernelInterface::class);
+        $consoleKernelMock->expects(self::once())
+            ->method('handle')
+            ->willReturn(0);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConsoleKernelInterface::class)
+            ->willReturn($consoleKernelMock);
+
+        self::assertEquals(0, $this->application->runConsoleCommand());
+    }
+
+    public function testRunConsoleCommandReturnsOneIfAnErrorOccurs(): void
+    {
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->willThrowException(new Exception('Whoops'));
+
+        self::assertEquals(1, $this->application->runConsoleCommand());
     }
 }
