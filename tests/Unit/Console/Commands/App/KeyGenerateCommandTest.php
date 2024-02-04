@@ -46,7 +46,7 @@ class KeyGenerateCommandTest extends ConsoleTestCase
     {
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('app.cipher')
+            ->with('app.encryption.cipher')
             ->willReturn('AES-128-CBC');
 
         $command = $this->execute(

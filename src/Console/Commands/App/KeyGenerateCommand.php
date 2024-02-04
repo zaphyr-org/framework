@@ -81,7 +81,7 @@ class KeyGenerateCommand extends AbstractCommand
      */
     protected function generateRandomKey(): string
     {
-        $cipher = $this->config->get('app.cipher');
+        $cipher = $this->config->get('app.encryption.cipher');
         $key = random_bytes($cipher === 'AES-128-CBC' ? 16 : 32);
 
         return 'base64:' . base64_encode($key);
@@ -112,7 +112,7 @@ class KeyGenerateCommand extends AbstractCommand
      */
     protected function keyReplacementPattern(): string
     {
-        $escaped = preg_quote('=' . $this->config->get('app.key'), '/');
+        $escaped = preg_quote('=' . $this->config->get('app.encryption.key'), '/');
 
         return "/^APP_KEY{$escaped}/m";
     }

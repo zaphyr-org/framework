@@ -10,13 +10,13 @@ use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\EventDispatcher\EventDispatcher;
 use Zaphyr\Framework\Exceptions\FrameworkException;
-use Zaphyr\Framework\Providers\EventServiceProvider;
+use Zaphyr\Framework\Providers\EventsServiceProvider;
 use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\FrameworkTests\TestAssets\Events\TestEvent;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerOne;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerTwo;
 
-class EventServiceProviderTest extends HttpTestCase
+class EventsServiceProviderTest extends HttpTestCase
 {
     /**
      * @var ContainerInterface
@@ -24,22 +24,22 @@ class EventServiceProviderTest extends HttpTestCase
     protected ContainerInterface $container;
 
     /**
-     * @var EventServiceProvider
+     * @var EventsServiceProvider
      */
-    protected EventServiceProvider $eventServiceProvider;
+    protected EventsServiceProvider $eventsServiceProvider;
 
     protected function setUp(): void
     {
         $this->container = static::getContainer();
 
-        $this->eventServiceProvider = new EventServiceProvider();
-        $this->eventServiceProvider->setContainer($this->container);
-        $this->eventServiceProvider->register();
+        $this->eventsServiceProvider = new EventsServiceProvider();
+        $this->eventsServiceProvider->setContainer($this->container);
+        $this->eventsServiceProvider->register();
     }
 
     protected function tearDow(): void
     {
-        unset($this->container, $this->eventServiceProvider);
+        unset($this->container, $this->eventsServiceProvider);
         parent::tearDown();
     }
 
@@ -50,15 +50,17 @@ class EventServiceProviderTest extends HttpTestCase
 
     public function testRegister(): void
     {
-        self::assertTrue($this->eventServiceProvider->provides(EventDispatcherInterface::class));
-        self::assertTrue($this->eventServiceProvider->provides(ListenerProviderInterface::class));
+        self::assertTrue($this->eventsServiceProvider->provides(EventDispatcherInterface::class));
+        self::assertTrue($this->eventsServiceProvider->provides(ListenerProviderInterface::class));
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'events' => [
-                TestEvent::class => [
-                    TestListenerOne::class,
-                    TestListenerTwo::class,
+            'app' => [
+                'events' => [
+                    TestEvent::class => [
+                        TestListenerOne::class,
+                        TestListenerTwo::class,
+                    ],
                 ],
             ],
         ]);
@@ -79,10 +81,12 @@ class EventServiceProviderTest extends HttpTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'events' => [
-                TestEvent::class => [
-                    ['listener' => TestListenerOne::class, 'priority' => -100],
-                    ['listener' => TestListenerTwo::class, 'priority' => 100],
+            'app' => [
+                'events' => [
+                    TestEvent::class => [
+                        ['listener' => TestListenerOne::class, 'priority' => -100],
+                        ['listener' => TestListenerTwo::class, 'priority' => 100],
+                    ],
                 ],
             ],
         ]);
@@ -100,8 +104,10 @@ class EventServiceProviderTest extends HttpTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'events' => [
-                TestEvent::class => null,
+            'app' => [
+                'events' => [
+                    TestEvent::class => null,
+                ],
             ],
         ]);
 
@@ -114,9 +120,11 @@ class EventServiceProviderTest extends HttpTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'events' => [
-                TestEvent::class => [
-                    ['listener' => null]
+            'app' => [
+                'events' => [
+                    TestEvent::class => [
+                        ['listener' => null]
+                    ],
                 ],
             ],
         ]);

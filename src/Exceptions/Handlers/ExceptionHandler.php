@@ -146,7 +146,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      */
     protected function ignore(Throwable $throwable): bool
     {
-        $ignore = $this->application->getContainer()->get(ConfigInterface::class)->get('logs.ignore', []);
+        $ignore = $this->application->getContainer()->get(ConfigInterface::class)->get('app.logging.ignore', []);
 
         foreach ($ignore as $type) {
             if ($throwable instanceof $type) {

@@ -34,15 +34,15 @@ class RouterBootProvider extends AbstractServiceProvider implements BootableServ
         $router = new Router();
         $router->setContainer($container);
 
-        $controllers = $config->get('routes.controllers', []);
+        $controllers = $config->get('app.routing.controllers', []);
 
         if (is_string($controllers)) {
             $controllers = ClassFinder::getClassesFromDirectory($controllers);
         }
 
         $router->setControllerRoutes($controllers);
-        $router->setRoutePatterns($config->get('routes.patterns', []));
-        $router->setMiddleware($config->get('routes.middleware', []));
+        $router->setRoutePatterns($config->get('app.routing.patterns', []));
+        $router->setMiddleware($config->get('app.routing.middleware', []));
 
         $container->bindInstance(RouterInterface::class, $router);
     }

@@ -8,8 +8,8 @@ use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Http\RedirectResponse;
 use Zaphyr\Framework\Http\Response;
-use Zaphyr\Framework\Providers\EventServiceProvider;
-use Zaphyr\Framework\Providers\LogServiceProvider;
+use Zaphyr\Framework\Providers\EventsServiceProvider;
+use Zaphyr\Framework\Providers\LoggingServiceProvider;
 use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\HttpMessage\UploadedFile;
 use Zaphyr\Router\Contracts\RouterInterface;
@@ -59,8 +59,8 @@ class HttpTestCaseTest extends HttpTestCase
             ],
         ]);
 
-        $this->container->registerServiceProvider(new EventServiceProvider());
-        $this->container->registerServiceProvider(new LogServiceProvider());
+        $this->container->registerServiceProvider(new EventsServiceProvider());
+        $this->container->registerServiceProvider(new LoggingServiceProvider());
     }
 
     protected function tearDown(): void

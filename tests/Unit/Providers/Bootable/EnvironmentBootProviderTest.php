@@ -59,7 +59,7 @@ class EnvironmentBootProviderTest extends TestCase
 
         file_put_contents($configCachePath, serialize([
             'app' => [
-                'environment' => 'production',
+                'env' => 'production',
             ],
         ]));
 

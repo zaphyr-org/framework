@@ -186,7 +186,7 @@ class ExceptionHandlerTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('logs.ignore')
+            ->with('app.logging.ignore')
             ->willReturn([]);
 
         $this->loggerMock->expects(self::once())
@@ -217,7 +217,7 @@ class ExceptionHandlerTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('logs.ignore')
+            ->with('app.logging.ignore')
             ->willReturn([]);
 
         $this->loggerMock->expects(self::never())->method('error');
@@ -244,7 +244,7 @@ class ExceptionHandlerTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('logs.ignore')
+            ->with('app.logging.ignore')
             ->willReturn([$reportIgnore]);
 
         $this->loggerMock->expects(self::never())->method('error');

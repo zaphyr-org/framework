@@ -9,10 +9,10 @@ use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Encrypt\Contracts\EncryptInterface;
 use Zaphyr\Encrypt\Encrypt;
 use Zaphyr\Framework\Exceptions\FrameworkException;
-use Zaphyr\Framework\Providers\EncryptServiceProvider;
+use Zaphyr\Framework\Providers\EncryptionServiceProvider;
 use Zaphyr\Framework\Testing\HttpTestCase;
 
-class EncryptServiceProviderTest extends HttpTestCase
+class EncryptionServiceProviderTest extends HttpTestCase
 {
     /**
      * @var ContainerInterface
@@ -20,22 +20,22 @@ class EncryptServiceProviderTest extends HttpTestCase
     protected ContainerInterface $container;
 
     /**
-     * @var EncryptServiceProvider
+     * @var EncryptionServiceProvider
      */
-    protected EncryptServiceProvider $encryptServiceProvider;
+    protected EncryptionServiceProvider $encryptionServiceProvider;
 
     protected function setUp(): void
     {
         $this->container = static::getContainer();
 
-        $this->encryptServiceProvider = new EncryptServiceProvider();
-        $this->encryptServiceProvider->setContainer($this->container);
-        $this->encryptServiceProvider->register();
+        $this->encryptionServiceProvider = new EncryptionServiceProvider();
+        $this->encryptionServiceProvider->setContainer($this->container);
+        $this->encryptionServiceProvider->register();
     }
 
     protected function tearDown(): void
     {
-        unset($this->container, $this->encryptServiceProvider);
+        unset($this->container, $this->encryptionServiceProvider);
         parent::tearDown();
     }
 
@@ -46,12 +46,14 @@ class EncryptServiceProviderTest extends HttpTestCase
 
     public function testRegister(): void
     {
-        self::assertTrue($this->encryptServiceProvider->provides(EncryptInterface::class));
+        self::assertTrue($this->encryptionServiceProvider->provides(EncryptInterface::class));
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
             'app' => [
-                'key' => 'aaaaaaaaaaaaaaaa',
+                'encryption' => [
+                    'key' => str_repeat('a', 32),
+                ]
             ],
         ]);
 
@@ -61,13 +63,15 @@ class EncryptServiceProviderTest extends HttpTestCase
         self::assertInstanceOf(Encrypt::class, $encrypt);
     }
 
-    public function testRegisterWith256BitKey(): void
+    public function testRegisterWith128BitKey(): void
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
             'app' => [
-                'key' => 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-                'cipher' => 'AES-256-CBC',
+                'encryption' => [
+                    'key' => str_repeat('a', 16),
+                    'cipher' => 'AES-128-CBC',
+                ],
             ],
         ]);
 
@@ -82,7 +86,9 @@ class EncryptServiceProviderTest extends HttpTestCase
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
             'app' => [
-                'key' => 'base64:' . base64_encode('aaaaaaaaaaaaaaaa'),
+                'encryption' => [
+                    'key' => 'base64:' . base64_encode(str_repeat('a', 32)),
+                ],
             ],
         ]);
 
@@ -106,7 +112,9 @@ class EncryptServiceProviderTest extends HttpTestCase
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
             'app' => [
-                'key' => '',
+                'encryption' => [
+                    'key' => '',
+                ],
             ],
         ]);
 

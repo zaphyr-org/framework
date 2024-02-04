@@ -13,7 +13,7 @@ use Zaphyr\Framework\Exceptions\FrameworkException;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-class EncryptServiceProvider extends AbstractServiceProvider
+class EncryptionServiceProvider extends AbstractServiceProvider
 {
     /**
      * {@inheritdoc}
@@ -29,8 +29,8 @@ class EncryptServiceProvider extends AbstractServiceProvider
     {
         $this->getContainer()->bindSingleton(EncryptInterface::class, function ($container) {
             $config = $container->get(ConfigInterface::class);
-            $key = $this->sanitizeKey($config->get('app.key', ''));
-            $cipher = $config->get('app.cipher', 'AES-128-CBC');
+            $key = $this->sanitizeKey($config->get('app.encryption.key', ''));
+            $cipher = $config->get('app.encryption.cipher', 'AES-256-CBC');
 
             return new Encrypt($key, $cipher);
         });

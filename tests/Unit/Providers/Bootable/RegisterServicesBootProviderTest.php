@@ -55,7 +55,7 @@ class RegisterServicesBootProviderTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('services.providers')
+            ->with('app.providers')
             ->willReturn([RegisterServicesBootProvider::class]);
 
         $this->containerMock->expects(self::once())

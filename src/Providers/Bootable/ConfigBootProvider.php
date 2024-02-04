@@ -67,11 +67,11 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
 
         $container->bindInstance(ConfigInterface::class, $this->config);
 
-        $this->application->setEnvironment($this->config->get('app.environment', 'production'));
+        $this->application->setEnvironment($this->config->get('app.env', 'production'));
 
         date_default_timezone_set($this->config->get('app.timezone', 'UTC'));
 
-        mb_internal_encoding($this->config->get('app.encoding', 'UTF-8'));
+        mb_internal_encoding($this->config->get('app.charset', 'UTF-8'));
     }
 
     /**
@@ -98,13 +98,8 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
     {
         $configPath = $this->application->getRootPath('config');
 
-        if (
-            File::glob(
-                $configPath . '/app.{php,ini,json,xml,yml,yaml,neon}',
-                GLOB_BRACE
-            ) === null
-        ) {
-            throw new FrameworkException('Unable to load the "app" configuration file');
+        if (File::glob($configPath . '/app.neon', GLOB_BRACE) === null) {
+            throw new FrameworkException('Unable to load the "app.neon" configuration file');
         }
 
         $this->config->load([$configPath]);

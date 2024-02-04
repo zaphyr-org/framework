@@ -7,7 +7,7 @@ namespace Zaphyr\FrameworkTests\Integration\Providers;
 use Psr\Log\LoggerInterface;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
-use Zaphyr\Framework\Providers\LogServiceProvider;
+use Zaphyr\Framework\Providers\LoggingServiceProvider;
 use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\Logger\Contracts\LogManagerInterface;
 use Zaphyr\Logger\Handlers\FileHandler;
@@ -16,7 +16,7 @@ use Zaphyr\Logger\Handlers\RotateHandler;
 use Zaphyr\Logger\Logger;
 use Zaphyr\Logger\LogManager;
 
-class LogServiceProviderTest extends HttpTestCase
+class LoggingServiceProviderTest extends HttpTestCase
 {
     /**
      * @var ContainerInterface
@@ -24,22 +24,22 @@ class LogServiceProviderTest extends HttpTestCase
     protected ContainerInterface $container;
 
     /**
-     * @var LogServiceProvider
+     * @var LoggingServiceProvider
      */
-    protected LogServiceProvider $logServiceProvider;
+    protected LoggingServiceProvider $loggingServiceProvider;
 
     protected function setUp(): void
     {
         $this->container = static::getContainer();
 
-        $this->logServiceProvider = new LogServiceProvider();
-        $this->logServiceProvider->setContainer($this->container);
-        $this->logServiceProvider->register();
+        $this->loggingServiceProvider = new LoggingServiceProvider();
+        $this->loggingServiceProvider->setContainer($this->container);
+        $this->loggingServiceProvider->register();
     }
 
     protected function tearDown(): void
     {
-        unset($this->container, $this->logServiceProvider);
+        unset($this->container, $this->loggingServiceProvider);
         parent::tearDown();
     }
 
@@ -50,23 +50,25 @@ class LogServiceProviderTest extends HttpTestCase
 
     public function testRegisterWithFileHandler(): void
     {
-        self::assertTrue($this->logServiceProvider->provides(LogManagerInterface::class));
-        self::assertTrue($this->logServiceProvider->provides(LoggerInterface::class));
+        self::assertTrue($this->loggingServiceProvider->provides(LogManagerInterface::class));
+        self::assertTrue($this->loggingServiceProvider->provides(LoggerInterface::class));
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'logs' => [
-                'default' => 'test',
-                'channels' => [
-                    'test' => [
-                        'handlers' => [
-                            'file' => [
-                                'filename' => 'logs/test.log',
+            'app' => [
+                'logging' => [
+                    'default_channel' => 'test',
+                    'channels' => [
+                        'test' => [
+                            'handlers' => [
+                                'file' => [
+                                    'filename' => 'logs/test.log',
+                                ],
                             ],
                         ],
                     ],
                 ],
-            ]
+            ],
         ]);
 
         /** @var LogManager $logManager */
@@ -84,21 +86,23 @@ class LogServiceProviderTest extends HttpTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'logs' => [
-                'default' => 'test',
-                'channels' => [
-                    'test' => [
-                        'handlers' => [
-                            'mail' => [
-                                'dsn' => 'null://null',
-                                'from' => 'from@example.com',
-                                'to' => 'to@example',
-                                'subject' => 'Whoops'
+            'app' => [
+                'logging' => [
+                    'default_channel' => 'test',
+                    'channels' => [
+                        'test' => [
+                            'handlers' => [
+                                'mail' => [
+                                    'dsn' => 'null://null',
+                                    'from' => 'from@example.com',
+                                    'to' => 'to@example',
+                                    'subject' => 'Whoops'
+                                ],
                             ],
                         ],
                     ],
-                ],
-            ]
+                ]
+            ],
         ]);
 
         /** @var LogManager $logManager */
@@ -112,18 +116,20 @@ class LogServiceProviderTest extends HttpTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'logs' => [
-                'default' => 'test',
-                'channels' => [
-                    'test' => [
-                        'handlers' => [
-                            'rotate' => [
-                                'directory' => 'logs',
-                                'interval' => 'day'
+            'app' => [
+                'logging' => [
+                    'default_channel' => 'test',
+                    'channels' => [
+                        'test' => [
+                            'handlers' => [
+                                'rotate' => [
+                                    'directory' => 'logs',
+                                    'interval' => 'day'
+                                ],
                             ],
                         ],
                     ],
-                ],
+                ]
             ]
         ]);
 

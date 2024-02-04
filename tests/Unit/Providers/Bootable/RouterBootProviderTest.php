@@ -58,9 +58,9 @@ class RouterBootProviderTest extends TestCase
         $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'routes.controllers' => [__CLASS__],
-                'routes.patterns' => ['pattern' => 'value'],
-                'routes.middleware' => ['Middleware1', 'Middleware2'],
+                'app.routing.controllers' => [__CLASS__],
+                'app.routing.patterns' => ['pattern' => 'value'],
+                'app.routing.middleware' => ['Middleware1', 'Middleware2'],
             });
 
         $this->containerMock->expects(self::once())
@@ -83,9 +83,9 @@ class RouterBootProviderTest extends TestCase
         $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'routes.controllers' => __DIR__,
-                'routes.patterns' => ['pattern' => 'value'],
-                'routes.middleware' => ['Middleware1', 'Middleware2'],
+                'app.routing.controllers' => __DIR__,
+                'app.routing.patterns' => ['pattern' => 'value'],
+                'app.routing.middleware' => ['Middleware1', 'Middleware2'],
             });
 
         $this->containerMock->expects(self::once())

@@ -16,7 +16,7 @@ use Zaphyr\Framework\Exceptions\FrameworkException;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-class EventServiceProvider extends AbstractServiceProvider
+class EventsServiceProvider extends AbstractServiceProvider
 {
     /**
      * {@inheritdoc}
@@ -43,7 +43,7 @@ class EventServiceProvider extends AbstractServiceProvider
         $this->getContainer()->bindSingleton(ListenerProviderInterface::class, function ($container) {
             $listenerProvider = new ListenerProvider();
             $config = $container->get(ConfigInterface::class);
-            $events = $config->get('events', []);
+            $events = $config->get('app.events', []);
 
             foreach ($events as $event => $listeners) {
                 if (!is_array($listeners)) {
