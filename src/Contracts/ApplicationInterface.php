@@ -77,6 +77,13 @@ interface ApplicationInterface
      *
      * @return string
      */
+    public function getAppPath(string $path = ''): string;
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
     public function getConfigPath(string $path = ''): string;
 
     /**

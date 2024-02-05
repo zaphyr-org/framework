@@ -20,7 +20,7 @@ class ProviderCommandTest extends ConsoleTestCase
         $destinationPath = __DIR__ . '/test/Directory';
 
         $this->applicationMock->expects(self::once())
-            ->method('getRootPath')
+            ->method('getAppPath')
             ->willReturn($destinationPath);
 
         $file = $destinationPath . '/Test.php';

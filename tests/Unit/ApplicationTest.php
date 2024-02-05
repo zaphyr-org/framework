@@ -158,6 +158,23 @@ class ApplicationTest extends TestCase
         self::assertSame($this->rootPath, $this->application->getRootPath());
     }
 
+    public function testGetAppPath(): void
+    {
+        self::assertSame($this->rootPath . '/src', $this->application->getAppPath());
+    }
+
+    public function testGetAppPathAppendPath(): void
+    {
+        self::assertSame($this->rootPath . '/src/Foo', $this->application->getAppPath('Foo'));
+    }
+
+    public function testSetAppPath(): void
+    {
+        $this->application->setAppPath('foo');
+
+        self::assertSame($this->rootPath . '/foo', $this->application->getAppPath());
+    }
+
     public function testGetConfigPath(): void
     {
         self::assertSame($this->rootPath . '/config', $this->application->getConfigPath());

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework;
 
-use Psr\Container\ContainerExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Zaphyr\Container\Container;
@@ -49,6 +48,11 @@ class Application implements ApplicationInterface
      * @var string
      */
     protected string $environment = 'production';
+
+    /**
+     * @var string
+     */
+    protected string $appPath = 'src';
 
     /**
      * @var string
@@ -171,6 +175,24 @@ class Application implements ApplicationInterface
     public function getRootPath(string $path = ''): string
     {
         return $this->rootPath . $this->appendPath($path);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAppPath(string $path = ''): string
+    {
+        return $this->getRootPath($this->appPath) . $this->appendPath($path);
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
+    public function setAppPath(string $path): void
+    {
+        $this->appPath = $path;
     }
 
     /**

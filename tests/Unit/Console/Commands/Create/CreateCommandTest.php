@@ -43,7 +43,7 @@ class CreateCommandTest extends ConsoleTestCase
     public function testExecute(string $name, string $command): void
     {
         $this->applicationMock->expects(self::once())
-            ->method('getRootPath')
+            ->method('getAppPath')
             ->willReturn($this->destinationPath);
 
         $filename = $this->destinationPath . '/' . $name . '.php';
@@ -63,7 +63,7 @@ class CreateCommandTest extends ConsoleTestCase
     public function testExecuteWithCustomNamespace(string $name, string $command): void
     {
         $this->applicationMock->expects(self::once())
-            ->method('getRootPath')
+            ->method('getAppPath')
             ->willReturn($this->destinationPath . '/CustomNamespace');
 
         $filename = $this->destinationPath . '/CustomNamespace/' . $name . '.php';
@@ -91,7 +91,7 @@ class CreateCommandTest extends ConsoleTestCase
         File::put($filename, 'test');
 
         $this->applicationMock->expects(self::once())
-            ->method('getRootPath')
+            ->method('getAppPath')
             ->willReturn($this->destinationPath);
 
         $command = $this->execute(new $command($this->applicationMock), ['name' => $name]);
@@ -113,7 +113,7 @@ class CreateCommandTest extends ConsoleTestCase
         File::put($filename, 'test');
 
         $this->applicationMock->expects(self::once())
-            ->method('getRootPath')
+            ->method('getAppPath')
             ->willReturn($this->destinationPath);
 
         $command = $this->execute(
