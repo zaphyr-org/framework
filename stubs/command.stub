@@ -8,7 +8,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Zaphyr\Framework\Commands\AbstractCommand;
+use Zaphyr\Framework\Console\Commands\AbstractCommand;
 
 #[AsCommand(name: 'app:example', description: 'An example command')]
 class %class% extends AbstractCommand
