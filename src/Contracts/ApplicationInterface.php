@@ -14,6 +14,11 @@ use Zaphyr\Container\Exceptions\ContainerException;
 interface ApplicationInterface
 {
     /**
+     * @return string
+     */
+    public static function getVersion(): string;
+
+    /**
      * @return bool
      */
     public function isBootstrapped(): bool;

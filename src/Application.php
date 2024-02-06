@@ -95,6 +95,14 @@ class Application implements ApplicationInterface
     /**
      * {@inheritdoc}
      */
+    public static function getVersion(): string
+    {
+        return static::VERSION;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isBootstrapped(): bool
     {
         return $this->isBootstrapped;
