@@ -7,6 +7,11 @@ namespace Zaphyr\Framework\Providers\Bootable;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
+use Zaphyr\Framework\Middleware\CookieMiddleware;
+use Zaphyr\Framework\Middleware\CSRFMiddleware;
+use Zaphyr\Framework\Middleware\SessionMiddleware;
+use Zaphyr\Framework\Middleware\XSSMiddleware;
+use Zaphyr\Framework\Utils;
 use Zaphyr\Router\Contracts\RouterInterface;
 use Zaphyr\Router\Router;
 use Zaphyr\Utils\ClassFinder;
@@ -21,6 +26,16 @@ class RouterBootProvider extends AbstractServiceProvider implements BootableServ
      */
     protected array $provides = [
         RouterInterface::class,
+    ];
+
+    /**
+     * @var class-string[]
+     */
+    protected array $frameworkMiddleware = [
+        CookieMiddleware::class,
+        SessionMiddleware::class,
+        CSRFMiddleware::class,
+        XSSMiddleware::class,
     ];
 
     /**
@@ -40,9 +55,19 @@ class RouterBootProvider extends AbstractServiceProvider implements BootableServ
             $controllers = ClassFinder::getClassesFromDirectory($controllers);
         }
 
+        if (!is_array($controllers)) {
+            $controllers = [];
+        }
+
+        $middleware = Utils::merge(
+            $this->frameworkMiddleware,
+            $config->get('app.routing.middleware', []),
+            $config->get('app.routing.middleware_ignore', [])
+        );
+
         $router->setControllerRoutes($controllers);
+        $router->setMiddleware($middleware);
         $router->setRoutePatterns($config->get('app.routing.patterns', []));
-        $router->setMiddleware($config->get('app.routing.middleware', []));
 
         $container->bindInstance(RouterInterface::class, $router);
     }

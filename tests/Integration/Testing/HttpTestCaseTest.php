@@ -6,6 +6,7 @@ namespace Zaphyr\FrameworkTests\Integration\Testing;
 
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Http\RedirectResponse;
 use Zaphyr\Framework\Http\Response;
 use Zaphyr\Framework\Providers\EventsServiceProvider;
@@ -13,6 +14,7 @@ use Zaphyr\Framework\Providers\LoggingServiceProvider;
 use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\HttpMessage\UploadedFile;
 use Zaphyr\Router\Contracts\RouterInterface;
+use Zaphyr\Utils\File;
 
 class HttpTestCaseTest extends HttpTestCase
 {
@@ -34,7 +36,7 @@ class HttpTestCaseTest extends HttpTestCase
     /**
      * @var string
      */
-    protected string $testLogFilename = 'testing.log';
+    protected string $testSessionDir = __DIR__ . '/sessions';
 
     protected function setUp(): void
     {
@@ -42,20 +44,29 @@ class HttpTestCaseTest extends HttpTestCase
         $this->router = $this->container->get(RouterInterface::class);
 
         mkdir($this->testLogDir, 0777, true);
+        mkdir($this->testSessionDir, 0777, true);
 
-        // @todo use null logger as soon as it is implemented
         $this->container->get(ConfigInterface::class)->setItems([
-            'logs' => [
-                'default' => 'testing',
-                'channels' => [
-                    'testing' => [
-                        'handlers' => [
-                            'file' => [
-                                'filename' => $this->testLogDir . '/' . $this->testLogFilename,
+            'app' => [
+                'encryption' => [
+                    'key' => str_repeat('a', 32),
+                ],
+                'session' => [
+                    'default_handler' => 'array',
+                ],
+                // @todo use null logger as soon as it is implemented
+                'logging' => [
+                    'default_channel' => 'testing',
+                    'channels' => [
+                        'testing' => [
+                            'handlers' => [
+                                'file' => [
+                                    'filename' => $this->testLogDir . '/testing.log',
+                                ],
                             ],
                         ],
-                    ],
-                ]
+                    ]
+                ],
             ],
         ]);
 
@@ -67,11 +78,25 @@ class HttpTestCaseTest extends HttpTestCase
     {
         parent::tearDown();
 
-        if (is_file($this->testLogDir . '/' . $this->testLogFilename)) {
-            unlink($this->testLogDir . '/' . $this->testLogFilename);
-        }
+        unset($this->container, $this->router);
 
-        rmdir($this->testLogDir);
+        File::deleteDirectory($this->testLogDir);
+        File::deleteDirectory($this->testSessionDir);
+    }
+
+    /* -------------------------------------------------
+     * BOOT
+     * -------------------------------------------------
+     */
+
+    public function testBootApplication(): void
+    {
+        self::assertInstanceOf(ApplicationInterface::class, static::bootApplication());
+    }
+
+    public function testBootApplicationWithCustomEnvironment(): void
+    {
+        self::assertTrue(static::bootApplication('custom')->isEnvironment('custom'));
     }
 
     /* -------------------------------------------------
@@ -105,16 +130,12 @@ class HttpTestCaseTest extends HttpTestCase
         $this->router->get('/', function ($request) {
             $response = new Response();
 
-            foreach ($request->getHeaders() as $name => $values) {
-                $response = $response->withHeader($name, $values);
-            }
-
-            return $response;
+            return $response->withHeader('x-header', $request->getHeaderline('foo'));
         });
 
         $response = $this->call('GET', '/', ['foo' => 'bar']);
 
-        self::assertEquals(['foo' => ['bar']], $response->getHeaders());
+        self::assertEquals(['bar'], $response->getHeader('x-header'));
     }
 
     public function testCallWithServerParams(): void
@@ -122,16 +143,12 @@ class HttpTestCaseTest extends HttpTestCase
         $this->router->get('/', function ($request) {
             $response = new Response();
 
-            foreach ($request->getServerParams() as $name => $value) {
-                $response = $response->withHeader($name, $value);
-            }
-
-            return $response;
+            return $response->withHeader('x-server-params', json_encode($request->getServerParams()));
         });
 
         $response = $this->call('GET', '/', server: ['foo' => 'bar']);
 
-        self::assertEquals(['foo' => ['bar']], $response->getHeaders());
+        self::assertEquals(['{"foo":"bar"}'], $response->getHeader('x-server-params'));
     }
 
     public function testCallWithCookieParams(): void
@@ -139,16 +156,12 @@ class HttpTestCaseTest extends HttpTestCase
         $this->router->get('/', function ($request) {
             $response = new Response();
 
-            foreach ($request->getCookieParams() as $name => $value) {
-                $response = $response->withHeader($name, $value);
-            }
-
-            return $response;
+            return $response->withHeader('x-cookie-params', json_encode($request->getCookieParams()));
         });
 
         $response = $this->call('GET', '/', cookies: ['foo' => 'bar']);
 
-        self::assertEquals(['foo' => ['bar']], $response->getHeaders());
+        self::assertEquals(['{"foo":"bar"}'], $response->getHeader('x-cookie-params'));
     }
 
     public function testCallWithQueryParams(): void
@@ -156,16 +169,12 @@ class HttpTestCaseTest extends HttpTestCase
         $this->router->get('/', function ($request) {
             $response = new Response();
 
-            foreach ($request->getQueryParams() as $name => $value) {
-                $response = $response->withHeader($name, $value);
-            }
-
-            return $response;
+            return $response->withHeader('x-query-params', json_encode($request->getQueryParams()));
         });
 
         $response = $this->call('GET', '/', query: ['foo' => 'bar']);
 
-        self::assertEquals(['foo' => ['bar']], $response->getHeaders());
+        self::assertEquals(['{"foo":"bar"}'], $response->getHeader('x-query-params'));
     }
 
     public function testCallWithUploadedFiles(): void
@@ -174,15 +183,19 @@ class HttpTestCaseTest extends HttpTestCase
             $response = new Response();
 
             foreach ($request->getUploadedFiles() as $key => $file) {
-                $response = $response->withHeader($file->getClientFilename(), 'bar');
+                $response = $response->withHeader(
+                    'Content-Disposition',
+                    'attachment; filename="' . $file->getClientFilename() . '"'
+                );
             }
 
             return $response;
         });
 
-        $response = $this->call('GET', '/', files: [new UploadedFile('bar', null, 0, 'file')]);
+        $uploadedFile = new UploadedFile('bar', null, 0, 'file', 'mime/type');
+        $response = $this->call('GET', '/', files: ['file' => $uploadedFile]);
 
-        self::assertEquals(['file' => ['bar']], $response->getHeaders());
+        self::assertEquals(['attachment; filename="file"'], $response->getHeader('Content-Disposition'));
     }
 
     /* -------------------------------------------------
@@ -506,5 +519,20 @@ class HttpTestCaseTest extends HttpTestCase
         $this->router->get('/', fn() => new Response(statusCode: 503));
 
         self::assertServiceUnavailable($this->get('/'));
+    }
+
+    /* -------------------------------------------------
+     * GET CONTAINER
+     * -------------------------------------------------
+     */
+
+    public function testGetContainerReturnsContainerInstance(): void
+    {
+        self::assertInstanceOf(ContainerInterface::class, static::getContainer());
+    }
+
+    public function testGetContainerReturnsSameContainerInstance(): void
+    {
+        self::assertSame(static::getContainer(), static::getContainer());
     }
 }

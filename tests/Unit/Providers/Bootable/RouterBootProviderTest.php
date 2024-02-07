@@ -9,9 +9,11 @@ use PHPUnit\Framework\TestCase;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Providers\Bootable\RouterBootProvider;
+use Zaphyr\FrameworkTests\TestAssets\Controllers\TestController;
 use Zaphyr\Router\Contracts\RouterInterface;
 use Zaphyr\Router\Router;
 
+// @todo this "tests" doesn't really test anything
 class RouterBootProviderTest extends TestCase
 {
     /**
@@ -48,19 +50,21 @@ class RouterBootProviderTest extends TestCase
      * -------------------------------------------------
      */
 
-    public function testBoot(): void
+    public function testBootWithFrameworkProviders(): void
     {
         $this->containerMock->expects(self::once())
             ->method('get')
             ->with(ConfigInterface::class)
             ->willReturn($this->configMock);
 
-        $this->configMock->expects(self::exactly(3))
+        $this->configMock->expects(self::exactly(4))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'app.routing.controllers' => [__CLASS__],
-                'app.routing.patterns' => ['pattern' => 'value'],
-                'app.routing.middleware' => ['Middleware1', 'Middleware2'],
+                'app.routing.controllers',
+                'app.routing.middleware',
+                'app.routing.middleware_ignore',
+                'app.routing.patterns' => [],
+
             });
 
         $this->containerMock->expects(self::once())
@@ -73,19 +77,72 @@ class RouterBootProviderTest extends TestCase
         $this->routerBootProvider->boot();
     }
 
-    public function testBootWithControllerSrcDirectory(): void
+    public function testBootWithControllersAsArray(): void
     {
         $this->containerMock->expects(self::once())
             ->method('get')
             ->with(ConfigInterface::class)
             ->willReturn($this->configMock);
 
-        $this->configMock->expects(self::exactly(3))
+        $this->configMock->expects(self::exactly(4))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'app.routing.controllers' => __DIR__,
-                'app.routing.patterns' => ['pattern' => 'value'],
-                'app.routing.middleware' => ['Middleware1', 'Middleware2'],
+                'app.routing.controllers' => [TestController::class],
+                'app.routing.middleware',
+                'app.routing.middleware_ignore',
+                'app.routing.patterns' => [],
+            });
+
+        $this->containerMock->expects(self::once())
+            ->method('bindInstance')
+            ->with(
+                $this->equalTo(RouterInterface::class),
+                $this->isInstanceOf(Router::class)
+            );
+
+        $this->routerBootProvider->boot();
+    }
+
+    public function testBootWithControllersAsDirectoryString(): void
+    {
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
+        $this->configMock->expects(self::exactly(4))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'app.routing.controllers' => dirname(__DIR__, 3) . '/TestAssets/Controllers',
+                'app.routing.middleware',
+                'app.routing.middleware_ignore',
+                'app.routing.patterns' => [],
+            });
+
+        $this->containerMock->expects(self::once())
+            ->method('bindInstance')
+            ->with(
+                $this->equalTo(RouterInterface::class),
+                $this->isInstanceOf(Router::class)
+            );
+
+        $this->routerBootProvider->boot();
+    }
+
+    public function testBootWithWrongControllersFormat(): void
+    {
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
+        $this->configMock->expects(self::exactly(4))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'app.routing.controllers' => false,
+                'app.routing.middleware',
+                'app.routing.middleware_ignore',
+                'app.routing.patterns' => [],
             });
 
         $this->containerMock->expects(self::once())

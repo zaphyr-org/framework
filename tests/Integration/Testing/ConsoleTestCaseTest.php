@@ -7,10 +7,27 @@ namespace Zaphyr\FrameworkTests\Integration\Testing;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Testing\ConsoleTestCase;
 
 class ConsoleTestCaseTest extends ConsoleTestCase
 {
+    /* -------------------------------------------------
+     * BOOT
+     * -------------------------------------------------
+     */
+
+    public function testBootApplication(): void
+    {
+        self::assertInstanceOf(ApplicationInterface::class, static::bootApplication());
+    }
+
+    public function testBootApplicationWithCustomEnvironment(): void
+    {
+        self::assertTrue(static::bootApplication('custom')->isEnvironment('custom'));
+    }
+
     /* -------------------------------------------------
      * EXECUTE
      * -------------------------------------------------
@@ -127,5 +144,20 @@ class ConsoleTestCaseTest extends ConsoleTestCase
         $commandTester = $this->execute($command);
 
         self::assertDisplayEquals("foo\n", $commandTester);
+    }
+
+    /* -------------------------------------------------
+     * GET CONTAINER
+     * -------------------------------------------------
+     */
+
+    public function testGetContainerReturnsContainerInstance(): void
+    {
+        self::assertInstanceOf(ContainerInterface::class, static::getContainer());
+    }
+
+    public function testGetContainerReturnsSameContainerInstance(): void
+    {
+        self::assertSame(static::getContainer(), static::getContainer());
     }
 }

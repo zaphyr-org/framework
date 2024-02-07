@@ -6,7 +6,7 @@ namespace Zaphyr\Framework\Kernel;
 
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
@@ -16,9 +16,6 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Throwable;
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Framework\Application as Zaphyr;
-use Zaphyr\Framework\Console\Commands;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
@@ -26,6 +23,7 @@ use Zaphyr\Framework\Events\Console\Commands\CommandFailedEvent;
 use Zaphyr\Framework\Events\Console\Commands\CommandFinishedEvent;
 use Zaphyr\Framework\Events\Console\Commands\CommandStartingEvent;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
+use Zaphyr\Framework\Providers\Bootable\ConsoleBootServiceProvider;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
 use Zaphyr\Framework\Providers\Bootable\ExceptionBootProvider;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
@@ -33,8 +31,13 @@ use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-class ConsoleKernel extends Application implements ConsoleKernelInterface
+class ConsoleKernel implements ConsoleKernelInterface
 {
+    /**
+     * @var ConsoleApplication
+     */
+    protected ConsoleApplication $consoleApplication;
+
     /**
      * @var ContainerInterface
      */
@@ -53,38 +56,33 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
         ConfigBootProvider::class,
         ExceptionBootProvider::class,
         RegisterServicesBootProvider::class,
+        ConsoleBootServiceProvider::class,
     ];
 
     /**
-     * @var class-string[]
+     * @param ApplicationInterface    $application
+     * @param ConsoleApplication|null $consoleApplication
      */
-    protected array $frameworkCommands = [
-        Commands\App\EnvironmentCommand::class,
-        Commands\App\KeyGenerateCommand::class,
-        Commands\Cache\ClearCommand::class,
-        Commands\Config\CacheCommand::class,
-        Commands\Config\ClearCommand::class,
-        Commands\Config\ListCommand::class,
-        Commands\Create\CommandCommand::class,
-        Commands\Create\ControllerCommand::class,
-        Commands\Create\EventCommand::class,
-        Commands\Create\ListenerCommand::class,
-        Commands\Create\MiddlewareCommand::class,
-        Commands\Create\ProviderCommand::class,
-        Commands\Logs\ClearCommand::class,
-        Commands\Maintenance\DownCommand::class,
-        Commands\Maintenance\UpCommand::class,
-    ];
+    public function __construct(
+        protected ApplicationInterface $application,
+        ConsoleApplication|null $consoleApplication = null
+    ) {
+        $this->consoleApplication = $consoleApplication ?? new ConsoleApplication(
+            'ZAPHYR',
+            $this->application->getVersion()
+        );
+        $this->consoleApplication->setAutoExit(false);
 
-    /**
-     * @param ApplicationInterface $application
-     * @param string               $version
-     */
-    public function __construct(protected ApplicationInterface $application, string $version = Zaphyr::VERSION)
-    {
         $this->container = $this->application->getContainer();
+        $this->container->bindInstance(ConsoleKernelInterface::class, $this);
+    }
 
-        parent::__construct('ZAPHYR', $version);
+    /**
+     * {@inheritdoc}
+     */
+    public function addCommand(string $command): void
+    {
+        $this->consoleApplication->add($this->container->get($command));
     }
 
     /**
@@ -102,14 +100,11 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
      */
     public function handle(InputInterface $input = null, OutputInterface $output = null): int
     {
-        $this->bootstrap();
-        $this->registerEvents();
-
         try {
-            $this->registerFrameworkCommands();
-            $this->registerApplicationCommands();
+            $this->bootstrap();
+            $this->registerEvents();
 
-            return $this->run($input, $output);
+            return $this->consoleApplication->run($input, $output);
         } catch (Throwable $exception) {
             $output ??= new ConsoleOutput();
 
@@ -168,40 +163,8 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
                 }
             );
 
-            $this->setDispatcher($this->symfonyEventDispatcher);
+            $this->consoleApplication->setDispatcher($this->symfonyEventDispatcher);
         }
-    }
-
-    /**
-     * @return void
-     */
-    protected function registerFrameworkCommands(): void
-    {
-        foreach ($this->frameworkCommands as $command) {
-            $this->addCommand($command);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    protected function registerApplicationCommands(): void
-    {
-        $commands = $this->container->get(ConfigInterface::class)->get('console.commands', []);
-
-        foreach ($commands as $command) {
-            $this->addCommand($command);
-        }
-    }
-
-    /**
-     * @param class-string $command
-     *
-     * @return void
-     */
-    protected function addCommand(string $command): void
-    {
-        $this->add($this->container->get($command));
     }
 
     /**
@@ -214,7 +177,7 @@ class ConsoleKernel extends Application implements ConsoleKernelInterface
     {
         $this->container->get(ExceptionHandlerInterface::class)->report($exception);
 
-        $this->renderThrowable($exception, $output);
+        $this->consoleApplication->renderThrowable($exception, $output);
 
         return 1;
     }
