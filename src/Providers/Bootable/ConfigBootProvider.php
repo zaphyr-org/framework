@@ -98,8 +98,13 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
     {
         $configPath = $this->application->getRootPath('config');
 
-        if (File::glob($configPath . '/app.neon', GLOB_BRACE) === null) {
-            throw new FrameworkException('Unable to load the "app.neon" configuration file');
+        if (
+            File::glob(
+                $configPath . '/app.{php,ini,json,xml,yml,yaml,neon}',
+                GLOB_BRACE
+            ) === null
+        ) {
+            throw new FrameworkException('Unable to load the "app" configuration file');
         }
 
         $this->config->load([$configPath]);
