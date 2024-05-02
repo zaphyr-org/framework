@@ -198,6 +198,15 @@ class HttpTestCaseTest extends HttpTestCase
         self::assertEquals(['attachment; filename="file"'], $response->getHeader('Content-Disposition'));
     }
 
+    public function testCallTrimsSlashes(): void
+    {
+        $this->router->get('/foo', fn() => new Response());
+
+        self::assertEquals(200, $this->call('GET', 'foo')->getStatusCode());
+        self::assertEquals(200, $this->call('GET', '/foo')->getStatusCode());
+        self::assertEquals(200, $this->call('GET', 'foo/')->getStatusCode());
+    }
+
     /* -------------------------------------------------
      * RESPONSE
      * -------------------------------------------------

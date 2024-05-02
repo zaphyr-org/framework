@@ -36,7 +36,7 @@ trait RequestTrait
     ): ResponseInterface {
         $request = new Request(
             method: $method,
-            uri: $uri,
+            uri: is_string($uri) ? '/' . trim($uri, '/') : $uri,
             headers: $headers,
             serverParams: $server,
             cookieParams: $cookies,
