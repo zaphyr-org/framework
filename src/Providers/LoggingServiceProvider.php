@@ -16,6 +16,7 @@ use Zaphyr\Logger\Contracts\LogManagerInterface;
 use Zaphyr\Logger\Formatters\HtmlFormatter;
 use Zaphyr\Logger\Handlers\FileHandler;
 use Zaphyr\Logger\Handlers\MailHandler;
+use Zaphyr\Logger\Handlers\NoopHandler;
 use Zaphyr\Logger\Handlers\RotateHandler;
 use Zaphyr\Logger\LogManager;
 
@@ -80,6 +81,7 @@ class LoggingServiceProvider extends AbstractServiceProvider
                     'file' => $this->prepareFileHandlerInstance($name, $config),
                     'mail' => $this->prepareMailHandlerInstance($name, $config),
                     'rotate' => $this->prepareRotateHandlerInstance($name, $config),
+                    'noop' => new NoopHandler(),
                     default => throw new FrameworkException('Unknown log handler "' . $handler . '"'),
                 };
             }

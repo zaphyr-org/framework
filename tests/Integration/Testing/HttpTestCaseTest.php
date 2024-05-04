@@ -31,11 +31,6 @@ class HttpTestCaseTest extends HttpTestCase
     /**
      * @var string
      */
-    protected string $testLogDir = __DIR__ . '/testing';
-
-    /**
-     * @var string
-     */
     protected string $testSessionDir = __DIR__ . '/sessions';
 
     protected function setUp(): void
@@ -43,7 +38,6 @@ class HttpTestCaseTest extends HttpTestCase
         $this->container = HttpTestCase::getContainer();
         $this->router = $this->container->get(RouterInterface::class);
 
-        mkdir($this->testLogDir, 0777, true);
         mkdir($this->testSessionDir, 0777, true);
 
         $this->container->get(ConfigInterface::class)->setItems([
@@ -54,15 +48,12 @@ class HttpTestCaseTest extends HttpTestCase
                 'session' => [
                     'default_handler' => 'array',
                 ],
-                // @todo use null logger as soon as it is implemented
                 'logging' => [
                     'default_channel' => 'testing',
                     'channels' => [
                         'testing' => [
                             'handlers' => [
-                                'file' => [
-                                    'filename' => $this->testLogDir . '/testing.log',
-                                ],
+                                'noop' => null,
                             ],
                         ],
                     ]
@@ -80,7 +71,6 @@ class HttpTestCaseTest extends HttpTestCase
 
         unset($this->container, $this->router);
 
-        File::deleteDirectory($this->testLogDir);
         File::deleteDirectory($this->testSessionDir);
     }
 

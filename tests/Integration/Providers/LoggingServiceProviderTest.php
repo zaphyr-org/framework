@@ -12,6 +12,7 @@ use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\Logger\Contracts\LogManagerInterface;
 use Zaphyr\Logger\Handlers\FileHandler;
 use Zaphyr\Logger\Handlers\MailHandler;
+use Zaphyr\Logger\Handlers\NoopHandler;
 use Zaphyr\Logger\Handlers\RotateHandler;
 use Zaphyr\Logger\Logger;
 use Zaphyr\Logger\LogManager;
@@ -138,5 +139,30 @@ class LoggingServiceProviderTest extends HttpTestCase
 
         self::assertInstanceOf(LogManager::class, $logManager);
         self::assertInstanceOf(RotateHandler::class, $logManager->logger()->getHandlers()[0]);
+    }
+
+    public function testRegisterWithNoopHandler(): void
+    {
+        $config = $this->container->get(ConfigInterface::class);
+        $config->setItems([
+            'app' => [
+                'logging' => [
+                    'default_channel' => 'test',
+                    'channels' => [
+                        'test' => [
+                            'handlers' => [
+                                'noop' => null,
+                            ],
+                        ],
+                    ],
+                ]
+            ]
+        ]);
+
+        /** @var LogManager $logManager */
+        $logManager = $this->container->get(LogManagerInterface::class);
+
+        self::assertInstanceOf(LogManager::class, $logManager);
+        self::assertInstanceOf(NoopHandler::class, $logManager->logger()->getHandlers()[0]);
     }
 }
