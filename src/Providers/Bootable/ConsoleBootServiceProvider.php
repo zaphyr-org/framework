@@ -7,19 +7,7 @@ namespace Zaphyr\Framework\Providers\Bootable;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
-use Zaphyr\Framework\Console\Commands\App\EnvironmentCommand;
-use Zaphyr\Framework\Console\Commands\App\KeyGenerateCommand;
-use Zaphyr\Framework\Console\Commands\Config\CacheCommand;
-use Zaphyr\Framework\Console\Commands\Config\ClearCommand;
-use Zaphyr\Framework\Console\Commands\Config\ListCommand;
-use Zaphyr\Framework\Console\Commands\Create\CommandCommand;
-use Zaphyr\Framework\Console\Commands\Create\ControllerCommand;
-use Zaphyr\Framework\Console\Commands\Create\EventCommand;
-use Zaphyr\Framework\Console\Commands\Create\ListenerCommand;
-use Zaphyr\Framework\Console\Commands\Create\MiddlewareCommand;
-use Zaphyr\Framework\Console\Commands\Create\ProviderCommand;
-use Zaphyr\Framework\Console\Commands\Maintenance\DownCommand;
-use Zaphyr\Framework\Console\Commands\Maintenance\UpCommand;
+use Zaphyr\Framework\Console\Commands;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Utils;
 
@@ -37,21 +25,21 @@ class ConsoleBootServiceProvider extends AbstractServiceProvider implements Boot
      * @var class-string[]
      */
     protected array $frameworkCommands = [
-        EnvironmentCommand::class,
-        KeyGenerateCommand::class,
-        ClearCommand::class,
-        CacheCommand::class,
-        ClearCommand::class,
-        ListCommand::class,
-        CommandCommand::class,
-        ControllerCommand::class,
-        EventCommand::class,
-        ListenerCommand::class,
-        MiddlewareCommand::class,
-        ProviderCommand::class,
-        ClearCommand::class,
-        DownCommand::class,
-        UpCommand::class,
+        Commands\App\EnvironmentCommand::class,
+        Commands\App\KeyGenerateCommand::class,
+        Commands\Config\CacheCommand::class,
+        Commands\Config\ClearCommand::class,
+        Commands\Config\ListCommand::class,
+        Commands\Create\CommandCommand::class,
+        Commands\Create\ControllerCommand::class,
+        Commands\Create\EventCommand::class,
+        Commands\Create\ListenerCommand::class,
+        Commands\Create\MiddlewareCommand::class,
+        Commands\Create\ProviderCommand::class,
+        Commands\Logs\ClearCommand::class,
+        Commands\Maintenance\DownCommand::class,
+        Commands\Maintenance\UpCommand::class,
+        Commands\Routes\ListCommand::class,
     ];
 
     /**

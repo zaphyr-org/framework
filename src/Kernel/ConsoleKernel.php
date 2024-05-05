@@ -27,6 +27,7 @@ use Zaphyr\Framework\Providers\Bootable\ConsoleBootServiceProvider;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
 use Zaphyr\Framework\Providers\Bootable\ExceptionBootProvider;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
+use Zaphyr\Framework\Providers\Bootable\RouterBootProvider;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -55,6 +56,7 @@ class ConsoleKernel implements ConsoleKernelInterface
         EnvironmentBootProvider::class,
         ConfigBootProvider::class,
         ExceptionBootProvider::class,
+        RouterBootProvider::class,
         RegisterServicesBootProvider::class,
         ConsoleBootServiceProvider::class,
     ];
