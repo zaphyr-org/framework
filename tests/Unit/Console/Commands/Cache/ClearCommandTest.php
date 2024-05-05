@@ -14,12 +14,29 @@ class ClearCommandTest extends ConsoleTestCase
      * -------------------------------------------------
      */
 
-    public function testExecute(): void
+    public function testExecuteWithFile(): void
     {
         $cacheDir = __DIR__ . '/directory';
         $cacheFile = __DIR__ . '/directory/file.cache';
         mkdir($cacheDir);
         file_put_contents($cacheFile, '');
+
+        $this->applicationMock->expects(self::once())
+            ->method('getStoragePath')
+            ->with('cache')
+            ->willReturn($cacheDir);
+
+        $command = $this->execute(new ClearCommand($this->applicationMock));
+
+        self::assertDisplayEquals("Cache files cleared successfully.\n", $command);
+
+        rmdir($cacheDir);
+    }
+
+    public function testExecuteWithDirectory(): void
+    {
+        $cacheDir = __DIR__ . '/directory';
+        mkdir($cacheDir . '/subdirectory', 0777, true);
 
         $this->applicationMock->expects(self::once())
             ->method('getStoragePath')
