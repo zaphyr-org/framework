@@ -20,7 +20,7 @@ use Zaphyr\Framework\Utils;
 class RegisterServicesBootProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
     /**
-     * @var class-string[]
+     * @var class-string<ServiceProviderInterface>[]
      */
     protected array $frameworkProviders = [
         LoggingServiceProvider::class,

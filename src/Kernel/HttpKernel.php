@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
@@ -33,7 +34,7 @@ class HttpKernel implements HttpKernelInterface
     protected ContainerInterface $container;
 
     /**
-     * @var class-string[]
+     * @var class-string<ServiceProviderInterface>[]
      */
     protected array $bootServiceProvider = [
         EnvironmentBootProvider::class,

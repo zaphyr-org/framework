@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Contracts;
 
 use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Container\Exceptions\ContainerException;
 
 /**
@@ -23,7 +24,7 @@ interface ApplicationInterface
     public function isBootstrapped(): bool;
 
     /**
-     * @param class-string[] $bootServiceProvider
+     * @param class-string<ServiceProviderInterface>[] $bootServiceProvider
      *
      * @throws ContainerException if the service provider is not bootable
      * @return void

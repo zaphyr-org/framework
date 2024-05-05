@@ -6,6 +6,7 @@ namespace Zaphyr\Framework\Providers\Bootable;
 
 use Zaphyr\Config\Config;
 use Zaphyr\Config\Contracts\ConfigInterface;
+use Zaphyr\Config\Contracts\ReplacerInterface;
 use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
 use Zaphyr\Framework\Config\Replacers\PathReplacer;
@@ -31,7 +32,7 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
     ];
 
     /**
-     * @var array<string, class-string>
+     * @var array<string, class-string<ReplacerInterface>>
      */
     protected array $replacers = [
         'path' => PathReplacer::class,

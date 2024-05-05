@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Providers\Bootable;
 
+use Symfony\Component\Console\Command\Command;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
@@ -22,7 +23,7 @@ class ConsoleBootServiceProvider extends AbstractServiceProvider implements Boot
     protected array $provides = [];
 
     /**
-     * @var class-string[]
+     * @var class-string<Command>[]
      */
     protected array $frameworkCommands = [
         Commands\App\EnvironmentCommand::class,

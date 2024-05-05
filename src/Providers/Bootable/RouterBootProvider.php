@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Providers\Bootable;
 
+use Psr\Http\Server\MiddlewareInterface;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
@@ -29,7 +30,7 @@ class RouterBootProvider extends AbstractServiceProvider implements BootableServ
     ];
 
     /**
-     * @var class-string[]
+     * @var class-string<MiddlewareInterface>[]
      */
     protected array $frameworkMiddleware = [
         CookieMiddleware::class,

@@ -6,7 +6,6 @@ namespace Zaphyr\Framework;
 
 use Zaphyr\Container\Container;
 use Zaphyr\Container\Contracts\ContainerInterface;
-use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 
 /**
@@ -88,7 +87,6 @@ class Application implements ApplicationInterface
         $this->isBootstrapped = true;
 
         foreach ($bootServiceProvider as $provider) {
-            /** @var ServiceProviderInterface $provider */
             $this->container->registerServiceProvider(new $provider($this));
         }
     }

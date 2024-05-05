@@ -9,7 +9,6 @@ use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Cookie\Contracts\CookieManagerInterface;
 use Zaphyr\Cookie\Cookie;
 use Zaphyr\Cookie\CookieManager;
-use Zaphyr\Framework\Providers\CookieServiceProvider;
 use Zaphyr\Framework\Providers\SessionServiceProvider;
 use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\Session\Contracts\SessionInterface;

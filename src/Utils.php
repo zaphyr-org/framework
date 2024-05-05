@@ -6,7 +6,7 @@ use Zaphyr\Utils\ClassFinder;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
- * @internal
+ * @internal This class is not part of the public API of the framework and may change at any time without notice
  */
 class Utils
 {

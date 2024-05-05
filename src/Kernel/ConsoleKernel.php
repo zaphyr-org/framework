@@ -16,6 +16,7 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Throwable;
+use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
@@ -50,7 +51,7 @@ class ConsoleKernel implements ConsoleKernelInterface
     protected EventDispatcher|null $symfonyEventDispatcher = null;
 
     /**
-     * @var class-string[]
+     * @var class-string<ServiceProviderInterface>[]
      */
     protected array $bootServiceProvider = [
         EnvironmentBootProvider::class,
