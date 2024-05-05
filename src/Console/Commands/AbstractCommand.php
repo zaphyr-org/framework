@@ -13,7 +13,7 @@ use Zaphyr\Framework\Contracts\ApplicationInterface;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-class AbstractCommand extends Command
+abstract class AbstractCommand extends Command
 {
     /**
      * @param ApplicationInterface $zaphyr

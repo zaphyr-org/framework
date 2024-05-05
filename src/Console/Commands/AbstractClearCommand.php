@@ -9,7 +9,7 @@ use Zaphyr\Utils\File;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-class AbstractClearCommand extends AbstractCommand
+abstract class AbstractClearCommand extends AbstractCommand
 {
     /**
      * @param string $directory
