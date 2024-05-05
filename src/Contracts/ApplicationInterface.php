@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Contracts;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Container\Exceptions\ContainerException;
 
@@ -116,16 +115,4 @@ interface ApplicationInterface
      * @return ContainerInterface
      */
     public function getContainer(): ContainerInterface;
-
-    /**
-     * @param ServerRequestInterface $request
-     *
-     * @return bool
-     */
-    public function runHttpRequest(ServerRequestInterface $request): bool;
-
-    /**
-     * @return int
-     */
-    public function runConsoleCommand(): int;
 }
