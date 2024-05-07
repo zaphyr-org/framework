@@ -51,7 +51,7 @@ class SessionServiceProvider extends AbstractServiceProvider
             }
 
             $path = $config->get('app.session.cookie.path', '/');
-            $domain = $config->get('app.session.cookie.domain', $config->get('app.url'));
+            $domain = $config->get('app.session.cookie.domain');
             $secure = $config->get('app.session.cookie.secure', true);
             $httpOnly = $config->get('app.session.cookie.http_only', true);
             $raw = $config->get('app.session.cookie.raw', false);
@@ -69,7 +69,7 @@ class SessionServiceProvider extends AbstractServiceProvider
         $this->getContainer()->bindSingleton(SessionManagerInterface::class, function ($container) {
             $config = $container->get(ConfigInterface::class);
 
-            $name = $config->get('app.session.name', Str::slug($config->get('app.name', 'zaphyr'), '_') . '_session');
+            $name = Str::slug($config->get('app.session.name', $config->get('app.name', 'zaphyr') . '_session'), '_');
             $handlers = $config->get('app.session.handlers', []);
             $expire = $config->get('app.session.expire', 120);
             $defaultHandler = $config->get('app.session.default_handler', SessionManager::FILE_HANDLER);
