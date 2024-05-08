@@ -12,6 +12,10 @@ use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
 use Zaphyr\Framework\Exceptions\Handlers\ExceptionHandler;
+use Zaphyr\Framework\Kernel\ConsoleKernel;
+use Zaphyr\Framework\Kernel\HttpKernel;
+use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
+use Zaphyr\HttpEmitter\SapiEmitter;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -44,10 +48,7 @@ abstract class AbstractTestCase extends TestCase
     public static function bootApplication(string|null $environment = null): ApplicationInterface
     {
         static::$application = new Application($_ENV['ROOT_DIR']);
-        static::$application->getContainer()->bindSingleton(
-            ExceptionHandlerInterface::class,
-            $_ENV['EXCEPTION_HANDLER'] ?? ExceptionHandler::class
-        );
+        static::bindImportantInterfaces();
 
         $kernel = static::getKernel();
         (new $kernel(static::$application))->bootstrap();
@@ -55,6 +56,28 @@ abstract class AbstractTestCase extends TestCase
         static::$application->setEnvironment($environment ?? $_ENV['APP_ENV'] ?? 'testing');
 
         return static::$application;
+    }
+
+    protected static function bindImportantInterfaces(): void
+    {
+        if (static::$application !== null) {
+            static::$application->getContainer()->bindSingleton(
+                HttpKernelInterface::class,
+                $_ENV['HTTP_KERNEL'] ?? HttpKernel::class
+            );
+            static::$application->getContainer()->bindSingleton(
+                ConsoleKernelInterface::class,
+                $_ENV['CONSOLE_KERNEL'] ?? ConsoleKernel::class
+            );
+            static::$application->getContainer()->bindSingleton(
+                ExceptionHandlerInterface::class,
+                $_ENV['EXCEPTION_HANDLER'] ?? ExceptionHandler::class
+            );
+            static::$application->getContainer()->bindSingleton(
+                EmitterInterface::class,
+                $_ENV['EMITTER'] ?? SapiEmitter::class
+            );
+        }
     }
 
     /**
