@@ -97,7 +97,7 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
      */
     protected function loadConfigItems(): void
     {
-        $configPath = $this->application->getRootPath('config');
+        $configPath = $this->application->getConfigPath();
 
         if (
             File::glob(

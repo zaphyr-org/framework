@@ -57,8 +57,7 @@ class ConfigBootProviderTest extends TestCase
             ->willReturn('');
 
         $this->applicationMock->expects(self::once())
-            ->method('getRootPath')
-            ->with('config')
+            ->method('getConfigPath')
             ->willReturn(dirname(__DIR__, 3) . '/TestAssets/config');
 
         $this->containerMock->expects($this->once())
@@ -119,8 +118,7 @@ class ConfigBootProviderTest extends TestCase
             ->willReturn('');
 
         $this->applicationMock->expects(self::once())
-            ->method('getRootPath')
-            ->with('config')
+            ->method('getConfigPath')
             ->willReturn(dirname(__DIR__, 2) . '/TestAssets/config/empty');
 
         $this->configBootProvider->boot();
