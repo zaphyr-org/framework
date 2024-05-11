@@ -2,11 +2,14 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 🔥 v1.0.0-alpha.1 [2024-05-06]
+## 🔥 [v1.0.0-alpha.2](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.1...1.0.0-alpha.2) [2024-05-11]
 
-> [!WARNING]
-> This release contains the latest development changes, but you should be prepared for anything,
-> including sudden breaking changes or code refactoring.
+### Fixed:
+* Fixed `Zaphyr\Framework\Providers\SessionServiceProvider` cookie domain and session name config
+* Changed `getRootPath` to `getConfigPath` in `Zaphyr\Framework\Providers\Bootable\ConfigBootProvider::loadConfigItems`
+* Bind default important interfaces to Application instance in `Zaphyr\Framework\Testing\AbstractTestCase` class
+
+## 🔥 v1.0.0-alpha.1 [2024-05-06]
 
 ### New:
 * Initial commit
