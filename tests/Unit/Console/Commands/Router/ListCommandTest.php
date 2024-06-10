@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Routes;
+namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Router;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Zaphyr\Framework\Console\Commands\Routes\ListCommand;
+use Zaphyr\Framework\Console\Commands\Router\ListCommand;
 use Zaphyr\Framework\Testing\ConsoleTestCase;
 use Zaphyr\Router\Attributes\Route;
 use Zaphyr\Router\Contracts\RouterInterface;

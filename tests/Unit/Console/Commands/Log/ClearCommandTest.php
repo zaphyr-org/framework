@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Logs;
+namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Log;
 
-use Zaphyr\Framework\Console\Commands\Logs\ClearCommand;
+use Zaphyr\Framework\Console\Commands\Log\ClearCommand;
 use Zaphyr\Framework\Testing\ConsoleTestCase;
 
 class ClearCommandTest extends ConsoleTestCase

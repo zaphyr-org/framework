@@ -37,10 +37,10 @@ class ConsoleBootServiceProvider extends AbstractServiceProvider implements Boot
         Commands\Create\ListenerCommand::class,
         Commands\Create\MiddlewareCommand::class,
         Commands\Create\ProviderCommand::class,
-        Commands\Logs\ClearCommand::class,
+        Commands\Log\ClearCommand::class,
         Commands\Maintenance\DownCommand::class,
         Commands\Maintenance\UpCommand::class,
-        Commands\Routes\ListCommand::class,
+        Commands\Router\ListCommand::class,
     ];
 
     /**

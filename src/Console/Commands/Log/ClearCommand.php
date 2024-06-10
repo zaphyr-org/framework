@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\Framework\Console\Commands\Logs;
+namespace Zaphyr\Framework\Console\Commands\Log;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +12,7 @@ use Zaphyr\Framework\Console\Commands\AbstractClearCommand;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-#[AsCommand(name: 'logs:clear', description: 'Clear the log files')]
+#[AsCommand(name: 'log:clear', description: 'Clear the log files')]
 class ClearCommand extends AbstractClearCommand
 {
     /**
