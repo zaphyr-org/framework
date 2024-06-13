@@ -18,7 +18,7 @@ parameters:
             path: 'src/Console/Commands/Config/ListCommand.php'
         -
             message: '%Parameter #2 \$array of function implode expects array<string>, array<class-string<Psr\\Http\\Server\\MiddlewareInterface>\|Psr\\Http\\Server\\MiddlewareInterface> given.%'
-            path: src/Console/Commands/Routes/ListCommand.php
+            path: src/Console/Commands/Router/ListCommand.php
         -
             message: '%Parameter #1 \$middleware of method Zaphyr\\Router\\Router::setMiddleware\(\) expects array<class-string<Psr\\Http\\Server\\MiddlewareInterface>\|Psr\\Http\\Server\\MiddlewareInterface>\|class-string<Psr\\Http\\Server\\MiddlewareInterface>\|Psr\\Http\\Server\\MiddlewareInterface, array<class-string> given.%'
             path: src/Providers/Bootable/RouterBootProvider.php
