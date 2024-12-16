@@ -31,7 +31,7 @@ class Application implements ApplicationInterface
     /**
      * @var string
      */
-    protected string $appPath = 'src';
+    protected string $appPath = 'app';
 
     /**
      * @var string
