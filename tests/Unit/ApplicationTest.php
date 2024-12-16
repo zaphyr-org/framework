@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit;
 
-use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\Application;
-use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
-use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
-use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
 
 class ApplicationTest extends TestCase
 {
@@ -142,6 +136,24 @@ class ApplicationTest extends TestCase
 
         self::assertSame($this->rootPath . '/foo', $this->application->getAppPath());
     }
+
+    public function testGetBinPath(): void
+    {
+        self::assertSame($this->rootPath . '/bin', $this->application->getBinPath());
+    }
+
+    public function testGetBinPathAppendPath(): void
+    {
+        self::assertSame($this->rootPath . '/bin/foo', $this->application->getBinPath('foo'));
+    }
+
+    public function testSetBinPath(): void
+    {
+        $this->application->setBinPath('foo');
+
+        self::assertSame($this->rootPath . '/foo', $this->application->getBinPath());
+    }
+
 
     public function testGetConfigPath(): void
     {

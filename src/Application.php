@@ -36,6 +36,11 @@ class Application implements ApplicationInterface
     /**
      * @var string
      */
+    protected string $binPath = 'bin';
+
+    /**
+     * @var string
+     */
     protected string $configPath = 'config';
 
     /**
@@ -171,6 +176,24 @@ class Application implements ApplicationInterface
     public function setAppPath(string $path): void
     {
         $this->appPath = $path;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBinPath(string $path = ''): string
+    {
+        return $this->getRootPath($this->binPath) . $this->appendPath($path);
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return void
+     */
+    public function setBinPath(string $path): void
+    {
+        $this->binPath = $path;
     }
 
     /**
