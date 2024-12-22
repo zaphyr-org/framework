@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 🔥 [v1.0.0-alpha.3](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.2...1.0.0-alpha.3) [2024-12-22]
+
+### New:
+* Added bin path to Application class
+
+### Changed:
+* Renamed "logs" commands to "log" and "routes" command to "router"
+* Updated zaphyr-org/config to v2.3
+* Changed app source code directory from "src" to "app"
+
+### Fixed:
+* Fixed path for router list command in phpstan.neon
+
 ## 🔥 [v1.0.0-alpha.2](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.1...1.0.0-alpha.2) [2024-05-11]
 
 ### Fixed:
