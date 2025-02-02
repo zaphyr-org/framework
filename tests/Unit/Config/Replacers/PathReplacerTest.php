@@ -56,6 +56,7 @@ class PathReplacerTest extends TestCase
     {
         return [
             'root' => ['root', 'getRootPath'],
+            'bin' => ['bin', 'getBinPath'],
             'config' => ['config', 'getConfigPath'],
             'public' => ['public', 'getPublicPath'],
             'resources' => ['resources', 'getResourcesPath'],

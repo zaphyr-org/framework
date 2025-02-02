@@ -19,6 +19,7 @@ class PathReplacer implements ReplacerInterface
     protected array $pathMethods = [
         'root' => 'getRootPath',
         'app' => 'getAppPath',
+        'bin' => 'getBinPath',
         'config' => 'getConfigPath',
         'public' => 'getPublicPath',
         'resources' => 'getResourcesPath',
