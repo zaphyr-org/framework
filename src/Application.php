@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zaphyr\Container\Container;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
+use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
+use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -94,6 +100,32 @@ class Application implements ApplicationInterface
         foreach ($bootServiceProvider as $provider) {
             $this->container->registerServiceProvider(new $provider($this));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleRequest(ServerRequestInterface $request): bool
+    {
+        $response = $this->container->get(HttpKernelInterface::class)->handle($request);
+
+        return $this->container->get(EmitterInterface::class)->emit($response);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleCommand(InputInterface $input = null, OutputInterface $output = null): int
+    {
+        return $this->container->get(ConsoleKernelInterface::class)->handle($input, $output);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 
     /**
@@ -276,13 +308,5 @@ class Application implements ApplicationInterface
     protected function appendPath(string $path): string
     {
         return ($path !== '' ? '/' . trim($path, '/') : '');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getContainer(): ContainerInterface
-    {
-        return $this->container;
     }
 }

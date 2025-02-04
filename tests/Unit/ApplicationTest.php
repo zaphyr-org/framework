@@ -6,36 +6,66 @@ namespace Zaphyr\FrameworkTests\Unit;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\Application;
+use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
+use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
+use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
 
 class ApplicationTest extends TestCase
 {
-    /**
-     * @var string
-     */
     protected string $rootPath = 'root';
 
-    /**
-     * @var ContainerInterface&MockObject
-     */
     protected ContainerInterface&MockObject $containerMock;
 
-    /**
-     * @var Application
-     */
+    protected HttpKernelInterface&MockObject $httpKernelMock;
+
+    protected EmitterInterface&MockObject $emitterMock;
+
+    protected ServerRequestInterface&MockObject $serverRequestMock;
+
+    protected ResponseInterface&MockObject $responseMock;
+
+    protected ConsoleKernelInterface&MockObject $consoleKernelMock;
+
+    protected InputInterface&MockObject $inputMock;
+
+    protected OutputInterface&MockObject $outputMock;
+
     protected Application $application;
 
     protected function setUp(): void
     {
         $this->containerMock = $this->createMock(ContainerInterface::class);
+        $this->httpKernelMock = $this->createMock(HttpKernelInterface::class);
+        $this->emitterMock = $this->createMock(EmitterInterface::class);
+        $this->serverRequestMock = $this->createMock(ServerRequestInterface::class);
+        $this->responseMock = $this->createMock(ResponseInterface::class);
+        $this->consoleKernelMock = $this->createMock(ConsoleKernelInterface::class);
+        $this->inputMock = $this->createMock(InputInterface::class);
+        $this->outputMock = $this->createMock(OutputInterface::class);
+
         $this->application = new Application($this->rootPath, $this->containerMock);
     }
 
     protected function tearDown(): void
     {
-        unset($this->containerMock, $this->application);
+        unset(
+            $this->containerMock,
+            $this->httpKernelMock,
+            $this->emitterMock,
+            $this->serverRequestMock,
+            $this->responseMock,
+            $this->consoleKernelMock,
+            $this->inputMock,
+            $this->outputMock,
+            $this->application
+        );
     }
 
     /* -------------------------------------------------
@@ -54,6 +84,58 @@ class ApplicationTest extends TestCase
         $this->application->bootstrapWith([$providerMock]);
 
         self::assertTrue($this->application->isBootstrapped());
+    }
+
+    /* -------------------------------------------------
+     * HANDLE
+     * -------------------------------------------------
+     */
+
+    public function testHandleRequest(): void
+    {
+        $this->containerMock->expects(self::exactly(2))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                HttpKernelInterface::class => $this->httpKernelMock,
+                EmitterInterface::class => $this->emitterMock,
+            });
+
+        $this->httpKernelMock->expects(self::once())
+            ->method('handle')
+            ->with($this->serverRequestMock)
+            ->willReturn($this->responseMock);
+
+        $this->emitterMock->expects(self::once())
+            ->method('emit')
+            ->with($this->responseMock)
+            ->willReturn(true);
+
+        $this->application->handleRequest($this->serverRequestMock);
+    }
+
+    public function testHandleCommand(): void
+    {
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConsoleKernelInterface::class)
+            ->willReturn($this->consoleKernelMock);
+
+        $this->consoleKernelMock->expects(self::once())
+            ->method('handle')
+            ->with($this->inputMock, $this->outputMock)
+            ->willReturn(0);
+
+        self::assertSame(0, $this->application->handleCommand($this->inputMock, $this->outputMock));
+    }
+
+    /* -------------------------------------------------
+     * CONTAINER
+     * -------------------------------------------------
+     */
+
+    public function testGetContainer(): void
+    {
+        self::assertSame($this->containerMock, $this->application->getContainer());
     }
 
     /* -------------------------------------------------
@@ -228,15 +310,5 @@ class ApplicationTest extends TestCase
         $this->application->setConfigPath('/foo/bar/');
 
         self::assertSame('root/foo/bar', $this->application->getConfigPath());
-    }
-
-    /* -------------------------------------------------
-     * CONTAINER
-     * -------------------------------------------------
-     */
-
-    public function testGetContainer(): void
-    {
-        self::assertSame($this->containerMock, $this->application->getContainer());
     }
 }

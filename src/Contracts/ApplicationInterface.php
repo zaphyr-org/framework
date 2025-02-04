@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Contracts;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Container\Exceptions\ContainerException;
@@ -30,6 +33,26 @@ interface ApplicationInterface
      * @return void
      */
     public function bootstrapWith(array $bootServiceProvider): void;
+
+    /**
+     * @param ServerRequestInterface $request
+     *
+     * @return bool
+     */
+    public function handleRequest(ServerRequestInterface $request): bool;
+
+    /**
+     * @param InputInterface|null  $input
+     * @param OutputInterface|null $output
+     *
+     * @return int
+     */
+    public function handleCommand(InputInterface $input = null, OutputInterface $output = null): int;
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer(): ContainerInterface;
 
     /**
      * @return string
@@ -118,9 +141,4 @@ interface ApplicationInterface
      * @return string
      */
     public function getStoragePath(string $path = ''): string;
-
-    /**
-     * @return ContainerInterface
-     */
-    public function getContainer(): ContainerInterface;
 }
