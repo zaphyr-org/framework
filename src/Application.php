@@ -77,7 +77,7 @@ class Application implements ApplicationInterface
     /**
      * {@inheritdoc}
      */
-    public static function getVersion(): string
+    public function getVersion(): string
     {
         return static::VERSION;
     }

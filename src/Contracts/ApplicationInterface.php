@@ -19,7 +19,7 @@ interface ApplicationInterface
     /**
      * @return string
      */
-    public static function getVersion(): string;
+    public function getVersion(): string;
 
     /**
      * @return bool
