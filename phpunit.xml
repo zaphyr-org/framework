@@ -22,6 +22,6 @@
         <testdoxHtml outputFile="./tests/report/testdox.html"/>
     </logging>
     <php>
-        <env name="ROOT_DIR" value="./tests/TestAssets"/>
+        <env name="ROOT_PATH" value="./tests/TestAssets/"/>
     </php>
 </phpunit>

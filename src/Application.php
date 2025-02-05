@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework;
 
+use Composer\Autoload\ClassLoader;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,7 +13,11 @@ use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
+use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
+use Zaphyr\Utils\Arr;
+use Zaphyr\Utils\Exceptions\FileNotFoundException;
+use Zaphyr\Utils\File;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -35,43 +40,85 @@ class Application implements ApplicationInterface
     protected string $environment = 'production';
 
     /**
-     * @var string
+     * @var string[]
      */
-    protected string $appPath = 'app';
+    protected array $paths = [
+        'app' => 'app',
+        'bin' => 'bin',
+        'config' => 'config',
+        'public' => 'public',
+        'resources' => 'resources',
+        'storage' => 'storage',
+    ];
 
     /**
-     * @var string
-     */
-    protected string $binPath = 'bin';
-
-    /**
-     * @var string
-     */
-    protected string $configPath = 'config';
-
-    /**
-     * @var string
-     */
-    protected string $publicPath = 'public';
-
-    /**
-     * @var string
-     */
-    protected string $resourcesPath = 'resources';
-
-    /**
-     * @var string
-     */
-    protected string $storagePath = 'storage';
-
-    /**
-     * @param string             $rootPath
+     * @param string[]           $paths
      * @param ContainerInterface $container
+     *
+     * @throws FrameworkException if unable to determine the root path.
      */
-    public function __construct(protected string $rootPath, protected ContainerInterface $container = new Container())
+    public function __construct(array $paths = [], protected ContainerInterface $container = new Container())
     {
+        $this->setPaths($paths);
+
         $this->container->bindInstance(ApplicationInterface::class, $this);
         $this->container->bindInstance(ContainerInterface::class, $this->container);
+    }
+
+    /**
+     * @param string[] $paths
+     *
+     * @throws FrameworkException if unable to determine the root path.
+     * @return void
+     */
+    protected function setPaths(array $paths): void
+    {
+        $paths['root'] = $this->initRootPath($paths);
+        $composerPaths = $this->getComposerPaths($paths['root']);
+
+        $this->paths = array_merge($this->paths, $composerPaths, $paths);
+    }
+
+    /**
+     * @param string[] $paths
+     *
+     * @throws FrameworkException if unable to determine the root path.
+     * @return string
+     */
+    protected function initRootPath(array $paths): string
+    {
+        if (isset($paths['root'])) {
+            return rtrim($paths['root'], '/');
+        }
+
+        if (isset($_ENV['ROOT_PATH'])) {
+            return rtrim($_ENV['ROOT_PATH'], '/');
+        }
+
+        foreach (array_keys(ClassLoader::getRegisteredLoaders()) as $path) {
+            if (!str_contains($path, '/vendor/')) {
+                return rtrim(dirname($path), '/');
+            }
+        }
+
+        throw new FrameworkException('Unable to determine the root path.');
+    }
+
+    /**
+     * @param string $rootPath
+     *
+     * @return string[]
+     */
+    protected function getComposerPaths(string $rootPath): array
+    {
+        try {
+            $composer = File::read($rootPath . '/composer.json') ?? '{}';
+            $composer = json_decode($composer, true);
+
+            return Arr::get($composer, 'extra.zaphyr.paths', []);
+        } catch (FileNotFoundException) {
+            return [];
+        }
     }
 
     /**
@@ -189,7 +236,7 @@ class Application implements ApplicationInterface
      */
     public function getRootPath(string $path = ''): string
     {
-        return $this->rootPath . $this->appendPath($path);
+        return $this->joinPaths($this->paths['root'], $path);
     }
 
     /**
@@ -197,17 +244,7 @@ class Application implements ApplicationInterface
      */
     public function getAppPath(string $path = ''): string
     {
-        return $this->getRootPath($this->appPath) . $this->appendPath($path);
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return void
-     */
-    public function setAppPath(string $path): void
-    {
-        $this->appPath = $path;
+        return $this->joinPaths($this->paths['root'], $this->paths['app'], $path);
     }
 
     /**
@@ -215,17 +252,7 @@ class Application implements ApplicationInterface
      */
     public function getBinPath(string $path = ''): string
     {
-        return $this->getRootPath($this->binPath) . $this->appendPath($path);
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return void
-     */
-    public function setBinPath(string $path): void
-    {
-        $this->binPath = $path;
+        return $this->joinPaths($this->paths['root'], $this->paths['bin'], $path);
     }
 
     /**
@@ -233,17 +260,7 @@ class Application implements ApplicationInterface
      */
     public function getConfigPath(string $path = ''): string
     {
-        return $this->getRootPath($this->configPath) . $this->appendPath($path);
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return void
-     */
-    public function setConfigPath(string $path): void
-    {
-        $this->configPath = $path;
+        return $this->joinPaths($this->paths['root'], $this->paths['config'], $path);
     }
 
     /**
@@ -251,17 +268,7 @@ class Application implements ApplicationInterface
      */
     public function getPublicPath(string $path = ''): string
     {
-        return $this->getRootPath($this->publicPath) . $this->appendPath($path);
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return void
-     */
-    public function setPublicPath(string $path): void
-    {
-        $this->publicPath = $path;
+        return $this->joinPaths($this->paths['root'], $this->paths['public'], $path);
     }
 
     /**
@@ -269,17 +276,7 @@ class Application implements ApplicationInterface
      */
     public function getResourcesPath(string $path = ''): string
     {
-        return $this->getRootPath($this->resourcesPath) . $this->appendPath($path);
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return void
-     */
-    public function setResourcesPath(string $path): void
-    {
-        $this->resourcesPath = $path;
+        return $this->joinPaths($this->paths['root'], $this->paths['resources'], $path);
     }
 
     /**
@@ -287,26 +284,24 @@ class Application implements ApplicationInterface
      */
     public function getStoragePath(string $path = ''): string
     {
-        return $this->getRootPath($this->storagePath) . $this->appendPath($path);
+        return $this->joinPaths($this->paths['root'], $this->paths['storage'], $path);
     }
 
     /**
-     * @param string $path
-     *
-     * @return void
-     */
-    public function setStoragePath(string $path): void
-    {
-        $this->storagePath = $path;
-    }
-
-    /**
-     * @param string $path
+     * @param string $rootPath
+     * @param string ...$paths
      *
      * @return string
+     *
+     * @todo move to zaphyr-org/utils package?
      */
-    protected function appendPath(string $path): string
+    protected function joinPaths(string $rootPath, string ...$paths): string
     {
-        return ($path !== '' ? '/' . trim($path, '/') : '');
+        $filteredPaths = array_map(
+            fn($path) => '/' . trim($path, '/'),
+            array_filter($paths, fn($path) => !empty($path))
+        );
+
+        return $rootPath . implode('', $filteredPaths);
     }
 }

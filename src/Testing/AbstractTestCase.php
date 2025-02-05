@@ -47,7 +47,7 @@ abstract class AbstractTestCase extends TestCase
      */
     public static function bootApplication(string|null $environment = null): ApplicationInterface
     {
-        static::$application = new Application($_ENV['ROOT_DIR']);
+        static::$application = new Application();
         static::bindImportantInterfaces();
 
         $kernel = static::getKernel();
