@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 🔥 [v1.0.0-alpha.4](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.3...1.0.0-alpha.4) [2025-02-08]
+
+### New:
+* Added bin path to config path resolver
+* Added `handleRequest` and `handleCommand` methods to Application class
+
+### Changed:
+* Changed `Application::getVersion` method from static to non-static
+
 ## 🔥 [v1.0.0-alpha.3](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.2...1.0.0-alpha.3) [2024-12-22]
 
 ### New:
