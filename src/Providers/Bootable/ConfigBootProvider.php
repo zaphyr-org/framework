@@ -97,18 +97,20 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
      */
     protected function loadConfigItems(): void
     {
-        $configPath = $this->application->getConfigPath();
+        $appConfigExists = false;
 
-        if (
-            File::glob(
-                $configPath . '/app.{php,ini,json,xml,yml,yaml,neon}',
-                GLOB_BRACE
-            ) === null
-        ) {
+        foreach (['php', 'ini', 'json', 'xml', 'yml', 'yaml', 'neon'] as $extension) {
+            if (file_exists($this->application->getConfigPath('app.' . $extension))) {
+                $appConfigExists = true;
+                break;
+            }
+        }
+
+        if (!$appConfigExists) {
             throw new FrameworkException('Unable to load the "app" configuration file');
         }
 
-        $this->config->load([$configPath]);
+        $this->config->load([$this->application->getConfigPath()]);
     }
 
     /**
