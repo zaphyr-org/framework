@@ -31,5 +31,5 @@ interface ConsoleKernelInterface
      *
      * @return int
      */
-    public function handle(InputInterface $input = null, OutputInterface $output = null): int;
+    public function handle(?InputInterface $input = null, ?OutputInterface $output = null): int;
 }

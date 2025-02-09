@@ -162,7 +162,7 @@ class Application implements ApplicationInterface
     /**
      * {@inheritdoc}
      */
-    public function handleCommand(InputInterface $input = null, OutputInterface $output = null): int
+    public function handleCommand(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         return $this->container->get(ConsoleKernelInterface::class)->handle($input, $output);
     }

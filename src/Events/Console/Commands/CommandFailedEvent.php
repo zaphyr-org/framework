@@ -21,7 +21,7 @@ class CommandFailedEvent extends AbstractCommandEvent
      * @param Throwable       $error
      */
     public function __construct(
-        protected string|null $command,
+        protected ?string $command,
         protected InputInterface $input,
         protected OutputInterface $output,
         protected int $exitCode,

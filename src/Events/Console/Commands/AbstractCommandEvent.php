@@ -18,7 +18,7 @@ abstract class AbstractCommandEvent
      * @param OutputInterface $output
      */
     public function __construct(
-        protected string|null $command,
+        protected ?string $command,
         protected InputInterface $input,
         protected OutputInterface $output
     ) {
@@ -27,7 +27,7 @@ abstract class AbstractCommandEvent
     /**
      * @return string|null
      */
-    public function getCommand(): string|null
+    public function getCommand(): ?string
     {
         return $this->command;
     }

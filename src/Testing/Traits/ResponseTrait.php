@@ -18,7 +18,7 @@ trait ResponseTrait
      *
      * @return void
      */
-    public static function assertHeader(string $name, string|null $value, ResponseInterface $response): void
+    public static function assertHeader(string $name, ?string $value, ResponseInterface $response): void
     {
         self::assertTrue($response->hasHeader($name));
 

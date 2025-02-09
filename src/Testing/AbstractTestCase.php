@@ -25,7 +25,7 @@ abstract class AbstractTestCase extends TestCase
     /**
      * @var ApplicationInterface|null
      */
-    protected static ApplicationInterface|null $application = null;
+    protected static ?ApplicationInterface $application = null;
 
     /**
      * {@inheritdoc}
@@ -45,7 +45,7 @@ abstract class AbstractTestCase extends TestCase
      *
      * @return ApplicationInterface
      */
-    public static function bootApplication(string|null $environment = null): ApplicationInterface
+    public static function bootApplication(?string $environment = null): ApplicationInterface
     {
         static::$application = new Application();
         static::bindImportantInterfaces();

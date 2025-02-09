@@ -50,7 +50,7 @@ interface RequestInterface extends PsrServerRequestInterface
      *
      * @return array<string, mixed>
      */
-    public function getParams(array $specifiedKeys = null): array;
+    public function getParams(?array $specifiedKeys = null): array;
 
     /**
      * @param string $key
@@ -121,22 +121,22 @@ interface RequestInterface extends PsrServerRequestInterface
     /**
      * @return string|null
      */
-    public function getContentType(): string|null;
+    public function getContentType(): ?string;
 
     /**
      * @return string|null
      */
-    public function getContentCharset(): string|null;
+    public function getContentCharset(): ?string;
 
     /**
      * @return int|null
      */
-    public function getContentLength(): int|null;
+    public function getContentLength(): ?int;
 
     /**
      * @return string|null
      */
-    public function getMediaType(): string|null;
+    public function getMediaType(): ?string;
 
     /**
      * @return array<string, string>

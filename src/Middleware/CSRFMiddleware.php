@@ -129,7 +129,7 @@ class CSRFMiddleware implements MiddlewareInterface
      *
      * @return string|null
      */
-    protected function getTokenFromRequest(ServerRequestInterface $request): string|null
+    protected function getTokenFromRequest(ServerRequestInterface $request): ?string
     {
         $parsedBody = $request->getParsedBody();
 

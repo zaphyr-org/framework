@@ -48,7 +48,7 @@ class ConsoleKernel implements ConsoleKernelInterface
     /**
      * @var EventDispatcher|null
      */
-    protected EventDispatcher|null $symfonyEventDispatcher = null;
+    protected ?EventDispatcher $symfonyEventDispatcher = null;
 
     /**
      * @var class-string<ServiceProviderInterface>[]
@@ -68,7 +68,7 @@ class ConsoleKernel implements ConsoleKernelInterface
      */
     public function __construct(
         protected ApplicationInterface $application,
-        ConsoleApplication|null $consoleApplication = null
+        ?ConsoleApplication $consoleApplication = null
     ) {
         $this->consoleApplication = $consoleApplication ?? new ConsoleApplication(
             'ZAPHYR',
@@ -101,7 +101,7 @@ class ConsoleKernel implements ConsoleKernelInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(InputInterface $input = null, OutputInterface $output = null): int
+    public function handle(?InputInterface $input = null, ?OutputInterface $output = null): int
     {
         try {
             $this->bootstrap();

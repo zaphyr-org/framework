@@ -32,7 +32,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * @var string|null
      */
-    protected static string|null $reservedMemory;
+    protected static ?string $reservedMemory;
 
     /**
      * @param ApplicationInterface $application
@@ -82,7 +82,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
      *
      * @return void
      */
-    public function handleException(Throwable $throwable, OutputInterface|null $output = null): void
+    public function handleException(Throwable $throwable, ?OutputInterface $output = null): void
     {
         self::$reservedMemory = null;
 
@@ -99,7 +99,7 @@ class ExceptionHandler implements ExceptionHandlerInterface
     /**
      * @param array<string, mixed>|null $error
      */
-    public function handleShutdown(array $error = null): void
+    public function handleShutdown(?array $error = null): void
     {
         $error ??= error_get_last();
 

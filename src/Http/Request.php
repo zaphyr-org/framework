@@ -28,11 +28,11 @@ class Request extends BaseRequest implements RequestInterface
      * @return Request
      */
     public static function fromGlobals(
-        array|null $server = null,
-        array|null $query = null,
-        array|null $body = null,
-        array|null $cookies = null,
-        array|null $files = null
+        ?array $server = null,
+        ?array $query = null,
+        ?array $body = null,
+        ?array $cookies = null,
+        ?array $files = null
     ): Request {
         $server = $server ?? $_SERVER;
 
@@ -115,7 +115,7 @@ class Request extends BaseRequest implements RequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getParams(array $specifiedKeys = null): array
+    public function getParams(?array $specifiedKeys = null): array
     {
         $queryParams = $this->getQueryParams();
         $postParams = $this->getParsedBody();
@@ -273,7 +273,7 @@ class Request extends BaseRequest implements RequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentType(): string|null
+    public function getContentType(): ?string
     {
         $result = $this->getHeader('Content-Type');
 
@@ -283,7 +283,7 @@ class Request extends BaseRequest implements RequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentCharset(): string|null
+    public function getContentCharset(): ?string
     {
         $mediaTypeParams = $this->getMediaTypeParams();
 
@@ -293,7 +293,7 @@ class Request extends BaseRequest implements RequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentLength(): int|null
+    public function getContentLength(): ?int
     {
         if ($this->hasHeader('Content-Length')) {
             return (int)$this->getHeader('Content-Length')[0];
@@ -305,7 +305,7 @@ class Request extends BaseRequest implements RequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getMediaType(): string|null
+    public function getMediaType(): ?string
     {
         $contentType = $this->getContentType();
 

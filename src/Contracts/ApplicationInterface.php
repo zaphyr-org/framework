@@ -47,7 +47,7 @@ interface ApplicationInterface
      *
      * @return int
      */
-    public function handleCommand(InputInterface $input = null, OutputInterface $output = null): int;
+    public function handleCommand(?InputInterface $input = null, ?OutputInterface $output = null): int;
 
     /**
      * @return ContainerInterface

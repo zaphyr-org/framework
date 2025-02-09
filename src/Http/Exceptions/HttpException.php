@@ -23,9 +23,9 @@ class HttpException extends Exception implements HttpExceptionInterface
      */
     public function __construct(
         protected int $statusCode,
-        string|null $message = null,
+        ?string $message = null,
         protected array $headers = [],
-        Exception|null $previous = null,
+        ?Exception $previous = null,
         int $code = 0
     ) {
         $this->message = $message ?? (StatusCode::getMessage($statusCode) ?? 'Unknown error');

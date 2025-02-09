@@ -392,7 +392,7 @@ class StatusCode
      *
      * @return string|null
      */
-    public static function getMessage(int $statusCode): string|null
+    public static function getMessage(int $statusCode): ?string
     {
         return self::$messages[$statusCode] ?? null;
     }

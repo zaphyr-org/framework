@@ -20,7 +20,7 @@ class HttpUtils
      *
      * @return UriInterface
      */
-    public static function getUriFromGlobals(array|null $server = null): UriInterface
+    public static function getUriFromGlobals(?array $server = null): UriInterface
     {
         $server ??= $_SERVER;
         $uri = new Uri();
@@ -70,7 +70,7 @@ class HttpUtils
      *
      * @return array<string, string>
      */
-    public static function getHeadersFromGlobals(array|null $server = null): array
+    public static function getHeadersFromGlobals(?array $server = null): array
     {
         $server ??= $_SERVER;
         $headers = [];
@@ -106,7 +106,7 @@ class HttpUtils
      * @throws UploadedFileException if invalid files structure is provided
      * @return UploadedFileInterface[]
      */
-    public static function normalizeFiles(array|null $files = null): array
+    public static function normalizeFiles(?array $files = null): array
     {
         $files ??= $_FILES;
         $normalized = [];
