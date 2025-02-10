@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 🔥 [v1.0.0-alpha.5](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.4...1.0.0-alpha.5) [2025-02-10]
+
+### Fixed:
+* Removed GLOB_BRACE from ConfigBootProvider class
+* Removed PHP 8.4 deprecations
+
 ## 🔥 [v1.0.0-alpha.4](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.3...1.0.0-alpha.4) [2025-02-08]
 
 ### New:
