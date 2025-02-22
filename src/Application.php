@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework;
 
-use Composer\Autoload\ClassLoader;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -15,9 +14,6 @@ use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
-use Zaphyr\Utils\Arr;
-use Zaphyr\Utils\Exceptions\FileNotFoundException;
-use Zaphyr\Utils\File;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -40,16 +36,9 @@ class Application implements ApplicationInterface
     protected string $environment = 'production';
 
     /**
-     * @var string[]
+     * @var ApplicationPathResolver $applicationPathResolver
      */
-    protected array $paths = [
-        'app' => 'app',
-        'bin' => 'bin',
-        'config' => 'config',
-        'public' => 'public',
-        'resources' => 'resources',
-        'storage' => 'storage',
-    ];
+    protected ApplicationPathResolver $applicationPathResolver;
 
     /**
      * @param string[]           $paths
@@ -59,66 +48,10 @@ class Application implements ApplicationInterface
      */
     public function __construct(array $paths = [], protected ContainerInterface $container = new Container())
     {
-        $this->setPaths($paths);
+        $this->applicationPathResolver = new ApplicationPathResolver($paths);
 
         $this->container->bindInstance(ApplicationInterface::class, $this);
         $this->container->bindInstance(ContainerInterface::class, $this->container);
-    }
-
-    /**
-     * @param string[] $paths
-     *
-     * @throws FrameworkException if unable to determine the root path.
-     * @return void
-     */
-    protected function setPaths(array $paths): void
-    {
-        $paths['root'] = $this->initRootPath($paths);
-        $composerPaths = $this->getComposerPaths($paths['root']);
-
-        $this->paths = array_merge($this->paths, $composerPaths, $paths);
-    }
-
-    /**
-     * @param string[] $paths
-     *
-     * @throws FrameworkException if unable to determine the root path.
-     * @return string
-     */
-    protected function initRootPath(array $paths): string
-    {
-        if (isset($paths['root'])) {
-            return rtrim($paths['root'], '/');
-        }
-
-        if (isset($_ENV['ROOT_PATH'])) {
-            return rtrim($_ENV['ROOT_PATH'], '/');
-        }
-
-        foreach (array_keys(ClassLoader::getRegisteredLoaders()) as $path) {
-            if (!str_contains($path, '/vendor/')) {
-                return rtrim(dirname($path), '/');
-            }
-        }
-
-        throw new FrameworkException('Unable to determine the root path.');
-    }
-
-    /**
-     * @param string $rootPath
-     *
-     * @return string[]
-     */
-    protected function getComposerPaths(string $rootPath): array
-    {
-        try {
-            $composer = File::read($rootPath . '/composer.json') ?? '{}';
-            $composer = json_decode($composer, true);
-
-            return Arr::get($composer, 'extra.zaphyr.paths', []);
-        } catch (FileNotFoundException) {
-            return [];
-        }
     }
 
     /**
@@ -236,7 +169,7 @@ class Application implements ApplicationInterface
      */
     public function getRootPath(string $path = ''): string
     {
-        return $this->joinPaths($this->paths['root'], $path);
+        return $this->applicationPathResolver->getRootPath($path);
     }
 
     /**
@@ -244,7 +177,7 @@ class Application implements ApplicationInterface
      */
     public function getAppPath(string $path = ''): string
     {
-        return $this->joinPaths($this->paths['root'], $this->paths['app'], $path);
+        return $this->applicationPathResolver->getAppPath($path);
     }
 
     /**
@@ -252,7 +185,7 @@ class Application implements ApplicationInterface
      */
     public function getBinPath(string $path = ''): string
     {
-        return $this->joinPaths($this->paths['root'], $this->paths['bin'], $path);
+        return $this->applicationPathResolver->getBinPath($path);
     }
 
     /**
@@ -260,7 +193,7 @@ class Application implements ApplicationInterface
      */
     public function getConfigPath(string $path = ''): string
     {
-        return $this->joinPaths($this->paths['root'], $this->paths['config'], $path);
+        return $this->applicationPathResolver->getConfigPath($path);
     }
 
     /**
@@ -268,7 +201,7 @@ class Application implements ApplicationInterface
      */
     public function getPublicPath(string $path = ''): string
     {
-        return $this->joinPaths($this->paths['root'], $this->paths['public'], $path);
+        return $this->applicationPathResolver->getPublicPath($path);
     }
 
     /**
@@ -276,7 +209,7 @@ class Application implements ApplicationInterface
      */
     public function getResourcesPath(string $path = ''): string
     {
-        return $this->joinPaths($this->paths['root'], $this->paths['resources'], $path);
+        return $this->applicationPathResolver->getResourcesPath($path);
     }
 
     /**
@@ -284,24 +217,6 @@ class Application implements ApplicationInterface
      */
     public function getStoragePath(string $path = ''): string
     {
-        return $this->joinPaths($this->paths['root'], $this->paths['storage'], $path);
-    }
-
-    /**
-     * @param string $rootPath
-     * @param string ...$paths
-     *
-     * @return string
-     *
-     * @todo move to zaphyr-org/utils package?
-     */
-    protected function joinPaths(string $rootPath, string ...$paths): string
-    {
-        $filteredPaths = array_map(
-            fn($path) => '/' . trim($path, '/'),
-            array_filter($paths, fn($path) => !empty($path))
-        );
-
-        return $rootPath . implode('', $filteredPaths);
+        return $this->applicationPathResolver->getStoragePath($path);
     }
 }

@@ -14,7 +14,7 @@ use Zaphyr\Container\Exceptions\ContainerException;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-interface ApplicationInterface
+interface ApplicationInterface extends ApplicationPathResolverInterface
 {
     /**
      * @return string
@@ -92,53 +92,4 @@ interface ApplicationInterface
      * @return bool
      */
     public function isRunningInConsole(): bool;
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getRootPath(string $path = ''): string;
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getAppPath(string $path = ''): string;
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getBinPath(string $path = ''): string;
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getConfigPath(string $path = ''): string;
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getPublicPath(string $path = ''): string;
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getResourcesPath(string $path = ''): string;
-
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
-    public function getStoragePath(string $path = ''): string;
 }
