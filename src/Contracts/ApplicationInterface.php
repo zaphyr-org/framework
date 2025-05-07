@@ -17,6 +17,12 @@ use Zaphyr\Container\Exceptions\ContainerException;
 interface ApplicationInterface extends ApplicationPathResolverInterface
 {
     /**
+     * @param string[]                $paths
+     * @param ContainerInterface|null $container
+     */
+    public function __construct(array $paths = [], ?ContainerInterface $container = null);
+
+    /**
      * @return string
      */
     public function getVersion(): string;

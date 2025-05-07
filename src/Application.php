@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework;
 
+use Psr\Container\ContainerInterface as PsrContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,22 +37,35 @@ class Application implements ApplicationInterface
     protected string $environment = 'production';
 
     /**
+     * @var ApplicationInterface
+     */
+    protected static ApplicationInterface $instance;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected ContainerInterface $container;
+
+    /**
      * @var ApplicationPathResolver $applicationPathResolver
      */
     protected ApplicationPathResolver $applicationPathResolver;
 
     /**
-     * @param string[]           $paths
-     * @param ContainerInterface $container
+     * {@inheritdoc}
      *
      * @throws FrameworkException if unable to determine the root path.
      */
-    public function __construct(array $paths = [], protected ContainerInterface $container = new Container())
+    public function __construct(array $paths = [], ?ContainerInterface $container = null)
     {
+        $this->container = $container ?? new Container();
         $this->applicationPathResolver = new ApplicationPathResolver($paths);
+
+        self::setInstance($this);
 
         $this->container->bindInstance(ApplicationInterface::class, $this);
         $this->container->bindInstance(ContainerInterface::class, $this->container);
+        $this->container->bindInstance(PsrContainerInterface::class, $this->container);
     }
 
     /**
@@ -60,6 +74,22 @@ class Application implements ApplicationInterface
     public function getVersion(): string
     {
         return static::VERSION;
+    }
+
+    /**
+     * @return ApplicationInterface
+     */
+    public static function getInstance(): ApplicationInterface
+    {
+        return static::$instance ??= new static();
+    }
+
+    /**
+     * @param ApplicationInterface $instance
+     */
+    public static function setInstance(ApplicationInterface $instance): void
+    {
+        static::$instance = $instance;
     }
 
     /**

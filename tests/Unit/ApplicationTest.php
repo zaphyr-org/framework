@@ -15,7 +15,6 @@ use Zaphyr\Framework\Application;
 use Zaphyr\Framework\Contracts\Http\ResponseInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
-use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
 
 class ApplicationTest extends TestCase
@@ -69,6 +68,20 @@ class ApplicationTest extends TestCase
             $this->outputMock,
             $this->application
         );
+    }
+
+    /* -------------------------------------------------
+     * SINGLETON
+     * -------------------------------------------------
+     */
+
+    public function testSingleton(): void
+    {
+        $application = new Application();
+
+        Application::setInstance($application);
+
+        self::assertSame($application, Application::getInstance());
     }
 
     /* -------------------------------------------------
