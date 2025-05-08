@@ -21,6 +21,7 @@ class SessionMiddleware implements MiddlewareInterface
     /**
      * @param SessionManagerInterface $sessionManager
      * @param CookieManagerInterface  $cookieManager
+     * @param EncryptInterface        $encrypt
      */
     public function __construct(
         protected SessionManagerInterface $sessionManager,

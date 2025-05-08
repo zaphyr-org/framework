@@ -114,6 +114,6 @@ class KeyGenerateCommand extends AbstractCommand
     {
         $escaped = preg_quote('=' . $this->config->get('app.encryption.key'), '/');
 
-        return "/^APP_KEY{$escaped}/m";
+        return "/^APP_KEY$escaped/m";
     }
 }
