@@ -153,9 +153,9 @@ abstract class AbstractCreateCommand extends AbstractCommand
      */
     protected function getDestinationDirectory(string $namespace): string
     {
-        $namespace = explode('\\', $namespace);
-        array_shift($namespace);
-        $namespace = implode('/', $namespace);
+        $namespaceParts = explode('\\', $namespace);
+        array_shift($namespaceParts);
+        $namespace = implode('/', $namespaceParts);
 
         return $this->zaphyr->getAppPath($namespace);
     }

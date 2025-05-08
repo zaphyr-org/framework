@@ -104,11 +104,7 @@ class CSRFMiddleware implements MiddlewareInterface
         $exclude = preg_quote($exclude, '#');
         $exclude = str_replace('\*', '.*', $exclude);
 
-        if (preg_match('#^' . $exclude . '\z#u', $uri) === 1) {
-            return true;
-        }
-
-        return false;
+        return preg_match('#^' . $exclude . '\z#u', $uri) === 1;
     }
 
     /**

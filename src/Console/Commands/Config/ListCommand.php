@@ -83,7 +83,11 @@ class ListCommand extends AbstractCommand
 
         foreach ($array as $key => $value) {
             if (is_array($value) && !empty($value)) {
-                $results = array_merge($results, $this->flattenItems($value, $prepend . $key . '.'));
+                $nestedResults = $this->flattenItems($value, $prepend . $key . '.');
+
+                foreach ($nestedResults as $nestedKey => $nestedValue) {
+                    $results[$nestedKey] = $nestedValue;
+                }
             } else {
                 $results[$prepend . $key] = $value;
             }

@@ -144,7 +144,7 @@ class ApplicationPathResolver implements ApplicationPathResolverInterface
     {
         $filteredPaths = array_map(
             fn($path) => '/' . trim($path, '/'),
-            array_filter($paths, fn($path) => !empty($path))
+            array_filter($paths, static fn($path) => !empty($path))
         );
 
         return $rootPath . implode('', $filteredPaths);

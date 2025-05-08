@@ -81,11 +81,9 @@ class WhoopsDebugHandler
      */
     protected function prepareHandlerHeadersDataTable(PrettyPageHandler $handler, ServerRequestInterface $request): void
     {
-        $headers = [];
-
-        foreach ($request->getHeaders() as $name => $value) {
-            $headers[$name] = implode(', ', $value);
-        }
+        $headers = array_map(static function ($value) {
+            return implode(', ', $value);
+        }, $request->getHeaders());
 
         $handler->addDataTable('Headers', $headers);
     }

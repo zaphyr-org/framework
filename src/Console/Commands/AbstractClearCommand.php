@@ -28,8 +28,8 @@ abstract class AbstractClearCommand extends AbstractCommand
         }
 
         if ($directories !== null) {
-            foreach ($directories as $directory) {
-                File::deleteDirectory($directory->getPathname());
+            foreach ($directories as $deleteDirectory) {
+                File::deleteDirectory($deleteDirectory->getPathname());
             }
         }
     }
