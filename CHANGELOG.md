@@ -2,37 +2,62 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 🔥 [v1.0.0-alpha.6](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.5...1.0.0-alpha.6) [2025-05-10]
+
+### New:
+
+* Added singleton pattern to Application class
+
+### Changed:
+
+* Updated zaphyr-org/session to v1.1 and removed fixed phpstan error from ignore list
+* Moved application path in own ApplicationPathResolver class
+* Improved configuration loading
+* Added AbstractServiceProvider to framework and improved framework providers
+
+### Fixed:
+
+* Improved performance and readability
+
 ## 🔥 [v1.0.0-alpha.5](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.4...1.0.0-alpha.5) [2025-02-10]
 
 ### Fixed:
+
 * Removed GLOB_BRACE from ConfigBootProvider class
 * Removed PHP 8.4 deprecations
 
 ## 🔥 [v1.0.0-alpha.4](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.3...1.0.0-alpha.4) [2025-02-08]
 
 ### New:
+
 * Added bin path to config path resolver
 * Added `handleRequest` and `handleCommand` methods to Application class
 
 ### Changed:
+
 * Changed `Application::getVersion` method from static to non-static
+* Improved Application project path handling
 
 ## 🔥 [v1.0.0-alpha.3](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.2...1.0.0-alpha.3) [2024-12-22]
 
 ### New:
+
 * Added bin path to Application class
 
 ### Changed:
+
 * Renamed "logs" commands to "log" and "routes" command to "router"
 * Updated zaphyr-org/config to v2.3
 * Changed app source code directory from "src" to "app"
 
 ### Fixed:
+
 * Fixed path for router list command in phpstan.neon
 
 ## 🔥 [v1.0.0-alpha.2](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.1...1.0.0-alpha.2) [2024-05-11]
 
 ### Fixed:
+
 * Fixed `Zaphyr\Framework\Providers\SessionServiceProvider` cookie domain and session name config
 * Changed `getRootPath` to `getConfigPath` in `Zaphyr\Framework\Providers\Bootable\ConfigBootProvider::loadConfigItems`
 * Bind default important interfaces to Application instance in `Zaphyr\Framework\Testing\AbstractTestCase` class
@@ -40,6 +65,7 @@ All notable changes to this project will be documented in this file, in reverse 
 ## 🔥 v1.0.0-alpha.1 [2024-05-06]
 
 ### New:
+
 * Initial commit
 * Added HTTP StatusCode class
 * Added HTTP Response class
@@ -103,6 +129,7 @@ All notable changes to this project will be documented in this file, in reverse 
 * Improved unit tests for console ClearCommand classes
 
 ### Changed:
+
 * Improved HTTP response classes unit tests
 * Improved HttUtils::normalizeFiles method
 * Improved HTTP exceptions
@@ -131,6 +158,7 @@ All notable changes to this project will be documented in this file, in reverse 
 * Updated README.md
 
 ### Removed:
+
 * Removed psr/http-message from require section in composer.json
 * Removed phpstan/phpstan-phpunit from composer require-dev
 * Removed view layer from framework
@@ -140,6 +168,7 @@ All notable changes to this project will be documented in this file, in reverse 
 * Removed initBindingsOverwrite, runHttpRequest method and runConsoleCommand method from Application class
 
 ### Fixed:
+
 * Added missing FrameworkException class
 * Fixed IntegrationTestCase container return type
 * Moved `bootstrap` method outside of try block in ConsoleKernel class
