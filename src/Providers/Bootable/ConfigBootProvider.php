@@ -7,18 +7,23 @@ namespace Zaphyr\Framework\Providers\Bootable;
 use Zaphyr\Config\Config;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Config\Contracts\ReplacerInterface;
-use Zaphyr\Container\AbstractServiceProvider;
+use Zaphyr\Config\Exceptions\ConfigException;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
 use Zaphyr\Framework\Config\Replacers\PathReplacer;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
-use Zaphyr\Utils\File;
+use Zaphyr\Framework\Providers\AbstractServiceProvider;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
 class ConfigBootProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
+    /**
+     * @const string[]
+     */
+    protected const SUPPORTED_CONFIG_EXTENSIONS = ['php', 'ini', 'json', 'xml', 'yml', 'yaml', 'neon'];
+
     /**
      * @var ConfigInterface
      */
@@ -40,11 +45,18 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
 
     /**
      * @param ApplicationInterface $application
-     * @param bool                 $useConfigContainer
+     * @param bool                 $setConfigContainer
      */
-    public function __construct(protected ApplicationInterface $application, protected bool $useConfigContainer = true)
+    public function __construct(protected ApplicationInterface $application, protected bool $setConfigContainer = true)
     {
-        $this->config = new Config();
+        parent::__construct($this->application);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function register(): void
+    {
     }
 
     /**
@@ -53,71 +65,61 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
     public function boot(): void
     {
         $container = $this->getContainer();
+        $config = new Config();
 
-        if ($this->useConfigContainer) {
-            $this->config->setContainer($container);
+        if ($this->setConfigContainer) {
+            $config->setContainer($container);
         }
 
-        foreach ($this->replacers as $key => $replacer) {
-            $this->config->addReplacer($key, $replacer);
-        }
+        $this->loadConfigItems($config);
 
-        file_exists($this->getCachedConfigFile())
-            ? $this->setCachedConfigItems()
-            : $this->loadConfigItems();
+        $container->bindInstance(ConfigInterface::class, $config);
 
-        $container->bindInstance(ConfigInterface::class, $this->config);
+        $this->application->setEnvironment($config->get('app.env', 'production'));
 
-        $this->application->setEnvironment($this->config->get('app.env', 'production'));
+        date_default_timezone_set($config->get('app.timezone', 'UTC'));
 
-        date_default_timezone_set($this->config->get('app.timezone', 'UTC'));
-
-        mb_internal_encoding($this->config->get('app.charset', 'UTF-8'));
+        mb_internal_encoding($config->get('app.charset', 'UTF-8'));
     }
 
     /**
-     * @return string
-     */
-    protected function getCachedConfigFile(): string
-    {
-        return $this->application->getStoragePath('cache/config.cache');
-    }
-
-    /**
+     * @param ConfigInterface $config
+     *
+     * @throws FrameworkException if the "app" configuration file could not be loaded
+     * @throws ConfigException if the configuration file is invalid or the replacers could not be registered
      * @return void
      */
-    protected function setCachedConfigItems(): void
+    protected function loadConfigItems(ConfigInterface $config): void
     {
-        $this->config->setItems(File::unserialize($this->getCachedConfigFile()));
+        $configCache = $this->application->getConfigCachePath();
+
+        if (file_exists($configCache)) {
+            $config->setItems(require $configCache);
+
+            return;
+        }
+
+        $this->appConfigFileExists();
+
+        foreach ($this->replacers as $name => $replacer) {
+            $config->addReplacer($name, $replacer);
+        }
+
+        $config->load([$this->application->getConfigPath()]);
     }
 
     /**
      * @throws FrameworkException if the "app" configuration file could not be loaded
-     * @return void
+     * @return bool
      */
-    protected function loadConfigItems(): void
+    protected function appConfigFileExists(): bool
     {
-        $appConfigExists = false;
-
-        foreach (['php', 'ini', 'json', 'xml', 'yml', 'yaml', 'neon'] as $extension) {
+        foreach (self::SUPPORTED_CONFIG_EXTENSIONS as $extension) {
             if (file_exists($this->application->getConfigPath('app.' . $extension))) {
-                $appConfigExists = true;
-                break;
+                return true;
             }
         }
 
-        if (!$appConfigExists) {
-            throw new FrameworkException('Unable to load the "app" configuration file');
-        }
-
-        $this->config->load([$this->application->getConfigPath()]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function register(): void
-    {
-        //
+        throw new FrameworkException('Unable to load the "app" configuration file');
     }
 }

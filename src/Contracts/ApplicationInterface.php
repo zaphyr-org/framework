@@ -98,4 +98,9 @@ interface ApplicationInterface extends ApplicationPathResolverInterface
      * @return bool
      */
     public function isRunningInConsole(): bool;
+
+    /**
+     * @return string
+     */
+    public function getConfigCachePath(): string;
 }

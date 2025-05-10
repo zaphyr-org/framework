@@ -52,21 +52,20 @@ class ConfigBootProviderTest extends TestCase
     public function testBoot(): void
     {
         $this->applicationMock->expects(self::once())
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
-            ->willReturn('');
+            ->method('getConfigCachePath')
+            ->willReturn('cache/config.php');
 
         $this->applicationMock->method('getConfigPath')
             ->willReturn(dirname(__DIR__, 3) . '/TestAssets/config');
 
-        $this->containerMock->expects($this->once())
+        $this->containerMock->expects(self::once())
             ->method('bindInstance')
             ->with(
                 $this->equalTo(ConfigInterface::class),
                 $this->isInstanceOf(Config::class)
             );
 
-        $this->applicationMock->expects($this->once())
+        $this->applicationMock->expects(self::once())
             ->method('setEnvironment')
             ->with('testing');
 
@@ -75,30 +74,28 @@ class ConfigBootProviderTest extends TestCase
 
     public function testBootWithCachedConfig(): void
     {
-        $configCachePath = dirname(__DIR__, 3) . '/TestAssets/config/config.cache';
+        $configCachePath = __DIR__ . '/config.php';
 
-        file_put_contents($configCachePath, serialize([
-            'app' => [
-                'env' => 'production',
-            ],
-        ]));
+        file_put_contents(
+            $configCachePath,
+            '<?php return ' . var_export(['app' => ['env' => 'production']], true) . ';' . PHP_EOL
+        );
 
-        $this->applicationMock->expects(self::exactly(2))
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
+        $this->applicationMock->expects(self::once())
+            ->method('getConfigCachePath')
             ->willReturn($configCachePath);
 
         $this->applicationMock->expects(self::never())
-            ->method('getRootPath');
+            ->method('getConfigPath');
 
-        $this->containerMock->expects($this->once())
+        $this->containerMock->expects(self::once())
             ->method('bindInstance')
             ->with(
                 $this->equalTo(ConfigInterface::class),
                 $this->isInstanceOf(Config::class)
             );
 
-        $this->applicationMock->expects($this->once())
+        $this->applicationMock->expects(self::once())
             ->method('setEnvironment')
             ->with('production');
 
@@ -112,9 +109,8 @@ class ConfigBootProviderTest extends TestCase
         $this->expectException(FrameworkException::class);
 
         $this->applicationMock->expects(self::once())
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
-            ->willReturn('');
+            ->method('getConfigCachePath')
+            ->willReturn('cache/config.php');
 
         $this->applicationMock->method('getConfigPath')
             ->willReturn(dirname(__DIR__, 2) . '/TestAssets/config/empty');

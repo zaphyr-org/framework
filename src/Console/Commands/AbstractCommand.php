@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Console\Commands;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Throwable;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 
 /**
@@ -21,6 +24,36 @@ abstract class AbstractCommand extends Command
     public function __construct(protected ApplicationInterface $zaphyr)
     {
         parent::__construct();
+    }
+
+    /**
+     * @param string|array<string, mixed> $command
+     * @param OutputInterface             $output
+     *
+     * @throws Throwable if the command could not be executed
+     * @return int|null
+     */
+    public function call(string|array $command, OutputInterface $output): ?int
+    {
+        $arguments = is_array($command) ? $command : ['command' => $command];
+        $input = new ArrayInput($arguments);
+
+        if ($input->getParameterOption('--no-interaction')) {
+            $input->setInteractive(false);
+        }
+
+        return $this->getApplication()?->doRun($input, $output);
+    }
+
+    /**
+     * @param string|array<string, mixed> $command
+     *
+     * @throws Throwable if the command could not be executed
+     * @return int|null
+     */
+    public function callSilent(string|array $command): ?int
+    {
+        return $this->call($command, new NullOutput());
     }
 
     /**

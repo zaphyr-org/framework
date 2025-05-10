@@ -21,7 +21,19 @@ class ClearCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        File::delete($this->zaphyr->getStoragePath('cache/config.cache'));
+        $configCache = $this->zaphyr->getConfigCachePath();
+
+        if (!file_exists($configCache)) {
+            $output->writeln('<info>Configuration cache is already cleared.</info>');
+
+            return self::SUCCESS;
+        }
+
+        if (!File::delete($configCache)) {
+            $output->writeln('<error>Failed to clear configuration cache file.</error>');
+
+            return self::FAILURE;
+        }
 
         $output->writeln('<info>Configuration cache cleared successfully.</info>');
 

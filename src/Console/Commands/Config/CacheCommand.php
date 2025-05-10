@@ -10,7 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Framework\Console\Commands\AbstractCommand;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
-use Zaphyr\Utils\File;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -32,14 +31,16 @@ class CacheCommand extends AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if ($application = $this->getApplication()) {
-            $application->find('config:clear')->run($input, $output);
-        }
+        $this->callSilent('config:clear');
 
-        File::serialize(
-            $this->zaphyr->getStoragePath('cache/config.cache'),
-            $this->config->getItems()
-        );
+        $filename = $this->zaphyr->getConfigCachePath();
+        $data = '<?php return ' . var_export($this->config->getItems(), true) . ';' . PHP_EOL;
+
+        if (!file_put_contents($filename, $data)) {
+            $output->writeln('<error>Failed to write configuration cache file.</error>');
+
+            return self::FAILURE;
+        }
 
         $output->writeln('<info>Configuration cached successfully.</info>');
 

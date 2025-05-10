@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Config;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Framework\Console\Commands\Config\CacheCommand;
 use Zaphyr\Framework\Testing\ConsoleTestCase;
@@ -18,12 +19,11 @@ class CacheCommandTest extends ConsoleTestCase
 
     public function testExecute(): void
     {
-        $cacheFile = 'config.cache';
+        $cacheFile = 'config.php';
         file_put_contents($cacheFile, '');
 
         $this->applicationMock->expects(self::once())
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
+            ->method('getConfigCachePath')
             ->willReturn($cacheFile);
 
         $configMock = $this->createMock(ConfigInterface::class);
@@ -33,9 +33,9 @@ class CacheCommandTest extends ConsoleTestCase
 
         $consoleApplicationMock = $this->createMock(Application::class);
         $consoleApplicationMock->expects(self::once())
-            ->method('find')
-            ->with('config:clear')
-            ->willReturn($this->createMock(CacheCommand::class));
+            ->method('doRun')
+            ->with(new ArrayInput(['command' => 'config:clear']))
+            ->willReturn(0);
 
         $cacheCommand = new CacheCommand($this->applicationMock, $configMock);
         $cacheCommand->setApplication($consoleApplicationMock);

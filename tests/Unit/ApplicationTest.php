@@ -298,4 +298,9 @@ class ApplicationTest extends TestCase
         self::assertSame($this->rootPath . '/storage', $this->application->getStoragePath());
         self::assertSame($this->rootPath . '/storage/foo', $this->application->getStoragePath('foo/'));
     }
+
+    public function testGetConfigCachePath(): void
+    {
+        self::assertSame($this->rootPath . '/storage/cache/config.php', $this->application->getConfigCachePath());
+    }
 }

@@ -249,4 +249,12 @@ class Application implements ApplicationInterface
     {
         return $this->applicationPathResolver->getStoragePath($path);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfigCachePath(): string
+    {
+        return $this->getStoragePath('cache/config.php');
+    }
 }

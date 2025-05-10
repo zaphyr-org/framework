@@ -16,16 +16,26 @@ class ClearCommandTest extends ConsoleTestCase
 
     public function testExecute(): void
     {
-        $cacheFile = 'config.cache';
+        $cacheFile = 'config.php';
         file_put_contents($cacheFile, '');
 
         $this->applicationMock->expects(self::once())
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
+            ->method('getConfigCachePath')
             ->willReturn($cacheFile);
 
         $command = $this->execute(new ClearCommand($this->applicationMock));
 
         self::assertDisplayEquals("Configuration cache cleared successfully.\n", $command);
+    }
+
+    public function testExecuteWhenCacheFileDoesNotExist(): void
+    {
+        $this->applicationMock->expects(self::once())
+            ->method('getConfigCachePath')
+            ->willReturn('config.php');
+
+        $command = $this->execute(new ClearCommand($this->applicationMock));
+
+        self::assertDisplayEquals("Configuration cache is already cleared.\n", $command);
     }
 }

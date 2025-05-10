@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Providers\Bootable;
 
 use Dotenv\Dotenv;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
-use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
+use Zaphyr\Framework\Providers\AbstractServiceProvider;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -16,9 +15,9 @@ use Zaphyr\Framework\Exceptions\FrameworkException;
 class EnvironmentBootProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
     /**
-     * @param ApplicationInterface $application
+     * {@inheritdoc}
      */
-    public function __construct(protected ApplicationInterface $application)
+    public function register(): void
     {
     }
 
@@ -29,7 +28,7 @@ class EnvironmentBootProvider extends AbstractServiceProvider implements Bootabl
      */
     public function boot(): void
     {
-        if (file_exists($this->application->getStoragePath('cache/config.cache'))) {
+        if (file_exists($this->application->getConfigCachePath())) {
             return;
         }
 
@@ -40,13 +39,5 @@ class EnvironmentBootProvider extends AbstractServiceProvider implements Bootabl
         }
 
         (Dotenv::createImmutable($rootPath))->load();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function register(): void
-    {
-        //
     }
 }

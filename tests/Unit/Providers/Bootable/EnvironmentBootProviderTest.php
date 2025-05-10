@@ -42,9 +42,8 @@ class EnvironmentBootProviderTest extends TestCase
     public function testBoot(): void
     {
         $this->applicationMock->expects(self::once())
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
-            ->willReturn('');
+            ->method('getConfigCachePath')
+            ->willReturn('cache/config.php');
 
         $this->applicationMock->expects(self::once())
             ->method('getRootPath')
@@ -55,18 +54,16 @@ class EnvironmentBootProviderTest extends TestCase
 
     public function testBootWithConfig(): void
     {
-        $configCachePath = dirname(__DIR__, 3) . '/TestAssets/config/config.cache';
+        $configCachePath = __DIR__ . '/config.php';
 
-        file_put_contents($configCachePath, serialize([
-            'app' => [
-                'env' => 'production',
-            ],
-        ]));
+        file_put_contents(
+            $configCachePath,
+            '<php return' . var_export(['app' => ['env' => 'production']], true) . ';' . PHP_EOL
+        );
 
         $this->applicationMock->expects(self::once())
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
-            ->willReturn(dirname(__DIR__, 3) . '/TestAssets/config');
+            ->method('getConfigCachePath')
+            ->willReturn(__DIR__);
 
         $this->applicationMock->expects(self::never())
             ->method('getRootPath');
@@ -81,9 +78,8 @@ class EnvironmentBootProviderTest extends TestCase
         $this->expectException(FrameworkException::class);
 
         $this->applicationMock->expects(self::once())
-            ->method('getStoragePath')
-            ->with('cache/config.cache')
-            ->willReturn('');
+            ->method('getConfigCachePath')
+            ->willReturn('cache/config.php');
 
         $this->applicationMock->expects(self::once())
             ->method('getRootPath')
