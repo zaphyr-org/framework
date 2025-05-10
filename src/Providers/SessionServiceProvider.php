@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Providers;
 
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Cookie\Contracts\CookieManagerInterface;
 use Zaphyr\Cookie\Cookie;
 use Zaphyr\Cookie\CookieManager;
@@ -41,21 +39,19 @@ class SessionServiceProvider extends AbstractServiceProvider
 
     protected function registerCookieManager(): void
     {
-        $this->getContainer()->bindSingleton(CookieManagerInterface::class, function ($container) {
-            $config = $container->get(ConfigInterface::class);
-
-            $expire = $config->get('app.session.expire', 120);
+        $this->getContainer()->bindSingleton(CookieManagerInterface::class, function () {
+            $expire = $this->config('app.session.expire', 120);
 
             if ($expire !== 0) {
                 $expire = time() + $expire * 60;
             }
 
-            $path = $config->get('app.session.cookie.path', '/');
-            $domain = $config->get('app.session.cookie.domain');
-            $secure = $config->get('app.session.cookie.secure', true);
-            $httpOnly = $config->get('app.session.cookie.http_only', true);
-            $raw = $config->get('app.session.cookie.raw', false);
-            $sameSite = $config->get('app.session.cookie.same_site', Cookie::RESTRICTION_STRICT);
+            $path = $this->config('app.session.cookie.path', '/');
+            $domain = $this->config('app.session.cookie.domain');
+            $secure = $this->config('app.session.cookie.secure', true);
+            $httpOnly = $this->config('app.session.cookie.http_only', true);
+            $raw = $this->config('app.session.cookie.raw', false);
+            $sameSite = $this->config('app.session.cookie.same_site', Cookie::RESTRICTION_STRICT);
 
             return new CookieManager($expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
         });
@@ -67,13 +63,11 @@ class SessionServiceProvider extends AbstractServiceProvider
     protected function registerSessionManager(): void
     {
         $this->getContainer()->bindSingleton(SessionManagerInterface::class, function ($container) {
-            $config = $container->get(ConfigInterface::class);
-
-            $name = Str::slug($config->get('app.session.name', $config->get('app.name', 'zaphyr') . '_session'), '_');
-            $handlers = $config->get('app.session.handlers', []);
-            $expire = $config->get('app.session.expire', 120);
-            $defaultHandler = $config->get('app.session.default_handler', SessionManager::FILE_HANDLER);
-            $encrypt = $config->get('app.session.encrypt', true) ? $container->get(EncryptInterface::class) : null;
+            $name = Str::slug($this->config('app.session.name', $this->config('app.name', 'zaphyr') . '_session'), '_');
+            $handlers = $this->config('app.session.handlers', []);
+            $expire = $this->config('app.session.expire', 120);
+            $defaultHandler = $this->config('app.session.default_handler', SessionManager::FILE_HANDLER);
+            $encrypt = $this->config('app.session.encrypt', true) ? $container->get(EncryptInterface::class) : null;
 
             return new SessionManager($name, $handlers, $expire, $defaultHandler, $encrypt);
         });

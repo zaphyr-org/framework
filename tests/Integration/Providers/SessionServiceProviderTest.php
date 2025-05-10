@@ -31,7 +31,7 @@ class SessionServiceProviderTest extends HttpTestCase
     {
         $this->container = static::getContainer();
 
-        $this->sessionServiceProvider = new SessionServiceProvider();
+        $this->sessionServiceProvider = new SessionServiceProvider(static::bootApplication());
         $this->sessionServiceProvider->setContainer($this->container);
         $this->sessionServiceProvider->register();
     }

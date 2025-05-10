@@ -6,8 +6,6 @@ namespace Zaphyr\Framework\Providers;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\EventDispatcher\EventDispatcher;
 use Zaphyr\EventDispatcher\ListenerProvider;
@@ -42,10 +40,8 @@ class EventsServiceProvider extends AbstractServiceProvider
     {
         $this->getContainer()->bindSingleton(ListenerProviderInterface::class, function ($container) {
             $listenerProvider = new ListenerProvider();
-            $config = $container->get(ConfigInterface::class);
-            $events = $config->get('app.events', []);
 
-            foreach ($events as $event => $listeners) {
+            foreach ($this->config('app.events', []) as $event => $listeners) {
                 if (!is_array($listeners)) {
                     throw new FrameworkException('Listeners must be an array');
                 }

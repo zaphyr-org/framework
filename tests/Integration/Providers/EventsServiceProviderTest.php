@@ -32,7 +32,7 @@ class EventsServiceProviderTest extends HttpTestCase
     {
         $this->container = static::getContainer();
 
-        $this->eventsServiceProvider = new EventsServiceProvider();
+        $this->eventsServiceProvider = new EventsServiceProvider(static::bootApplication());
         $this->eventsServiceProvider->setContainer($this->container);
         $this->eventsServiceProvider->register();
     }

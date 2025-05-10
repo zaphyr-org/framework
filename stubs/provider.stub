@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace %namespace%;
 
-use Zaphyr\Container\AbstractServiceProvider;
+use Zaphyr\Framework\Providers\AbstractServiceProvider;
 
 class %class% extends AbstractServiceProvider
 {

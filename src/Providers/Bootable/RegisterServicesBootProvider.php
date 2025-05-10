@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Providers\Bootable;
 
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
+use Zaphyr\Framework\Providers\AbstractServiceProvider;
 use Zaphyr\Framework\Providers\EncryptionServiceProvider;
 use Zaphyr\Framework\Providers\EventsServiceProvider;
 use Zaphyr\Framework\Providers\LoggingServiceProvider;
@@ -32,28 +31,26 @@ class RegisterServicesBootProvider extends AbstractServiceProvider implements Bo
     /**
      * {@inheritdoc}
      */
-    public function boot(): void
+    public function register(): void
     {
-        $container = $this->getContainer();
-        $config = $container->get(ConfigInterface::class);
-
-        $providers = Utils::merge(
-            $this->frameworkProviders,
-            $config->get('app.services.providers', []),
-            $config->get('app.services.providers_ignore', [])
-        );
-
-        foreach ($providers as $provider) {
-            /** @var ServiceProviderInterface $provider */
-            $container->registerServiceProvider(new $provider());
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function register(): void
+    public function boot(): void
     {
-        //
+        $providers = Utils::merge(
+            $this->frameworkProviders,
+            $this->config('app.services.providers', []),
+            $this->config('app.services.providers_ignore', [])
+        );
+
+        $container = $this->getContainer();
+
+        foreach ($providers as $provider) {
+            /** @var ServiceProviderInterface $provider */
+            $container->registerServiceProvider(new $provider($this->application));
+        }
     }
 }

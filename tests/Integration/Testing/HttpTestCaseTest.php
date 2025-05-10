@@ -35,7 +35,9 @@ class HttpTestCaseTest extends HttpTestCase
 
     protected function setUp(): void
     {
-        $this->container = HttpTestCase::getContainer();
+        $application = static::bootApplication();
+
+        $this->container = $application->getContainer();
         $this->router = $this->container->get(RouterInterface::class);
 
         mkdir($this->testSessionDir, 0777, true);
@@ -61,8 +63,8 @@ class HttpTestCaseTest extends HttpTestCase
             ],
         ]);
 
-        $this->container->registerServiceProvider(new EventsServiceProvider());
-        $this->container->registerServiceProvider(new LoggingServiceProvider());
+        $this->container->registerServiceProvider(new EventsServiceProvider($application));
+        $this->container->registerServiceProvider(new LoggingServiceProvider($application));
     }
 
     protected function tearDown(): void

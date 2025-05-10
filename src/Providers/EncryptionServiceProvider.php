@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Providers;
 
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Encrypt\Contracts\EncryptInterface;
 use Zaphyr\Encrypt\Encrypt;
 use Zaphyr\Framework\Exceptions\FrameworkException;
@@ -27,10 +25,9 @@ class EncryptionServiceProvider extends AbstractServiceProvider
      */
     public function register(): void
     {
-        $this->getContainer()->bindSingleton(EncryptInterface::class, function ($container) {
-            $config = $container->get(ConfigInterface::class);
-            $key = $this->sanitizeKey($config->get('app.encryption.key', ''));
-            $cipher = $config->get('app.encryption.cipher', 'AES-256-CBC');
+        $this->getContainer()->bindSingleton(EncryptInterface::class, function () {
+            $key = $this->sanitizeKey($this->config('app.encryption.key', ''));
+            $cipher = $this->config('app.encryption.cipher', 'AES-256-CBC');
 
             return new Encrypt($key, $cipher);
         });

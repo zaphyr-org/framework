@@ -8,8 +8,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Email;
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Logger\Contracts\HandlerInterface;
 use Zaphyr\Logger\Contracts\LogManagerInterface;
@@ -47,11 +45,10 @@ class LoggingServiceProvider extends AbstractServiceProvider
      */
     protected function registerLogManager(): void
     {
-        $this->getContainer()->bindSingleton(LogManagerInterface::class, function ($container) {
-            $config = $container->get(ConfigInterface::class);
-            $logHandlers = $this->getLogHandlersFromConfig($config);
+        $this->getContainer()->bindSingleton(LogManagerInterface::class, function () {
+            $logHandlers = $this->getLogHandlersFromConfig();
 
-            return new LogManager($config->get('app.logging.default_channel', ''), $logHandlers);
+            return new LogManager($this->config('app.logging.default_channel', ''), $logHandlers);
         });
     }
 
@@ -66,21 +63,19 @@ class LoggingServiceProvider extends AbstractServiceProvider
     }
 
     /**
-     * @param ConfigInterface $config
-     *
      * @throws FrameworkException if the log handler is invalid
      * @return array<string, HandlerInterface[]>
      */
-    protected function getLogHandlersFromConfig(ConfigInterface $config): array
+    protected function getLogHandlersFromConfig(): array
     {
         $logHandlers = [];
 
-        foreach ($config->get('app.logging.channels', []) as $name => $channel) {
+        foreach ($this->config('app.logging.channels', []) as $handlerName => $channel) {
             foreach ($channel['handlers'] as $handler => $handlerConfig) {
-                $logHandlers[$name][] = match ($handler) {
-                    'file' => $this->prepareFileHandlerInstance($name, $config),
-                    'mail' => $this->prepareMailHandlerInstance($name, $config),
-                    'rotate' => $this->prepareRotateHandlerInstance($name, $config),
+                $logHandlers[$handlerName][] = match ($handler) {
+                    'file' => $this->prepareFileHandlerInstance($handlerName),
+                    'mail' => $this->prepareMailHandlerInstance($handlerName),
+                    'rotate' => $this->prepareRotateHandlerInstance($handlerName),
                     'noop' => new NoopHandler(),
                     default => throw new FrameworkException('Unknown log handler "' . $handler . '"'),
                 };
@@ -91,30 +86,28 @@ class LoggingServiceProvider extends AbstractServiceProvider
     }
 
     /**
-     * @param string          $name
-     * @param ConfigInterface $config
+     * @param string $handlerName
      *
      * @return FileHandler
      */
-    protected function prepareFileHandlerInstance(string $name, ConfigInterface $config): FileHandler
+    protected function prepareFileHandlerInstance(string $handlerName): FileHandler
     {
-        $filename = $config->get('app.logging.channels.' . $name . '.handlers.file.filename');
+        $filename = $this->config('app.logging.channels.' . $handlerName . '.handlers.file.filename');
 
         return new FileHandler($filename);
     }
 
     /**
-     * @param string          $name
-     * @param ConfigInterface $config
+     * @param string $handlerName
      *
      * @return MailHandler
      */
-    protected function prepareMailHandlerInstance(string $name, ConfigInterface $config): MailHandler
+    protected function prepareMailHandlerInstance(string $handlerName): MailHandler
     {
-        $dsn = $config->get('app.logging.channels.' . $name . '.handlers.mail.dsn');
-        $from = $config->get('app.logging.channels.' . $name . '.handlers.mail.from');
-        $to = $config->get('app.logging.channels.' . $name . '.handlers.mail.to');
-        $subject = $config->get('app.logging.channels.' . $name . '.handlers.mail.subject');
+        $dsn = $this->config('app.logging.channels.' . $handlerName . '.handlers.mail.dsn');
+        $from = $this->config('app.logging.channels.' . $handlerName . '.handlers.mail.from');
+        $to = $this->config('app.logging.channels.' . $handlerName . '.handlers.mail.to');
+        $subject = $this->config('app.logging.channels.' . $handlerName . '.handlers.mail.subject');
 
         $transport = Transport::fromDsn($dsn);
         $mailer = new Mailer($transport);
@@ -124,16 +117,15 @@ class LoggingServiceProvider extends AbstractServiceProvider
     }
 
     /**
-     * @param string          $name
-     * @param ConfigInterface $config
+     * @param string $handlerName
      *
      * @return RotateHandler
      */
-    protected function prepareRotateHandlerInstance(string $name, ConfigInterface $config): RotateHandler
+    protected function prepareRotateHandlerInstance(string $handlerName): RotateHandler
     {
-        $directory = $config->get('app.logging.channels.' . $name . '.handlers.rotate.directory');
-        $interval = $config->get(
-            'app.logging.channels.' . $name . '.handlers.rotate.interval',
+        $directory = $this->config('app.logging.channels.' . $handlerName . '.handlers.rotate.directory');
+        $interval = $this->config(
+            'app.logging.channels.' . $handlerName . '.handlers.rotate.interval',
             RotateHandler::INTERVAL_DAY
         );
 

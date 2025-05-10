@@ -8,12 +8,18 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
 use Zaphyr\Framework\Providers\LoggingServiceProvider;
 use Zaphyr\FrameworkTests\TestAssets\Providers\TestProvider;
 
 class RegisterServicesBootProviderTest extends TestCase
 {
+    /**
+     * @var ApplicationInterface&MockObject
+     */
+    protected ApplicationInterface&MockObject $applicationMock;
+
     /**
      * @var ContainerInterface&MockObject
      */
@@ -31,16 +37,27 @@ class RegisterServicesBootProviderTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->applicationMock = $this->createMock(ApplicationInterface::class);
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
 
-        $this->registerServicesBootProvider = new RegisterServicesBootProvider();
+        $this->containerMock
+            ->method('get')
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
+
+        $this->registerServicesBootProvider = new RegisterServicesBootProvider($this->applicationMock);
         $this->registerServicesBootProvider->setContainer($this->containerMock);
     }
 
     protected function tearDown(): void
     {
-        unset($this->containerMock, $this->configMock, $this->registerServicesBootProvider);
+        unset(
+            $this->applicationMock,
+            $this->containerMock,
+            $this->configMock,
+            $this->registerServicesBootProvider
+        );
     }
 
     /* -------------------------------------------------
@@ -50,11 +67,6 @@ class RegisterServicesBootProviderTest extends TestCase
 
     public function testBootWithFrameworkProviders(): void
     {
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with(ConfigInterface::class)
-            ->willReturn($this->configMock);
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -70,11 +82,6 @@ class RegisterServicesBootProviderTest extends TestCase
 
     public function testBootWithAdditionalProviders(): void
     {
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with(ConfigInterface::class)
-            ->willReturn($this->configMock);
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -90,11 +97,6 @@ class RegisterServicesBootProviderTest extends TestCase
 
     public function testBootWithAdditionalProvidersAsDirectoryString(): void
     {
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with(ConfigInterface::class)
-            ->willReturn($this->configMock);
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -110,11 +112,6 @@ class RegisterServicesBootProviderTest extends TestCase
 
     public function testBootWithIgnoredProviders(): void
     {
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with(ConfigInterface::class)
-            ->willReturn($this->configMock);
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -130,11 +127,6 @@ class RegisterServicesBootProviderTest extends TestCase
 
     public function testBootWithAdditionalAndIgnoredProviders(): void
     {
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with(ConfigInterface::class)
-            ->willReturn($this->configMock);
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -150,11 +142,6 @@ class RegisterServicesBootProviderTest extends TestCase
 
     public function testBootWithWrongAdditionalProvidersFormat(): void
     {
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with(ConfigInterface::class)
-            ->willReturn($this->configMock);
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -170,11 +157,6 @@ class RegisterServicesBootProviderTest extends TestCase
 
     public function testBootWithWrongIgnoredProvidersFormat(): void
     {
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with(ConfigInterface::class)
-            ->willReturn($this->configMock);
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -187,5 +169,4 @@ class RegisterServicesBootProviderTest extends TestCase
 
         $this->registerServicesBootProvider->boot();
     }
-
 }

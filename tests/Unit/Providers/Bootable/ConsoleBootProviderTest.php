@@ -9,12 +9,18 @@ use PHPUnit\Framework\TestCase;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Console\Commands\Config\CacheCommand;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Providers\Bootable\ConsoleBootServiceProvider;
 use Zaphyr\FrameworkTests\TestAssets\Commands\FooCommand;
 
 class ConsoleBootProviderTest extends TestCase
 {
+    /**
+     * @var ApplicationInterface&MockObject
+     */
+    protected ApplicationInterface&MockObject $applicationMock;
+
     /**
      * @var ContainerInterface&MockObject
      */
@@ -37,17 +43,26 @@ class ConsoleBootProviderTest extends TestCase
 
     protected function setUp(): void
     {
+        $this->applicationMock = $this->createMock(ApplicationInterface::class);
         $this->containerMock = $this->createMock(ContainerInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
         $this->consoleKernelMock = $this->createMock(ConsoleKernelInterface::class);
 
-        $this->consoleBootServiceProvider = new ConsoleBootServiceProvider();
+        $this->containerMock
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                ConfigInterface::class => $this->configMock,
+                ConsoleKernelInterface::class => $this->consoleKernelMock,
+            });
+
+        $this->consoleBootServiceProvider = new ConsoleBootServiceProvider($this->applicationMock);
         $this->consoleBootServiceProvider->setContainer($this->containerMock);
     }
 
     protected function tearDown(): void
     {
         unset(
+            $this->applicationMock,
             $this->containerMock,
             $this->configMock,
             $this->consoleKernelMock,
@@ -62,13 +77,6 @@ class ConsoleBootProviderTest extends TestCase
 
     public function testBootWithFrameworkCommands(): void
     {
-        $this->containerMock->expects(self::exactly(2))
-            ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ConfigInterface::class => $this->configMock,
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
-            });
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -84,13 +92,6 @@ class ConsoleBootProviderTest extends TestCase
 
     public function testBootWithAdditionalCommands(): void
     {
-        $this->containerMock->expects(self::exactly(2))
-            ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ConfigInterface::class => $this->configMock,
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
-            });
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -106,13 +107,6 @@ class ConsoleBootProviderTest extends TestCase
 
     public function testBootWithAdditionalCommandsAsDirectoryString(): void
     {
-        $this->containerMock->expects(self::exactly(2))
-            ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ConfigInterface::class => $this->configMock,
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
-            });
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -128,13 +122,6 @@ class ConsoleBootProviderTest extends TestCase
 
     public function testBootWithIgnoredCommands(): void
     {
-        $this->containerMock->expects(self::exactly(2))
-            ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ConfigInterface::class => $this->configMock,
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
-            });
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -150,13 +137,6 @@ class ConsoleBootProviderTest extends TestCase
 
     public function testBootWithAdditionalAndIgnoredCommands(): void
     {
-        $this->containerMock->expects(self::exactly(2))
-            ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ConfigInterface::class => $this->configMock,
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
-            });
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -172,13 +152,6 @@ class ConsoleBootProviderTest extends TestCase
 
     public function testBootWithWrongAdditionalCommandsFormat(): void
     {
-        $this->containerMock->expects(self::exactly(2))
-            ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ConfigInterface::class => $this->configMock,
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
-            });
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
@@ -194,13 +167,6 @@ class ConsoleBootProviderTest extends TestCase
 
     public function testBootWithWrongIgnoredCommandsFormat(): void
     {
-        $this->containerMock->expects(self::exactly(2))
-            ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ConfigInterface::class => $this->configMock,
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
-            });
-
         $this->configMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {

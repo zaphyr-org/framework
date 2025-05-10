@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Providers\Bootable;
 
 use Psr\Http\Server\MiddlewareInterface;
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
 use Zaphyr\Framework\Middleware\CookieMiddleware;
 use Zaphyr\Framework\Middleware\CSRFMiddleware;
 use Zaphyr\Framework\Middleware\SessionMiddleware;
 use Zaphyr\Framework\Middleware\XSSMiddleware;
+use Zaphyr\Framework\Providers\AbstractServiceProvider;
 use Zaphyr\Framework\Utils;
 use Zaphyr\Router\Contracts\RouterInterface;
 use Zaphyr\Router\Router;
@@ -42,15 +41,21 @@ class RouterBootProvider extends AbstractServiceProvider implements BootableServ
     /**
      * {@inheritdoc}
      */
+    public function register(): void
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function boot(): void
     {
         $container = $this->getContainer();
-        $config = $container->get(ConfigInterface::class);
 
         $router = new Router();
         $router->setContainer($container);
 
-        $controllers = $config->get('app.routing.controllers', []);
+        $controllers = $this->config('app.routing.controllers', []);
 
         if (is_string($controllers)) {
             $controllers = ClassFinder::getClassesFromDirectory($controllers);
@@ -62,22 +67,14 @@ class RouterBootProvider extends AbstractServiceProvider implements BootableServ
 
         $middleware = Utils::merge(
             $this->frameworkMiddleware,
-            $config->get('app.routing.middleware', []),
-            $config->get('app.routing.middleware_ignore', [])
+            $this->config('app.routing.middleware', []),
+            $this->config('app.routing.middleware_ignore', [])
         );
 
         $router->setControllerRoutes($controllers);
         $router->setMiddleware($middleware);
-        $router->setRoutePatterns($config->get('app.routing.patterns', []));
+        $router->setRoutePatterns($this->config('app.routing.patterns', []));
 
         $container->bindInstance(RouterInterface::class, $router);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function register(): void
-    {
-        //
     }
 }

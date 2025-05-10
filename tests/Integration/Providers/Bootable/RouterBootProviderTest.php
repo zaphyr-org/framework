@@ -30,7 +30,7 @@ class RouterBootProviderTest extends HttpTestCase
     {
         $this->container = static::getContainer();
 
-        $this->routerBootProvider = new RouterBootProvider();
+        $this->routerBootProvider = new RouterBootProvider(self::bootApplication());
         $this->routerBootProvider->setContainer($this->container);
     }
 

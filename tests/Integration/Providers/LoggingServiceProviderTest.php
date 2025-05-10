@@ -33,7 +33,7 @@ class LoggingServiceProviderTest extends HttpTestCase
     {
         $this->container = static::getContainer();
 
-        $this->loggingServiceProvider = new LoggingServiceProvider();
+        $this->loggingServiceProvider = new LoggingServiceProvider(static::bootApplication());
         $this->loggingServiceProvider->setContainer($this->container);
         $this->loggingServiceProvider->register();
     }

@@ -28,7 +28,7 @@ class EncryptionServiceProviderTest extends HttpTestCase
     {
         $this->container = static::getContainer();
 
-        $this->encryptionServiceProvider = new EncryptionServiceProvider();
+        $this->encryptionServiceProvider = new EncryptionServiceProvider(static::bootApplication());
         $this->encryptionServiceProvider->setContainer($this->container);
         $this->encryptionServiceProvider->register();
     }

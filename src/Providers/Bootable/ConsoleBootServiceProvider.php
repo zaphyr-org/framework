@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Providers\Bootable;
 
 use Symfony\Component\Console\Command\Command;
-use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Container\AbstractServiceProvider;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
 use Zaphyr\Framework\Console\Commands;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
+use Zaphyr\Framework\Providers\AbstractServiceProvider;
 use Zaphyr\Framework\Utils;
 
 /**
@@ -46,28 +45,26 @@ class ConsoleBootServiceProvider extends AbstractServiceProvider implements Boot
     /**
      * {@inheritdoc}
      */
-    public function boot(): void
+    public function register(): void
     {
-        $container = $this->getContainer();
-        $config = $container->get(ConfigInterface::class);
-        $consoleKernel = $container->get(ConsoleKernelInterface::class);
-
-        $commands = Utils::merge(
-            $this->frameworkCommands,
-            $config->get('app.console.commands', []),
-            $config->get('app.console.commands_ignore', [])
-        );
-
-        foreach ($commands as $command) {
-            $consoleKernel->addCommand($command);
-        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function register(): void
+    public function boot(): void
     {
-        //
+        $consoleKernel = $this->get(ConsoleKernelInterface::class);
+
+        /** @var class-string<Command>[] $commands */
+        $commands = Utils::merge(
+            $this->frameworkCommands,
+            $this->config('app.console.commands', []),
+            $this->config('app.console.commands_ignore', [])
+        );
+
+        foreach ($commands as $command) {
+            $consoleKernel->addCommand($command);
+        }
     }
 }
