@@ -6,14 +6,15 @@ namespace Zaphyr\FrameworkTests\Unit\Providers\Bootable;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
+use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
-use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
-use Zaphyr\Framework\Providers\Bootable\ConsoleBootServiceProvider;
+use Zaphyr\Framework\Providers\Bootable\RouterBootProvider;
+use Zaphyr\FrameworkTests\TestAssets\Controllers\TestController;
+use Zaphyr\FrameworkTests\TestAssets\Middleware\TestMiddleware;
 
-class ConsoleBootProviderTest extends TestCase
+class RouterBootProviderTest extends TestCase
 {
     /**
      * @var ApplicationInterface&MockObject
@@ -31,24 +32,24 @@ class ConsoleBootProviderTest extends TestCase
     protected ContainerInterface&MockObject $containerMock;
 
     /**
-     * @var ConsoleKernelInterface&MockObject
+     * @var ConfigInterface&MockObject
      */
-    protected ConsoleKernelInterface&MockObject $consoleKernelMock;
+    protected ConfigInterface&MockObject $configMock;
 
     /**
-     * @var ConsoleBootServiceProvider
+     * @var RouterBootProvider&MockObject
      */
-    protected ConsoleBootServiceProvider $consoleBootServiceProvider;
+    protected RouterBootProvider $routerBootProvider;
 
     protected function setUp(): void
     {
         $this->applicationMock = $this->createMock(ApplicationInterface::class);
         $this->applicationRegistryMock = $this->createMock(ApplicationRegistryInterface::class);
         $this->containerMock = $this->createMock(ContainerInterface::class);
-        $this->consoleKernelMock = $this->createMock(ConsoleKernelInterface::class);
+        $this->configMock = $this->createMock(ConfigInterface::class);
 
-        $this->consoleBootServiceProvider = new ConsoleBootServiceProvider($this->applicationMock);
-        $this->consoleBootServiceProvider->setContainer($this->containerMock);
+        $this->routerBootProvider = new RouterBootProvider($this->applicationMock);
+        $this->routerBootProvider->setContainer($this->containerMock);
     }
 
     protected function tearDown(): void
@@ -57,8 +58,8 @@ class ConsoleBootProviderTest extends TestCase
             $this->applicationMock,
             $this->applicationRegistryMock,
             $this->containerMock,
-            $this->consoleKernelMock,
-            $this->consoleBootServiceProvider
+            $this->configMock,
+            $this->routerBootProvider
         );
     }
 
@@ -67,23 +68,30 @@ class ConsoleBootProviderTest extends TestCase
      * -------------------------------------------------
      */
 
-    public function testBootWithFrameworkCommands(): void
+    public function testBoot(): void
     {
         $this->containerMock->expects(self::exactly(2))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                ConsoleKernelInterface::class => $this->consoleKernelMock,
                 ApplicationRegistryInterface::class => $this->applicationRegistryMock,
+                ConfigInterface::class => $this->configMock,
             });
 
-        $this->consoleKernelMock->expects(self::once())
-            ->method('addCommand')
-            ->with(Command::class);
+        $this->applicationRegistryMock->expects(self::once())
+            ->method('controllers')
+            ->willReturn([TestController::class]);
 
         $this->applicationRegistryMock->expects(self::once())
-            ->method('commands')
-            ->willReturn([Command::class]);
+            ->method('middleware')
+            ->willReturn([TestMiddleware::class]);
 
-        $this->consoleBootServiceProvider->boot();
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('app.routing.patterns', [])
+            ->willReturn([
+                'slug' => '[a-zA-Z0-9\-]+',
+            ]);
+
+        $this->routerBootProvider->boot();
     }
 }
