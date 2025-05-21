@@ -16,6 +16,7 @@ use Zaphyr\Framework\Contracts\Http\ResponseInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Contracts\Kernel\HttpKernelInterface;
 use Zaphyr\HttpEmitter\Contracts\EmitterInterface;
+use Zaphyr\Utils\File;
 
 class ApplicationTest extends TestCase
 {
@@ -299,8 +300,117 @@ class ApplicationTest extends TestCase
         self::assertSame($this->rootPath . '/storage/foo', $this->application->getStoragePath('foo/'));
     }
 
+    public function testGetCommandsCachePath(): void
+    {
+        self::assertSame($this->rootPath . '/storage/cache/commands.php', $this->application->getCommandsCachePath());
+    }
+
+    public function testIsCommandsCached(): void
+    {
+        mkdir($dir = dirname($this->application->getCommandsCachePath()), recursive: true);
+        file_put_contents($this->application->getCommandsCachePath(), '');
+
+        self::assertTrue($this->application->isCommandsCached());
+
+        File::deleteDirectory($dir);
+
+        self::assertFalse($this->application->isCommandsCached());
+    }
+
     public function testGetConfigCachePath(): void
     {
         self::assertSame($this->rootPath . '/storage/cache/config.php', $this->application->getConfigCachePath());
+    }
+
+    public function testIsConfigCached(): void
+    {
+        mkdir($dir = dirname($this->application->getConfigCachePath()), recursive: true);
+        file_put_contents($this->application->getConfigCachePath(), '');
+
+        self::assertTrue($this->application->isConfigCached());
+
+        File::deleteDirectory($dir);
+
+        self::assertFalse($this->application->isConfigCached());
+    }
+
+    public function testGetControllersCachePath(): void
+    {
+        self::assertSame(
+            $this->rootPath . '/storage/cache/controllers.php',
+            $this->application->getControllersCachePath()
+        );
+    }
+
+    public function testIsControllersCached(): void
+    {
+        mkdir($dir = dirname($this->application->getControllersCachePath()), recursive: true);
+        file_put_contents($this->application->getControllersCachePath(), '');
+
+        self::assertTrue($this->application->isControllersCached());
+
+        File::deleteDirectory($dir);
+
+        self::assertFalse($this->application->isControllersCached());
+    }
+
+    public function testGetMiddlewareCachePath(): void
+    {
+        self::assertSame(
+            $this->rootPath . '/storage/cache/middleware.php',
+            $this->application->getMiddlewareCachePath()
+        );
+    }
+
+    public function testIsMiddlewareCached(): void
+    {
+        mkdir($dir = dirname($this->application->getMiddlewareCachePath()), recursive: true);
+        file_put_contents($this->application->getMiddlewareCachePath(), '');
+
+        self::assertTrue($this->application->isMiddlewareCached());
+
+        File::deleteDirectory($dir);
+
+        self::assertFalse($this->application->isMiddlewareCached());
+    }
+
+    public function testGetProvidersCachePath(): void
+    {
+        self::assertSame(
+            $this->rootPath . '/storage/cache/providers.php',
+            $this->application->getProvidersCachePath()
+        );
+    }
+
+    public function testIsProvidersCached(): void
+    {
+        mkdir($dir = dirname($this->application->getProvidersCachePath()), recursive: true);
+        file_put_contents($this->application->getProvidersCachePath(), '');
+
+        self::assertTrue($this->application->isProvidersCached());
+
+        File::deleteDirectory($dir);
+
+        self::assertFalse($this->application->isProvidersCached());
+    }
+
+    public function testGetEventsCachePath(): void
+    {
+        self::assertSame(
+            $this->rootPath . '/storage/cache/events.php',
+            $this->application->getEventsCachePath()
+        );
+    }
+
+    public function testIsEventsCached(): void
+    {
+        mkdir($dir = dirname($this->application->getEventsCachePath()), recursive: true);
+        file_put_contents($this->application->getEventsCachePath(), '');
+
+        self::assertTrue($this->application->isEventsCached());
+
+        File::deleteDirectory($dir);
+
+        self::assertFalse($this->application->isEventsCached());
     }
 }
