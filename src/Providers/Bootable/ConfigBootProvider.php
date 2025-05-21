@@ -9,8 +9,10 @@ use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Config\Contracts\ReplacerInterface;
 use Zaphyr\Config\Exceptions\ConfigException;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
+use Zaphyr\Framework\ApplicationRegistry;
 use Zaphyr\Framework\Config\Replacers\PathReplacer;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\AbstractServiceProvider;
 
@@ -34,6 +36,7 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
      */
     protected array $provides = [
         ConfigInterface::class,
+        ApplicationRegistryInterface::class,
     ];
 
     /**
@@ -74,6 +77,7 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
         $this->loadConfigItems($config);
 
         $container->bindInstance(ConfigInterface::class, $config);
+        $container->bindSingleton(ApplicationRegistryInterface::class, ApplicationRegistry::class);
 
         $this->application->setEnvironment($config->get('app.env', 'production'));
 
@@ -93,7 +97,7 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
     {
         $configCache = $this->application->getConfigCachePath();
 
-        if (file_exists($configCache)) {
+        if ($this->application->isConfigCached()) {
             $config->setItems(require $configCache);
 
             return;
