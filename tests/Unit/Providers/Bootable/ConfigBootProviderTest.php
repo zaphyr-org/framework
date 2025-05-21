@@ -9,7 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Zaphyr\Config\Config;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Framework\ApplicationRegistry;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
 
@@ -65,6 +67,10 @@ class ConfigBootProviderTest extends TestCase
                 $this->isInstanceOf(Config::class)
             );
 
+        $this->containerMock->expects(self::once())
+            ->method('bindSingleton')
+            ->with(ApplicationRegistryInterface::class, ApplicationRegistry::class);
+
         $this->applicationMock->expects(self::once())
             ->method('setEnvironment')
             ->with('testing');
@@ -84,6 +90,10 @@ class ConfigBootProviderTest extends TestCase
         $this->applicationMock->expects(self::once())
             ->method('getConfigCachePath')
             ->willReturn($configCachePath);
+
+        $this->applicationMock->expects(self::once())
+            ->method('isConfigCached')
+            ->willReturn(true);
 
         $this->applicationMock->expects(self::never())
             ->method('getConfigPath');
