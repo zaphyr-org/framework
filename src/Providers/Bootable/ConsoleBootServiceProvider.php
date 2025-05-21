@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Zaphyr\Framework\Providers\Bootable;
 
-use Symfony\Component\Console\Command\Command;
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
-use Zaphyr\Framework\Console\Commands;
+use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Providers\AbstractServiceProvider;
-use Zaphyr\Framework\Utils;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -20,27 +18,6 @@ class ConsoleBootServiceProvider extends AbstractServiceProvider implements Boot
      * {@inheritdoc}
      */
     protected array $provides = [];
-
-    /**
-     * @var class-string<Command>[]
-     */
-    protected array $frameworkCommands = [
-        Commands\App\EnvironmentCommand::class,
-        Commands\App\KeyGenerateCommand::class,
-        Commands\Config\CacheCommand::class,
-        Commands\Config\ClearCommand::class,
-        Commands\Config\ListCommand::class,
-        Commands\Create\CommandCommand::class,
-        Commands\Create\ControllerCommand::class,
-        Commands\Create\EventCommand::class,
-        Commands\Create\ListenerCommand::class,
-        Commands\Create\MiddlewareCommand::class,
-        Commands\Create\ProviderCommand::class,
-        Commands\Log\ClearCommand::class,
-        Commands\Maintenance\DownCommand::class,
-        Commands\Maintenance\UpCommand::class,
-        Commands\Router\ListCommand::class,
-    ];
 
     /**
      * {@inheritdoc}
@@ -55,13 +32,7 @@ class ConsoleBootServiceProvider extends AbstractServiceProvider implements Boot
     public function boot(): void
     {
         $consoleKernel = $this->get(ConsoleKernelInterface::class);
-
-        /** @var class-string<Command>[] $commands */
-        $commands = Utils::merge(
-            $this->frameworkCommands,
-            $this->config('app.console.commands', []),
-            $this->config('app.console.commands_ignore', [])
-        );
+        $commands = $this->get(ApplicationRegistryInterface::class)->commands();
 
         foreach ($commands as $command) {
             $consoleKernel->addCommand($command);
