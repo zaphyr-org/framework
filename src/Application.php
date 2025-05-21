@@ -253,8 +253,93 @@ class Application implements ApplicationInterface
     /**
      * {@inheritdoc}
      */
+    public function getCommandsCachePath(): string
+    {
+        return $this->getStoragePath('cache/commands.php');
+    }
+
+    public function isCommandsCached(): bool
+    {
+        return file_exists($this->getCommandsCachePath());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getConfigCachePath(): string
     {
         return $this->getStoragePath('cache/config.php');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isConfigCached(): bool
+    {
+        return file_exists($this->getConfigCachePath());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getControllersCachePath(): string
+    {
+        return $this->getStoragePath('cache/controllers.php');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isControllersCached(): bool
+    {
+        return file_exists($this->getControllersCachePath());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMiddlewareCachePath(): string
+    {
+        return $this->getStoragePath('cache/middleware.php');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isMiddlewareCached(): bool
+    {
+        return file_exists($this->getMiddlewareCachePath());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProvidersCachePath(): string
+    {
+        return $this->getStoragePath('cache/providers.php');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isProvidersCached(): bool
+    {
+        return file_exists($this->getProvidersCachePath());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventsCachePath(): string
+    {
+        return $this->getStoragePath('cache/events.php');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEventsCached(): bool
+    {
+        return file_exists($this->getEventsCachePath());
     }
 }

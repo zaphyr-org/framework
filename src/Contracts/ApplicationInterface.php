@@ -102,5 +102,60 @@ interface ApplicationInterface extends ApplicationPathResolverInterface
     /**
      * @return string
      */
+    public function getCommandsCachePath(): string;
+
+    /**
+     * @return bool
+     */
+    public function isCommandsCached(): bool;
+
+    /**
+     * @return string
+     */
     public function getConfigCachePath(): string;
+
+    /**
+     * @return bool
+     */
+    public function isConfigCached(): bool;
+
+    /**
+     * @return string
+     */
+    public function getControllersCachePath(): string;
+
+    /**
+     * @return bool
+     */
+    public function isControllersCached(): bool;
+
+    /**
+     * @return string
+     */
+    public function getMiddlewareCachePath(): string;
+
+    /**
+     * @return bool
+     */
+    public function isMiddlewareCached(): bool;
+
+    /**
+     * @return string
+     */
+    public function getProvidersCachePath(): string;
+
+    /**
+     * @return bool
+     */
+    public function isProvidersCached(): bool;
+
+    /**
+     * @return string
+     */
+    public function getEventsCachePath(): string;
+
+    /**
+     * @return bool
+     */
+    public function isEventsCached(): bool;
 }
