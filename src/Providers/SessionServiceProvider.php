@@ -78,8 +78,9 @@ class SessionServiceProvider extends AbstractServiceProvider
      */
     protected function registerDefaultSession(): void
     {
-        $this->getContainer()->bindSingleton(SessionInterface::class, function ($container) {
-            return $container->get(SessionManagerInterface::class)->session();
-        });
+        $this->getContainer()->bindSingleton(
+            SessionInterface::class,
+            fn() => $this->get(SessionManagerInterface::class)->session()
+        );
     }
 }

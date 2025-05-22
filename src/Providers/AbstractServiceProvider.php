@@ -30,6 +30,14 @@ abstract class AbstractServiceProvider extends BaseServiceProvider
     }
 
     /**
+     * @return bool
+     */
+    public function has(string $id): bool
+    {
+        return $this->getContainer()->has($id);
+    }
+
+    /**
      * @param string $key
      * @param mixed  $default
      *
