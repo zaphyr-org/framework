@@ -15,6 +15,7 @@ use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\FrameworkTests\TestAssets\Events\TestEvent;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerOne;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerTwo;
+use Zaphyr\Utils\File;
 
 class EventsServiceProviderTest extends HttpTestCase
 {
@@ -37,7 +38,7 @@ class EventsServiceProviderTest extends HttpTestCase
         $this->eventsServiceProvider->register();
     }
 
-    protected function tearDow(): void
+    protected function tearDown(): void
     {
         unset($this->container, $this->eventsServiceProvider);
         parent::tearDown();
@@ -96,6 +97,23 @@ class EventsServiceProviderTest extends HttpTestCase
 
         self::assertInstanceOf(TestListenerTwo::class, $listeners[0]);
         self::assertInstanceOf(TestListenerOne::class, $listeners[1]);
+    }
+
+    public function testRegisterWithCachedEvents(): void
+    {
+        mkdir(static::$application->getStoragePath('cache'), recursive: true);
+
+        file_put_contents(
+            static::$application->getStoragePath('cache/events.php'),
+            '<?php return ' . var_export([TestEvent::class => [TestListenerOne::class]], true) . ';'
+        );
+
+        $listenerProvider = $this->container->get(ListenerProviderInterface::class);
+        $listeners = iterator_to_array($listenerProvider->getListenersForEvent(new TestEvent()));
+
+        self::assertInstanceOf(TestListenerOne::class, $listeners[0]);
+
+        File::deleteDirectory(static::$application->getStoragePath());
     }
 
     public function testRegisterListenersThrowsExceptionOnMisconfiguredEvents(): void

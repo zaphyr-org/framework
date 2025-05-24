@@ -94,4 +94,53 @@ class RouterBootProviderTest extends TestCase
 
         $this->routerBootProvider->boot();
     }
+
+    public function testBootWithCachedControllersAndMiddleware(): void
+    {
+        file_put_contents(
+            $controllersPath = __DIR__ . '/controllers.php',
+            '<?php return ' . var_export([TestController::class], true) . ';'
+        );
+
+        file_put_contents(
+            $middlewarePath = __DIR__ . '/middleware.php',
+            '<?php return ' . var_export([TestMiddleware::class], true) . ';'
+        );
+
+        $this->containerMock->expects(self::exactly(2))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                ApplicationRegistryInterface::class => $this->applicationRegistryMock,
+                ConfigInterface::class => $this->configMock,
+            });
+
+        $this->applicationMock->expects(self::once())
+            ->method('isControllersCached')
+            ->willReturn(true);
+
+        $this->applicationMock->expects(self::once())
+            ->method('getControllersCachePath')
+            ->willReturn($controllersPath);
+
+        $this->applicationMock->expects(self::once())
+            ->method('isMiddlewareCached')
+            ->willReturn(true);
+
+        $this->applicationMock->expects(self::once())
+            ->method('getMiddlewareCachePath')
+            ->willReturn($middlewarePath);
+
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('app.routing.patterns', [])
+            ->willReturn([]);
+
+        $this->applicationRegistryMock->expects(self::never())->method('controllers');
+        $this->applicationRegistryMock->expects(self::never())->method('middleware');
+
+        $this->routerBootProvider->boot();
+
+        unlink($controllersPath);
+        unlink($middlewarePath);
+    }
 }

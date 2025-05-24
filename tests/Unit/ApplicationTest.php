@@ -307,12 +307,12 @@ class ApplicationTest extends TestCase
 
     public function testIsCommandsCached(): void
     {
-        mkdir($dir = dirname($this->application->getCommandsCachePath()), recursive: true);
+        mkdir(dirname($this->application->getCommandsCachePath()), recursive: true);
         file_put_contents($this->application->getCommandsCachePath(), '');
 
         self::assertTrue($this->application->isCommandsCached());
 
-        File::deleteDirectory($dir);
+        File::deleteDirectory($this->application->getStoragePath());
 
         self::assertFalse($this->application->isCommandsCached());
     }
@@ -324,12 +324,12 @@ class ApplicationTest extends TestCase
 
     public function testIsConfigCached(): void
     {
-        mkdir($dir = dirname($this->application->getConfigCachePath()), recursive: true);
+        mkdir(dirname($this->application->getConfigCachePath()), recursive: true);
         file_put_contents($this->application->getConfigCachePath(), '');
 
         self::assertTrue($this->application->isConfigCached());
 
-        File::deleteDirectory($dir);
+        File::deleteDirectory($this->application->getStoragePath());
 
         self::assertFalse($this->application->isConfigCached());
     }
@@ -344,12 +344,12 @@ class ApplicationTest extends TestCase
 
     public function testIsControllersCached(): void
     {
-        mkdir($dir = dirname($this->application->getControllersCachePath()), recursive: true);
+        mkdir(dirname($this->application->getControllersCachePath()), recursive: true);
         file_put_contents($this->application->getControllersCachePath(), '');
 
         self::assertTrue($this->application->isControllersCached());
 
-        File::deleteDirectory($dir);
+        File::deleteDirectory($this->application->getStoragePath());
 
         self::assertFalse($this->application->isControllersCached());
     }
@@ -364,12 +364,12 @@ class ApplicationTest extends TestCase
 
     public function testIsMiddlewareCached(): void
     {
-        mkdir($dir = dirname($this->application->getMiddlewareCachePath()), recursive: true);
+        mkdir(dirname($this->application->getMiddlewareCachePath()), recursive: true);
         file_put_contents($this->application->getMiddlewareCachePath(), '');
 
         self::assertTrue($this->application->isMiddlewareCached());
 
-        File::deleteDirectory($dir);
+        File::deleteDirectory($this->application->getStoragePath());
 
         self::assertFalse($this->application->isMiddlewareCached());
     }
@@ -384,12 +384,12 @@ class ApplicationTest extends TestCase
 
     public function testIsProvidersCached(): void
     {
-        mkdir($dir = dirname($this->application->getProvidersCachePath()), recursive: true);
+        mkdir(dirname($this->application->getProvidersCachePath()), recursive: true);
         file_put_contents($this->application->getProvidersCachePath(), '');
 
         self::assertTrue($this->application->isProvidersCached());
 
-        File::deleteDirectory($dir);
+        File::deleteDirectory($this->application->getStoragePath());
 
         self::assertFalse($this->application->isProvidersCached());
     }
@@ -404,12 +404,12 @@ class ApplicationTest extends TestCase
 
     public function testIsEventsCached(): void
     {
-        mkdir($dir = dirname($this->application->getEventsCachePath()), recursive: true);
+        mkdir(dirname($this->application->getEventsCachePath()), recursive: true);
         file_put_contents($this->application->getEventsCachePath(), '');
 
         self::assertTrue($this->application->isEventsCached());
 
-        File::deleteDirectory($dir);
+        File::deleteDirectory($this->application->getStoragePath());
 
         self::assertFalse($this->application->isEventsCached());
     }

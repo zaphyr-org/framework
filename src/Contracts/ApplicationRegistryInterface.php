@@ -7,6 +7,7 @@ namespace Zaphyr\Framework\Contracts;
 use Psr\Http\Server\MiddlewareInterface;
 use Symfony\Component\Console\Command\Command;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
+use Zaphyr\Framework\Exceptions\FrameworkException;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
@@ -34,6 +35,7 @@ interface ApplicationRegistryInterface
     public function middleware(): array;
 
     /**
+     * @throws FrameworkException if event listeners are not an array
      * @return array<class-string, class-string[]|array{listener: class-string, priority: int}>
      */
     public function events(): array;

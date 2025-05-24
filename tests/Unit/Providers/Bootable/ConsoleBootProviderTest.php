@@ -12,6 +12,7 @@ use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
 use Zaphyr\Framework\Contracts\Kernel\ConsoleKernelInterface;
 use Zaphyr\Framework\Providers\Bootable\ConsoleBootServiceProvider;
+use Zaphyr\FrameworkTests\TestAssets\Commands\FooCommand;
 
 class ConsoleBootProviderTest extends TestCase
 {
@@ -67,7 +68,7 @@ class ConsoleBootProviderTest extends TestCase
      * -------------------------------------------------
      */
 
-    public function testBootWithFrameworkCommands(): void
+    public function testBoot(): void
     {
         $this->containerMock->expects(self::exactly(2))
             ->method('get')
@@ -85,5 +86,36 @@ class ConsoleBootProviderTest extends TestCase
             ->willReturn([Command::class]);
 
         $this->consoleBootServiceProvider->boot();
+    }
+
+    public function testBootWithCachedCommands(): void
+    {
+        file_put_contents(
+            $commandsPath = __DIR__ . '/commands.php',
+            '<?php return ' . var_export([FooCommand::class], true) . ';'
+        );
+
+        $this->applicationMock->expects(self::once())
+            ->method('isCommandsCached')
+            ->willReturn(true);
+
+        $this->applicationMock->expects(self::once())
+            ->method('getCommandsCachePath')
+            ->willReturn($commandsPath);
+
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(ConsoleKernelInterface::class)
+            ->willReturn($this->consoleKernelMock);
+
+        $this->consoleKernelMock->expects(self::once())
+            ->method('addCommand')
+            ->with(FooCommand::class);
+
+        $this->applicationRegistryMock->expects(self::never())->method('commands');
+
+        $this->consoleBootServiceProvider->boot();
+
+        unlink($commandsPath);
     }
 }
