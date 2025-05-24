@@ -10,6 +10,7 @@ use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
 use Zaphyr\Framework\Providers\Bootable\RegisterServicesBootProvider;
+use Zaphyr\FrameworkTests\TestAssets\Providers\TestProvider;
 
 class RegisterServicesBootProviderTest extends TestCase
 {
@@ -72,5 +73,27 @@ class RegisterServicesBootProviderTest extends TestCase
             ]);
 
         $this->registerServicesBootProvider->boot();
+    }
+
+    public function testBootWithCachedProviders(): void
+    {
+        file_put_contents(
+            $providersPath = __DIR__ . '/providers.php',
+            '<?php return ' . var_export([TestProvider::class], true) . ';'
+        );
+
+        $this->applicationMock->expects(self::once())
+            ->method('isProvidersCached')
+            ->willReturn(true);
+
+        $this->applicationMock->expects(self::once())
+            ->method('getProvidersCachePath')
+            ->willReturn($providersPath);
+
+        $this->applicationRegistryMock->expects(self::never())->method('providers');
+
+        $this->registerServicesBootProvider->boot();
+
+        unlink($providersPath);
     }
 }

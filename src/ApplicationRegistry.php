@@ -9,6 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
+use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Utils\ClassFinder;
 
 /**
@@ -123,6 +124,12 @@ class ApplicationRegistry implements ApplicationRegistryInterface
         $ignoreListener = $this->config->get('app.listener_ignore', []);
 
         foreach ($events as $event => $listeners) {
+            if (!is_array($listeners)) {
+                throw new FrameworkException(
+                    "Listeners for $event must be an array, " . gettype($listeners) . ' given.'
+                );
+            }
+
             $events[$event] = $this->processEventListeners($listeners, $ignoreListener, $event);
         }
 

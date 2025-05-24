@@ -9,6 +9,7 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\EventDispatcher\EventDispatcher;
 use Zaphyr\EventDispatcher\ListenerProvider;
+use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 
 /**
@@ -39,18 +40,27 @@ class EventsServiceProvider extends AbstractServiceProvider
     protected function registerListenerProvider(): void
     {
         $this->getContainer()->bindSingleton(ListenerProviderInterface::class, function ($container) {
+            $events = $this->getEvents();
             $listenerProvider = new ListenerProvider();
 
-            foreach ($this->config('app.events', []) as $event => $listeners) {
-                if (!is_array($listeners)) {
-                    throw new FrameworkException('Listeners must be an array');
-                }
-
+            foreach ($events as $event => $listeners) {
                 $this->addListeners($listenerProvider, $container, $event, $listeners);
             }
 
             return $listenerProvider;
         });
+    }
+
+    /**
+     * @return array<class-string, class-string[]|array{listener: class-string, priority: int}>
+     */
+    protected function getEvents(): array
+    {
+        if ($this->application->isEventsCached()) {
+            return require $this->application->getEventsCachePath();
+        }
+
+        return $this->get(ApplicationRegistryInterface::class)->events();
     }
 
     /**
