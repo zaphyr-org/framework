@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Config;
+namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Events;
 
-use Zaphyr\Framework\Console\Commands\Config\ClearCommand;
+use Zaphyr\Framework\Console\Commands\Events\ClearCommand;
 use Zaphyr\Framework\Testing\ConsoleTestCase;
 
 class ClearCommandTest extends ConsoleTestCase
@@ -16,15 +16,15 @@ class ClearCommandTest extends ConsoleTestCase
 
     public function testExecute(): void
     {
-        $cacheFile = 'config.php';
+        $cacheFile = 'events.php';
         file_put_contents($cacheFile, '');
 
         $this->applicationMock->expects(self::once())
-            ->method('getConfigCachePath')
+            ->method('getEventsCachePath')
             ->willReturn($cacheFile);
 
         $command = $this->execute(new ClearCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Configuration cache cleared successfully.\n", $command);
+        self::assertDisplayEquals("Event listeners cache cleared successfully.\n", $command);
     }
 }

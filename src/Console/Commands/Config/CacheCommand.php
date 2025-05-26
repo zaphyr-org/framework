@@ -8,22 +8,27 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zaphyr\Config\Contracts\ConfigInterface;
-use Zaphyr\Framework\Console\Commands\AbstractCommand;
+use Zaphyr\Framework\Console\Commands\AbstractCacheCommand;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
+use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
 
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
 #[AsCommand(name: 'config:cache', description: 'Create a configuration cache file')]
-class CacheCommand extends AbstractCommand
+class CacheCommand extends AbstractCacheCommand
 {
     /**
-     * @param ApplicationInterface $zaphyr
-     * @param ConfigInterface      $config
+     * @param ApplicationInterface         $zaphyr
+     * @param ApplicationRegistryInterface $applicationRegistry
+     * @param ConfigInterface              $config
      */
-    public function __construct(ApplicationInterface $zaphyr, protected ConfigInterface $config)
-    {
-        parent::__construct($zaphyr);
+    public function __construct(
+        ApplicationInterface $zaphyr,
+        ApplicationRegistryInterface $applicationRegistry,
+        protected ConfigInterface $config
+    ) {
+        parent::__construct($zaphyr, $applicationRegistry);
     }
 
     /**
@@ -32,15 +37,7 @@ class CacheCommand extends AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->callSilent('config:clear');
-
-        $filename = $this->zaphyr->getConfigCachePath();
-        $data = '<?php return ' . var_export($this->config->getItems(), true) . ';' . PHP_EOL;
-
-        if (!file_put_contents($filename, $data)) {
-            $output->writeln('<error>Failed to write configuration cache file.</error>');
-
-            return self::FAILURE;
-        }
+        $this->write($this->zaphyr->getConfigCachePath(), $this->config->getItems());
 
         $output->writeln('<info>Configuration cached successfully.</info>');
 

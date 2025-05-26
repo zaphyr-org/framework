@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\Framework\Console\Commands\Router;
+namespace Zaphyr\Framework\Console\Commands\Routes;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\Table;
@@ -16,7 +16,7 @@ use Zaphyr\Router\Contracts\RouterInterface;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-#[AsCommand(name: 'router:list', description: 'List all route items')]
+#[AsCommand(name: 'routes:list', description: 'List all route items')]
 class ListCommand extends AbstractCommand
 {
     /**
