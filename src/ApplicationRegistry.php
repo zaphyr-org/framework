@@ -35,6 +35,9 @@ class ApplicationRegistry implements ApplicationRegistryInterface
         Console\Commands\App\EnvironmentCommand::class,
         Console\Commands\App\KeyGenerateCommand::class,
         Console\Commands\Cache\ClearCommand::class,
+        Console\Commands\Cache\OptimizeCommand::class,
+        Console\Commands\Commands\CacheCommand::class,
+        Console\Commands\Commands\ClearCommand::class,
         Console\Commands\Config\CacheCommand::class,
         Console\Commands\Config\ClearCommand::class,
         Console\Commands\Config\ListCommand::class,
@@ -44,10 +47,19 @@ class ApplicationRegistry implements ApplicationRegistryInterface
         Console\Commands\Create\ListenerCommand::class,
         Console\Commands\Create\MiddlewareCommand::class,
         Console\Commands\Create\ProviderCommand::class,
-        Console\Commands\Log\ClearCommand::class,
+        Console\Commands\Events\CacheCommand::class,
+        Console\Commands\Events\ClearCommand::class,
+        Console\Commands\Logs\ClearCommand::class,
         Console\Commands\Maintenance\DownCommand::class,
+        Console\Commands\Providers\CacheCommand::class,
+        Console\Commands\Providers\ClearCommand::class,
         Console\Commands\Maintenance\UpCommand::class,
-        Console\Commands\Router\ListCommand::class,
+        Console\Commands\Routes\CacheControllersCommand::class,
+        Console\Commands\Routes\CacheMiddlewareCommand::class,
+        Console\Commands\Routes\ClearControllersCommand::class,
+        Console\Commands\Routes\ClearMiddlewareCommand::class,
+        Console\Commands\Routes\ListCommand::class,
+
     ];
 
     /**

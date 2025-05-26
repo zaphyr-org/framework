@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Unit\Console\Commands;
+namespace Zaphyr\FrameworkTests\Unit\Console\Commands;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Application;

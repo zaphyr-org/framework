@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\Framework\Console\Commands\Config;
+namespace Zaphyr\Framework\Console\Commands\Events;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,17 +13,17 @@ use Zaphyr\Utils\File;
 /**
  * @author merloxx <merloxx@zaphyr.org>
  */
-#[AsCommand(name: 'config:clear', description: 'Clear the configuration cache file')]
+#[AsCommand(name: 'events:clear', description: 'Clear the event listeners cache file')]
 class ClearCommand extends AbstractCommand
 {
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
-        File::delete($this->zaphyr->getConfigCachePath());
+        File::delete($this->zaphyr->getEventsCachePath());
 
-        $output->writeln('<info>Configuration cache cleared successfully.</info>');
+        $output->writeln('<info>Event listeners cache cleared successfully.</info>');
 
         return self::SUCCESS;
     }

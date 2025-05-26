@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Log;
+namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Logs;
 
-use Zaphyr\Framework\Console\Commands\Log\ClearCommand;
+use Zaphyr\Framework\Console\Commands\Logs\ClearCommand;
 use Zaphyr\Framework\Testing\ConsoleTestCase;
 
 class ClearCommandTest extends ConsoleTestCase
@@ -44,7 +44,5 @@ class ClearCommandTest extends ConsoleTestCase
         $command = $this->execute(new ClearCommand($this->applicationMock));
 
         self::assertDisplayEquals("Log files cleared successfully.\n", $command);
-
-        rmdir($cacheDir);
     }
 }
