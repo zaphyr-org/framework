@@ -39,8 +39,8 @@ class CacheServiceProvider extends AbstractServiceProvider
     protected function registerCacheManager(): void
     {
         $this->getContainer()->bindSingleton(CacheManagerInterface::class, function () {
-            $storeConfig = $this->config('app.cache.stores', []);
-            $defaultStore = $this->config('app.cache.default', CacheManager::FILE_STORE);
+            $storeConfig = $this->config('cache.stores', []);
+            $defaultStore = $this->config('cache.default_store', CacheManager::FILE_STORE);
             $eventDispatcher = $this->getEventDispatcher();
 
             return new CacheManager($storeConfig, $defaultStore, $eventDispatcher);
@@ -52,7 +52,7 @@ class CacheServiceProvider extends AbstractServiceProvider
      */
     protected function getEventDispatcher(): ?EventDispatcherInterface
     {
-        $useEventDispatcher = $this->config('app.cache.events', false);
+        $useEventDispatcher = $this->config('cache.events', false);
 
         if ($useEventDispatcher && $this->has(EventDispatcherInterface::class)) {
             return $this->get(EventDispatcherInterface::class);

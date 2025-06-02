@@ -7,6 +7,7 @@ namespace Zaphyr\FrameworkTests\Integration\Providers;
 use Psr\Log\LoggerInterface;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
+use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\LoggingServiceProvider;
 use Zaphyr\Framework\Testing\HttpTestCase;
 use Zaphyr\Logger\Contracts\LogManagerInterface;
@@ -56,15 +57,13 @@ class LoggingServiceProviderTest extends HttpTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'logging' => [
-                    'default_channel' => 'test',
-                    'channels' => [
-                        'test' => [
-                            'handlers' => [
-                                'file' => [
-                                    'filename' => 'logs/test.log',
-                                ],
+            'logging' => [
+                'default_channel' => 'test',
+                'channels' => [
+                    'test' => [
+                        'handlers' => [
+                            'file' => [
+                                'filename' => 'logs/test.log',
                             ],
                         ],
                     ],
@@ -87,22 +86,20 @@ class LoggingServiceProviderTest extends HttpTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'logging' => [
-                    'default_channel' => 'test',
-                    'channels' => [
-                        'test' => [
-                            'handlers' => [
-                                'mail' => [
-                                    'dsn' => 'null://null',
-                                    'from' => 'from@example.com',
-                                    'to' => 'to@example',
-                                    'subject' => 'Whoops'
-                                ],
+            'logging' => [
+                'default_channel' => 'test',
+                'channels' => [
+                    'test' => [
+                        'handlers' => [
+                            'mail' => [
+                                'dsn' => 'null://null',
+                                'from' => 'from@example.com',
+                                'to' => 'to@example',
+                                'subject' => 'Whoops'
                             ],
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
 
@@ -117,21 +114,19 @@ class LoggingServiceProviderTest extends HttpTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'logging' => [
-                    'default_channel' => 'test',
-                    'channels' => [
-                        'test' => [
-                            'handlers' => [
-                                'rotate' => [
-                                    'directory' => 'logs',
-                                    'interval' => 'day'
-                                ],
+            'logging' => [
+                'default_channel' => 'test',
+                'channels' => [
+                    'test' => [
+                        'handlers' => [
+                            'rotate' => [
+                                'directory' => 'logs',
+                                'interval' => 'day'
                             ],
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         /** @var LogManager $logManager */
@@ -145,18 +140,16 @@ class LoggingServiceProviderTest extends HttpTestCase
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'logging' => [
-                    'default_channel' => 'test',
-                    'channels' => [
-                        'test' => [
-                            'handlers' => [
-                                'noop' => null,
-                            ],
+            'logging' => [
+                'default_channel' => 'test',
+                'channels' => [
+                    'test' => [
+                        'handlers' => [
+                            'noop' => null,
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         /** @var LogManager $logManager */
@@ -164,5 +157,26 @@ class LoggingServiceProviderTest extends HttpTestCase
 
         self::assertInstanceOf(LogManager::class, $logManager);
         self::assertInstanceOf(NoopHandler::class, $logManager->logger()->getHandlers()[0]);
+    }
+
+    public function testRegisterThrowsExceptionOnInvalidHandler(): void
+    {
+        $config = $this->container->get(ConfigInterface::class);
+        $config->setItems([
+            'logging' => [
+                'default_channel' => 'test',
+                'channels' => [
+                    'test' => [
+                        'handlers' => [
+                            'invalid_handler' => [],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(FrameworkException::class);
+
+        $this->container->get(LogManagerInterface::class);
     }
 }

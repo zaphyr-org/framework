@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Integration\Testing;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
@@ -47,19 +48,19 @@ class HttpTestCaseTest extends HttpTestCase
                 'encryption' => [
                     'key' => str_repeat('a', 32),
                 ],
-                'session' => [
-                    'default_handler' => 'array',
-                ],
-                'logging' => [
-                    'default_channel' => 'testing',
-                    'channels' => [
-                        'testing' => [
-                            'handlers' => [
-                                'noop' => null,
-                            ],
+            ],
+            'session' => [
+                'default_handler' => 'array',
+            ],
+            'logging' => [
+                'default_channel' => 'testing',
+                'channels' => [
+                    'testing' => [
+                        'handlers' => [
+                            'noop' => null,
                         ],
-                    ]
-                ],
+                    ],
+                ]
             ],
         ]);
 
@@ -120,9 +121,7 @@ class HttpTestCaseTest extends HttpTestCase
     public function testCallWithHeaders(): void
     {
         $this->router->get('/', function ($request) {
-            $response = new Response();
-
-            return $response->withHeader('x-header', $request->getHeaderline('foo'));
+            return (new Response())->withHeader('x-header', $request->getHeaderline('foo'));
         });
 
         $response = $this->call('GET', '/', ['foo' => 'bar']);
@@ -133,9 +132,7 @@ class HttpTestCaseTest extends HttpTestCase
     public function testCallWithServerParams(): void
     {
         $this->router->get('/', function ($request) {
-            $response = new Response();
-
-            return $response->withHeader('x-server-params', json_encode($request->getServerParams()));
+            return (new Response())->withHeader('x-server-params', json_encode($request->getServerParams()));
         });
 
         $response = $this->call('GET', '/', server: ['foo' => 'bar']);
@@ -146,9 +143,7 @@ class HttpTestCaseTest extends HttpTestCase
     public function testCallWithCookieParams(): void
     {
         $this->router->get('/', function ($request) {
-            $response = new Response();
-
-            return $response->withHeader('x-cookie-params', json_encode($request->getCookieParams()));
+            return (new Response())->withHeader('x-cookie-params', json_encode($request->getCookieParams()));
         });
 
         $response = $this->call('GET', '/', cookies: ['foo' => 'bar']);
@@ -159,9 +154,7 @@ class HttpTestCaseTest extends HttpTestCase
     public function testCallWithQueryParams(): void
     {
         $this->router->get('/', function ($request) {
-            $response = new Response();
-
-            return $response->withHeader('x-query-params', json_encode($request->getQueryParams()));
+            return (new Response())->withHeader('x-query-params', json_encode($request->getQueryParams()));
         });
 
         $response = $this->call('GET', '/', query: ['foo' => 'bar']);
@@ -248,10 +241,9 @@ class HttpTestCaseTest extends HttpTestCase
     }
 
     /**
-     * @dataProvider successfulDataProvider
-     *
      * @param int $statusCode
      */
+    #[DataProvider('successfulDataProvider')]
     public function testAssertSuccessful(int $statusCode): void
     {
         $this->router->get('/', fn() => new Response(statusCode: $statusCode));
@@ -279,10 +271,9 @@ class HttpTestCaseTest extends HttpTestCase
     }
 
     /**
-     * @dataProvider redirectDataProvider
-     *
      * @param int $statusCode
      */
+    #[DataProvider('redirectDataProvider')]
     public function testAssertRedirect(int $statusCode): void
     {
         $this->router->get('/', fn() => new Response(statusCode: $statusCode));
@@ -316,10 +307,9 @@ class HttpTestCaseTest extends HttpTestCase
     }
 
     /**
-     * @dataProvider serverErrorDataProvider
-     *
      * @param int $statusCode
      */
+    #[DataProvider('serverErrorDataProvider')]
     public function testAssertServerError(int $statusCode): void
     {
         $this->router->get('/', fn() => new Response(statusCode: $statusCode));

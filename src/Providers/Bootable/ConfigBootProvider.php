@@ -13,7 +13,6 @@ use Zaphyr\Framework\ApplicationRegistry;
 use Zaphyr\Framework\Config\Replacers\PathReplacer;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
-use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\AbstractServiceProvider;
 
 /**
@@ -21,11 +20,6 @@ use Zaphyr\Framework\Providers\AbstractServiceProvider;
  */
 class ConfigBootProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
-    /**
-     * @const string[]
-     */
-    protected const SUPPORTED_CONFIG_EXTENSIONS = ['php', 'ini', 'json', 'xml', 'yml', 'yaml', 'neon'];
-
     /**
      * @var ConfigInterface
      */
@@ -89,7 +83,6 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
     /**
      * @param ConfigInterface $config
      *
-     * @throws FrameworkException if the "app" configuration file could not be loaded
      * @throws ConfigException if the configuration file is invalid or the replacers could not be registered
      * @return void
      */
@@ -103,27 +96,10 @@ class ConfigBootProvider extends AbstractServiceProvider implements BootableServ
             return;
         }
 
-        $this->appConfigFileExists();
-
         foreach ($this->replacers as $name => $replacer) {
             $config->addReplacer($name, $replacer);
         }
 
         $config->load([$this->application->getConfigPath()]);
-    }
-
-    /**
-     * @throws FrameworkException if the "app" configuration file could not be loaded
-     * @return bool
-     */
-    protected function appConfigFileExists(): bool
-    {
-        foreach (self::SUPPORTED_CONFIG_EXTENSIONS as $extension) {
-            if (file_exists($this->application->getConfigPath('app.' . $extension))) {
-                return true;
-            }
-        }
-
-        throw new FrameworkException('Unable to load the "app" configuration file');
     }
 }

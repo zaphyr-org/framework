@@ -42,6 +42,7 @@ class RegisterServicesBootProviderTest extends TestCase
 
         $this->registerServicesBootProvider = new RegisterServicesBootProvider($this->applicationMock);
         $this->registerServicesBootProvider->setContainer($this->containerMock);
+        $this->registerServicesBootProvider->register();
     }
 
     protected function tearDown(): void

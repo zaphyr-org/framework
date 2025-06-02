@@ -41,6 +41,7 @@ class ExceptionBootProviderTest extends TestCase
 
         $this->exceptionBootProvider = new ExceptionBootProvider($this->applicationMock);
         $this->exceptionBootProvider->setContainer($this->containerMock);
+        $this->exceptionBootProvider->register();
     }
 
     protected function tearDown(): void

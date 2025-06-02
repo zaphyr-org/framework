@@ -56,8 +56,8 @@ class EventsServiceProviderTest extends HttpTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'events' => [
+            'events' => [
+                'listeners' => [
                     TestEvent::class => [
                         TestListenerOne::class,
                         TestListenerTwo::class,
@@ -78,15 +78,25 @@ class EventsServiceProviderTest extends HttpTestCase
         self::assertInstanceOf(TestListenerTwo::class, $listeners[1]);
     }
 
+    public function testRegisterWithoutConfiguration(): void
+    {
+        $eventDispatcher = $this->container->get(EventDispatcherInterface::class);
+        $listenerProvider = $this->container->get(ListenerProviderInterface::class);
+
+        self::assertInstanceOf(EventDispatcher::class, $eventDispatcher);
+        self::assertInstanceOf(ListenerProviderInterface::class, $listenerProvider);
+        self::assertEmpty(iterator_to_array($listenerProvider->getListenersForEvent(new TestEvent())));
+    }
+
     public function testRegisterWithListenersPriority(): void
     {
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'events' => [
+            'events' => [
+                'listeners' => [
                     TestEvent::class => [
-                        ['listener' => TestListenerOne::class, 'priority' => -100],
-                        ['listener' => TestListenerTwo::class, 'priority' => 100],
+                        ['listener' => TestListenerTwo::class, 'priority' => 10],
+                        ['listener' => TestListenerOne::class, 'priority' => 5],
                     ],
                 ],
             ],
@@ -122,10 +132,10 @@ class EventsServiceProviderTest extends HttpTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'events' => [
+            'events' => [
+                'listeners' => [
                     TestEvent::class => null,
-                ],
+                ]
             ],
         ]);
 
@@ -138,12 +148,12 @@ class EventsServiceProviderTest extends HttpTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'events' => [
+            'events' => [
+                'listeners' => [
                     TestEvent::class => [
                         ['listener' => null]
                     ],
-                ],
+                ]
             ],
         ]);
 

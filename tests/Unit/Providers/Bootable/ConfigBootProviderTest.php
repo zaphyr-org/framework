@@ -12,7 +12,6 @@ use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\ApplicationRegistry;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
-use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
 
 class ConfigBootProviderTest extends TestCase
@@ -39,6 +38,7 @@ class ConfigBootProviderTest extends TestCase
 
         $this->configBootProvider = new ConfigBootProvider($this->applicationMock, false);
         $this->configBootProvider->setContainer($this->containerMock);
+        $this->configBootProvider->register();
     }
 
     protected function tearDown(): void
@@ -112,19 +112,5 @@ class ConfigBootProviderTest extends TestCase
         $this->configBootProvider->boot();
 
         unlink($configCachePath);
-    }
-
-    public function testBootThrowsExceptionOnMissingAppConfiguration(): void
-    {
-        $this->expectException(FrameworkException::class);
-
-        $this->applicationMock->expects(self::once())
-            ->method('getConfigCachePath')
-            ->willReturn('cache/config.php');
-
-        $this->applicationMock->method('getConfigPath')
-            ->willReturn(dirname(__DIR__, 2) . '/TestAssets/config/empty');
-
-        $this->configBootProvider->boot();
     }
 }

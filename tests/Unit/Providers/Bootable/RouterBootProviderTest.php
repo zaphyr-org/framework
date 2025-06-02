@@ -50,6 +50,7 @@ class RouterBootProviderTest extends TestCase
 
         $this->routerBootProvider = new RouterBootProvider($this->applicationMock);
         $this->routerBootProvider->setContainer($this->containerMock);
+        $this->routerBootProvider->register();
     }
 
     protected function tearDown(): void
@@ -70,7 +71,7 @@ class RouterBootProviderTest extends TestCase
 
     public function testBoot(): void
     {
-        $this->containerMock->expects(self::exactly(2))
+        $this->containerMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 ApplicationRegistryInterface::class => $this->applicationRegistryMock,
@@ -87,7 +88,7 @@ class RouterBootProviderTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('app.routing.patterns', [])
+            ->with('routing.patterns', [])
             ->willReturn([
                 'slug' => '[a-zA-Z0-9\-]+',
             ]);
@@ -107,12 +108,10 @@ class RouterBootProviderTest extends TestCase
             '<?php return ' . var_export([TestMiddleware::class], true) . ';'
         );
 
-        $this->containerMock->expects(self::exactly(2))
+        $this->containerMock->expects(self::once())
             ->method('get')
-            ->willReturnCallback(fn($key) => match ($key) {
-                ApplicationRegistryInterface::class => $this->applicationRegistryMock,
-                ConfigInterface::class => $this->configMock,
-            });
+            ->with(ConfigInterface::class)
+            ->willReturn($this->configMock);
 
         $this->applicationMock->expects(self::once())
             ->method('isControllersCached')
@@ -132,7 +131,7 @@ class RouterBootProviderTest extends TestCase
 
         $this->configMock->expects(self::once())
             ->method('get')
-            ->with('app.routing.patterns', [])
+            ->with('routing.patterns', [])
             ->willReturn([]);
 
         $this->applicationRegistryMock->expects(self::never())->method('controllers');

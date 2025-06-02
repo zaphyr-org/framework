@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Zaphyr\FrameworkTests\Integration\Providers;
 
 use Psr\SimpleCache\CacheInterface as Psr7CacheInterface;
+use Zaphyr\Cache\CacheManager;
 use Zaphyr\Cache\Contracts\CacheInterface;
 use Zaphyr\Cache\Contracts\CacheManagerInterface;
+use Zaphyr\Cache\Stores\ArrayStore;
+use Zaphyr\Cache\Stores\FileStore;
+use Zaphyr\Cache\Stores\RedisStore;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Providers\CacheServiceProvider;
@@ -52,16 +56,21 @@ class CacheServicesProviderTest extends HttpTestCase
 
         $config = $this->container->get(ConfigInterface::class);
         $config->setItems([
-            'app' => [
-                'cache' => [
-                    'events' => true,
-                    'default' => 'file',
-                    'stores' => [
-                        'file' => [
-                            'driver' => 'file',
-                            'path' => __DIR__ . '/storage/framework/cache',
-                        ],
+            'cache' => [
+                'events' => true,
+                'default_store' => 'file',
+                'stores' => [
+                    'file' => [
+                        'path' => __DIR__ . '/storage/framework/cache',
+                        'permissions' => 0755,
                     ],
+                    'redis' => [
+                        'scheme' => 'tcp',
+                        'host' => '127.0.0.1',
+                        'port' => 6379,
+                        'database' => 0,
+                        'prefix' => 'zaphyr_cache',
+                    ]
                 ],
             ],
         ]);
@@ -70,8 +79,20 @@ class CacheServicesProviderTest extends HttpTestCase
         $cache = $this->container->get(CacheInterface::class);
         $psr7Cache = $this->container->get(Psr7CacheInterface::class);
 
-        self::assertInstanceOf(CacheManagerInterface::class, $cacheManager);
+        self::assertInstanceOf(CacheManager::class, $cacheManager);
+        self::assertInstanceOf(FileStore::class, $cacheManager->cache()->getStore());
+        self::assertInstanceOf(FileStore::class, $cacheManager->cache(CacheManager::FILE_STORE)->getStore());
+        self::assertInstanceOf(RedisStore::class, $cacheManager->cache(CacheManager::REDIS_STORE)->getStore());
         self::assertInstanceOf(CacheInterface::class, $cache);
         self::assertInstanceOf(Psr7CacheInterface::class, $psr7Cache);
+    }
+
+    public function testRegisterWithoutConfiguration(): void
+    {
+        $cacheManager = $this->container->get(CacheManagerInterface::class);
+
+        self::assertInstanceOf(FileStore::class, $cacheManager->cache()->getStore());
+        self::assertInstanceOf(RedisStore::class, $cacheManager->cache(CacheManager::REDIS_STORE)->getStore());
+        self::assertInstanceOf(ArrayStore::class, $cacheManager->cache(CacheManager::ARRAY_STORE)->getStore());
     }
 }

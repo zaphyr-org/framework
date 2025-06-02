@@ -91,8 +91,8 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     {
         return $this->merge([
             $this->frameworkProviders,
-            $this->config->get('app.services.providers', []),
-        ], $this->config->get('app.services.providers_ignore', []));
+            $this->config->get('services.providers', []),
+        ], $this->config->get('services.providers_ignore', []));
     }
 
     /**
@@ -102,8 +102,8 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     {
         return $this->merge([
             $this->frameworkCommands,
-            $this->config->get('app.console.commands', []),
-        ], $this->config->get('app.console.commands_ignore', []));
+            $this->config->get('console.commands', []),
+        ], $this->config->get('console.commands_ignore', []));
     }
 
     /**
@@ -112,8 +112,8 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     public function controllers(): array
     {
         return $this->merge([
-            $this->config->get('app.routing.controllers', []),
-        ], $this->config->get('app.routing.controllers_ignore', []));
+            $this->config->get('routing.controllers', []),
+        ], $this->config->get('routing.controllers_ignore', []));
     }
 
     /**
@@ -123,8 +123,8 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     {
         return $this->merge([
             $this->frameworkMiddleware,
-            $this->config->get('app.routing.middleware', []),
-        ], $this->config->get('app.routing.middleware_ignore', []));
+            $this->config->get('routing.middleware', []),
+        ], $this->config->get('routing.middleware_ignore', []));
     }
 
     /**
@@ -132,8 +132,8 @@ class ApplicationRegistry implements ApplicationRegistryInterface
      */
     public function events(): array
     {
-        $events = $this->config->get('app.events', []);
-        $ignoreListener = $this->config->get('app.listener_ignore', []);
+        $events = $this->config->get('events.listeners', []);
+        $ignoreListeners = $this->config->get('events.listeners_ignore', []);
 
         foreach ($events as $event => $listeners) {
             if (!is_array($listeners)) {
@@ -142,7 +142,7 @@ class ApplicationRegistry implements ApplicationRegistryInterface
                 );
             }
 
-            $events[$event] = $this->processEventListeners($listeners, $ignoreListener, $event);
+            $events[$event] = $this->processEventListeners($listeners, $ignoreListeners, $event);
         }
 
         return $events;

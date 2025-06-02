@@ -27,6 +27,7 @@ class EnvironmentBootProviderTest extends TestCase
         $this->applicationMock = $this->createMock(ApplicationInterface::class);
 
         $this->environmentBootProvider = new EnvironmentBootProvider($this->applicationMock);
+        $this->environmentBootProvider->register();
     }
 
     protected function tearDown(): void

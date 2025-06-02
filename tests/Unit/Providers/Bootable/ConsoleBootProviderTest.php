@@ -50,6 +50,7 @@ class ConsoleBootProviderTest extends TestCase
 
         $this->consoleBootServiceProvider = new ConsoleBootServiceProvider($this->applicationMock);
         $this->consoleBootServiceProvider->setContainer($this->containerMock);
+        $this->consoleBootServiceProvider->register();
     }
 
     protected function tearDown(): void

@@ -40,18 +40,18 @@ class SessionServiceProvider extends AbstractServiceProvider
     protected function registerCookieManager(): void
     {
         $this->getContainer()->bindSingleton(CookieManagerInterface::class, function () {
-            $expire = $this->config('app.session.expire', 120);
+            $expire = (int)$this->config('session.expire', 0);
 
             if ($expire !== 0) {
                 $expire = time() + $expire * 60;
             }
 
-            $path = $this->config('app.session.cookie.path', '/');
-            $domain = $this->config('app.session.cookie.domain');
-            $secure = $this->config('app.session.cookie.secure', true);
-            $httpOnly = $this->config('app.session.cookie.http_only', true);
-            $raw = $this->config('app.session.cookie.raw', false);
-            $sameSite = $this->config('app.session.cookie.same_site', Cookie::RESTRICTION_STRICT);
+            $path = $this->config('session.cookie_path', '/');
+            $domain = $this->config('session.cookie_domain');
+            $secure = $this->config('session.cookie_secure', false);
+            $httpOnly = $this->config('session.cookie_http_only', true);
+            $raw = $this->config('session.cookie_raw', false);
+            $sameSite = $this->config('session.cookie_same_site', Cookie::RESTRICTION_LAX);
 
             return new CookieManager($expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
         });
@@ -63,11 +63,15 @@ class SessionServiceProvider extends AbstractServiceProvider
     protected function registerSessionManager(): void
     {
         $this->getContainer()->bindSingleton(SessionManagerInterface::class, function ($container) {
-            $name = Str::slug($this->config('app.session.name', $this->config('app.name', 'zaphyr') . '_session'), '_');
-            $handlers = $this->config('app.session.handlers', []);
-            $expire = $this->config('app.session.expire', 120);
-            $defaultHandler = $this->config('app.session.default_handler', SessionManager::FILE_HANDLER);
-            $encrypt = $this->config('app.session.encrypt', true) ? $container->get(EncryptInterface::class) : null;
+            $name = Str::slug($this->config('session.name', 'zaphyr_session'), '_');
+            $handlers = $this->config('session.handlers', [
+                'file' => [
+                    'path' => $this->application->getStoragePath('sessions'),
+                ],
+            ]);
+            $expire = (int)$this->config('session.expire', 60);
+            $defaultHandler = $this->config('session.default_handler', SessionManager::FILE_HANDLER);
+            $encrypt = $this->config('session.encrypt', false) ? $container->get(EncryptInterface::class) : null;
 
             return new SessionManager($name, $handlers, $expire, $defaultHandler, $encrypt);
         });
