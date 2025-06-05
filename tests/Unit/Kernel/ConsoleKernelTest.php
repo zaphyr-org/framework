@@ -6,16 +6,26 @@ namespace Zaphyr\FrameworkTests\Unit\Kernel;
 
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use ReflectionMethod;
+use ReflectionProperty;
 use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ContainerInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
+use Zaphyr\Framework\Events\Console\Commands\CommandFailedEvent;
+use Zaphyr\Framework\Events\Console\Commands\CommandFinishedEvent;
+use Zaphyr\Framework\Events\Console\Commands\CommandStartingEvent;
 use Zaphyr\Framework\Kernel\ConsoleKernel;
-use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Providers\Bootable\ConfigBootProvider;
 use Zaphyr\Framework\Providers\Bootable\ConsoleBootServiceProvider;
 use Zaphyr\Framework\Providers\Bootable\EnvironmentBootProvider;
@@ -186,5 +196,55 @@ class ConsoleKernelTest extends TestCase
         $exitCode = $this->consoleKernel->handle($inputMock, $this->output);
 
         self::assertEquals(1, $exitCode);
+    }
+
+    public function testEventHandlersAreTriggered(): void
+    {
+        $this->containerMock->expects(self::once())
+            ->method('get')
+            ->with(EventDispatcherInterface::class)
+            ->willReturn($this->eventDispatcherMock);
+
+        $this->eventDispatcherMock->expects(self::exactly(3))
+            ->method('dispatch')
+            ->willReturnCallback(function ($event) use (&$eventCalls) {
+                $eventCalls[] = get_class($event);
+
+                return $event;
+            });
+
+        $reflectionMethod = new ReflectionMethod(ConsoleKernel::class, 'registerEvents');
+        $reflectionMethod->invoke($this->consoleKernel);
+
+        $reflectionProperty = new ReflectionProperty(ConsoleKernel::class, 'symfonyEventDispatcher');
+        $symfonyEventDispatcher = $reflectionProperty->getValue($this->consoleKernel);
+
+        $command = $this->createMock(Command::class);
+        $command->expects(self::exactly(3))
+            ->method('getName')
+            ->willReturn('test-command');
+
+        $input = new ArrayInput([]);
+        $output = new BufferedOutput();
+
+        $symfonyEventDispatcher->dispatch(
+            new ConsoleCommandEvent($command, $input, $output),
+            ConsoleEvents::COMMAND
+        );
+
+        $symfonyEventDispatcher->dispatch(
+            new ConsoleErrorEvent($input, $output, new Exception('test'), $command),
+            ConsoleEvents::ERROR
+        );
+
+        $symfonyEventDispatcher->dispatch(
+            new ConsoleTerminateEvent($command, $input, $output, 0),
+            ConsoleEvents::TERMINATE
+        );
+
+        self::assertCount(3, $eventCalls);
+        self::assertContains(CommandStartingEvent::class, $eventCalls);
+        self::assertContains(CommandFailedEvent::class, $eventCalls);
+        self::assertContains(CommandFinishedEvent::class, $eventCalls);
     }
 }

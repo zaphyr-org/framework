@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Config\Replacers;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Config\Replacers\PathReplacer;
@@ -38,9 +39,7 @@ class PathReplacerTest extends TestCase
      * -------------------------------------------------
      */
 
-    /**
-     * @dataProvider validReplacersDataProvider
-     */
+    #[DataProvider('validReplacersDataProvider')]
     public function testReplace(string $path, string $pathMethod): void
     {
         $this->applicationMock->expects(self::once())

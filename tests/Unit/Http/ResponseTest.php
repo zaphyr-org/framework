@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Http;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Http\Response;
 
@@ -33,9 +34,8 @@ class ResponseTest extends TestCase
 
     /**
      * @param int $statusCode
-     *
-     * @dataProvider emptyStatusCodesDataProvider
      */
+    #[DataProvider('emptyStatusCodesDataProvider')]
     public function testIsEmpty(int $statusCode): void
     {
         self::assertTrue((new Response(statusCode: $statusCode))->isEmpty());
@@ -59,9 +59,8 @@ class ResponseTest extends TestCase
 
     /**
      * @param int $statusCode
-     *
-     * @dataProvider informationalCodesDataProvider
      */
+    #[DataProvider('informationalCodesDataProvider')]
     public function testIsInformational(int $statusCode): void
     {
         self::assertTrue((new Response(statusCode: $statusCode))->isInformational());
@@ -96,9 +95,8 @@ class ResponseTest extends TestCase
 
     /**
      * @param int $statusCode
-     *
-     * @dataProvider successfulCodesDataProvider
      */
+    #[DataProvider('successfulCodesDataProvider')]
     public function testIsSuccessful(int $statusCode): void
     {
         self::assertTrue((new Response(statusCode: $statusCode))->isSuccessful());
@@ -130,9 +128,8 @@ class ResponseTest extends TestCase
 
     /**
      * @param int $statusCode
-     *
-     * @dataProvider redirectCodesDataProvider
      */
+    #[DataProvider('redirectCodesDataProvider')]
     public function testIsRedirect(int $statusCode): void
     {
         self::assertTrue((new Response(statusCode: $statusCode))->isRedirect());
@@ -160,9 +157,8 @@ class ResponseTest extends TestCase
 
     /**
      * @param int $statusCode
-     *
-     * @dataProvider redirectionCodesDataProvider
      */
+    #[DataProvider('redirectionCodesDataProvider')]
     public function testIsRedirection(int $statusCode): void
     {
         self::assertTrue((new Response(statusCode: $statusCode))->isRedirection());
@@ -213,9 +209,8 @@ class ResponseTest extends TestCase
 
     /**
      * @param int $statusCode
-     *
-     * @dataProvider clientErrorCodesDataProvider
      */
+    #[DataProvider('clientErrorCodesDataProvider')]
     public function testIsClientError(int $statusCode): void
     {
         self::assertTrue((new Response(statusCode: $statusCode))->isClientError());
@@ -266,9 +261,8 @@ class ResponseTest extends TestCase
 
     /**
      * @param int $statusCode
-     *
-     * @dataProvider serverErrorCodesDataProvider
      */
+    #[DataProvider('serverErrorCodesDataProvider')]
     public function testIsServerError(int $statusCode): void
     {
         self::assertTrue((new Response(statusCode: $statusCode))->isServerError());

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Http\Utils;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Http\Utils\StatusCode;
 
@@ -17,9 +18,8 @@ class StatusCodeTest extends TestCase
     /**
      * @param int    $statusCode
      * @param string $message
-     *
-     * @dataProvider getMessageDataProvider
      */
+    #[DataProvider('getMessageDataProvider')]
     public function testGetMessage(int $statusCode, string $message): void
     {
         self::assertEquals($message, StatusCode::getMessage($statusCode));

@@ -6,6 +6,7 @@ namespace Zaphyr\FrameworkTests\Unit\Exceptions\Handlers;
 
 use ErrorException;
 use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -228,9 +229,8 @@ class ExceptionHandlerTest extends TestCase
     /**
      * @param Exception    $exception
      * @param class-string $reportIgnore
-     *
-     * @dataProvider shouldNotReportDataProvider
      */
+    #[DataProvider('shouldNotReportDataProvider')]
     public function testReportShouldNotReportWithInternalDontReport(Exception $exception, string $reportIgnore): void
     {
         $this->applicationMock->expects(self::once())

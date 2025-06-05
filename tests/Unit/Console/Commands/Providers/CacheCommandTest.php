@@ -45,4 +45,33 @@ class CacheCommandTest extends ConsoleTestCase
 
         unlink($cacheFile);
     }
+
+    public function testExecuteCreatesCacheDirectory(): void
+    {
+        $cacheFile = 'providers/providers.php';
+
+        $this->applicationMock->expects(self::once())
+            ->method('getProvidersCachePath')
+            ->willReturn($cacheFile);
+
+        $applicationRegistryMock = $this->createMock(ApplicationRegistryInterface::class);
+        $applicationRegistryMock->expects(self::once())
+            ->method('providers')
+            ->willReturn(['providers1', 'providers2']);
+
+        $consoleApplicationMock = $this->createMock(Application::class);
+        $consoleApplicationMock->expects(self::once())
+            ->method('doRun')
+            ->with(new ArrayInput(['command' => 'providers:clear']))
+            ->willReturn(0);
+
+        $cacheCommand = new CacheCommand($this->applicationMock, $applicationRegistryMock);
+        $cacheCommand->setApplication($consoleApplicationMock);
+        $command = $this->execute($cacheCommand);
+
+        self::assertDisplayEquals("Service providers cached successfully.\n", $command);
+
+        unlink($cacheFile);
+        rmdir(dirname($cacheFile));
+    }
 }

@@ -45,4 +45,33 @@ class CacheCommandTest extends ConsoleTestCase
 
         unlink($cacheFile);
     }
+
+    public function testExecuteCreatesCacheDirectory(): void
+    {
+        $cacheFile = 'events/events.php';
+
+        $this->applicationMock->expects(self::once())
+            ->method('getEventsCachePath')
+            ->willReturn($cacheFile);
+
+        $applicationRegistryMock = $this->createMock(ApplicationRegistryInterface::class);
+        $applicationRegistryMock->expects(self::once())
+            ->method('events')
+            ->willReturn(['event1', 'event2']);
+
+        $consoleApplicationMock = $this->createMock(Application::class);
+        $consoleApplicationMock->expects(self::once())
+            ->method('doRun')
+            ->with(new ArrayInput(['command' => 'events:clear']))
+            ->willReturn(0);
+
+        $cacheCommand = new CacheCommand($this->applicationMock, $applicationRegistryMock);
+        $cacheCommand->setApplication($consoleApplicationMock);
+        $command = $this->execute($cacheCommand);
+
+        self::assertDisplayEquals("Event listeners cached successfully.\n", $command);
+
+        unlink($cacheFile);
+        rmdir(dirname($cacheFile));
+    }
 }

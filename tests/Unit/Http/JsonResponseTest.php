@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Http;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Http\Exceptions\ResponseException;
 use Zaphyr\Framework\Http\JsonResponse;
@@ -80,9 +81,8 @@ class JsonResponseTest extends TestCase
 
     /**
      * @param mixed $value
-     *
-     * @dataProvider scalarValuesDataProvider
      */
+    #[DataProvider('scalarValuesDataProvider')]
     public function testJsonResponseScalarValues(mixed $value): void
     {
         self::assertEquals(json_encode($value), (new JsonResponse($value))->getBody()->__toString());
@@ -135,7 +135,10 @@ class JsonResponseTest extends TestCase
     {
         $this->expectException(ResponseException::class);
 
-        new JsonResponse(new class {});
+        new JsonResponse(
+            new class {
+            }
+        );
     }
 
     public function testJsonResponseThrowsExceptionOnInvalidJson(): void

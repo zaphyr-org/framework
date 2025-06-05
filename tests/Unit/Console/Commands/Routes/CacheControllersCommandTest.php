@@ -45,4 +45,33 @@ class CacheControllersCommandTest extends ConsoleTestCase
 
         unlink($cacheFile);
     }
+
+    public function testExecuteCreatesCacheDirectory(): void
+    {
+        $cacheFile = 'controllers/controllers.php';
+
+        $this->applicationMock->expects(self::once())
+            ->method('getControllersCachePath')
+            ->willReturn($cacheFile);
+
+        $applicationRegistryMock = $this->createMock(ApplicationRegistryInterface::class);
+        $applicationRegistryMock->expects(self::once())
+            ->method('controllers')
+            ->willReturn(['controller1', 'controller2']);
+
+        $consoleApplicationMock = $this->createMock(Application::class);
+        $consoleApplicationMock->expects(self::once())
+            ->method('doRun')
+            ->with(new ArrayInput(['command' => 'routes:controllers:clear']))
+            ->willReturn(0);
+
+        $cacheCommand = new CacheControllersCommand($this->applicationMock, $applicationRegistryMock);
+        $cacheCommand->setApplication($consoleApplicationMock);
+        $command = $this->execute($cacheCommand);
+
+        self::assertDisplayEquals("Controllers cached successfully.\n", $command);
+
+        unlink($cacheFile);
+        rmdir(dirname($cacheFile));
+    }
 }

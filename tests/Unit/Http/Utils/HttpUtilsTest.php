@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Http\Utils;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Http\Exceptions\UploadedFileException;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
@@ -20,9 +21,8 @@ class HttpUtilsTest extends TestCase
     /**
      * @param string $expected
      * @param array<string, array<int, mixed>> $serverParams
-     *
-     * @dataProvider uriFromGlobalsDataProvider
      */
+    #[DataProvider('uriFromGlobalsDataProvider')]
     public function testFromGlobals(string $expected, array $serverParams): void
     {
         self::assertEquals((new Uri($expected))->__toString(), HttpUtils::getUrifromGlobals($serverParams));
@@ -137,9 +137,8 @@ class HttpUtilsTest extends TestCase
     /**
      * @param array<string, array<int, mixed>> $files
      * @param array<int, mixed>                $expected
-     *
-     * @dataProvider normalizeFilesDataProvider
      */
+    #[DataProvider('normalizeFilesDataProvider')]
     public function testNormalizeFiles(array $files, array $expected): void
     {
         self::assertEquals($expected, HttpUtils::normalizeFiles($files));

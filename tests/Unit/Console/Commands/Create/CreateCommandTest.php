@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Console\Commands\Create;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Zaphyr\Framework\Console\Commands\Create\AbstractCreateCommand;
 use Zaphyr\Framework\Console\Commands\Create\CommandCommand;
 use Zaphyr\Framework\Console\Commands\Create\ControllerCommand;
@@ -37,9 +38,8 @@ class CreateCommandTest extends ConsoleTestCase
     /**
      * @param string       $name
      * @param class-string $command
-     *
-     * @dataProvider createCommandsDataProvider
      */
+    #[DataProvider('createCommandsDataProvider')]
     public function testExecute(string $name, string $command): void
     {
         $this->applicationMock->expects(self::once())
@@ -57,9 +57,8 @@ class CreateCommandTest extends ConsoleTestCase
     /**
      * @param string       $name
      * @param class-string $command
-     *
-     * @dataProvider createCommandsDataProvider
      */
+    #[DataProvider('createCommandsDataProvider')]
     public function testExecuteWithCustomNamespace(string $name, string $command): void
     {
         $this->applicationMock->expects(self::once())
@@ -81,8 +80,8 @@ class CreateCommandTest extends ConsoleTestCase
      * @param string       $name
      * @param class-string $command
      *
-     * @dataProvider createCommandsDataProvider
      */
+    #[DataProvider('createCommandsDataProvider')]
     public function testExecuteWithConfirmation(string $name, string $command): void
     {
         $filename = $this->destinationPath . '/' . $name . '.php';
@@ -102,9 +101,8 @@ class CreateCommandTest extends ConsoleTestCase
     /**
      * @param string       $name
      * @param class-string $command
-     *
-     * @dataProvider createCommandsDataProvider
      */
+    #[DataProvider('createCommandsDataProvider')]
     public function testExecuteWithForce(string $name, string $command): void
     {
         $filename = $this->destinationPath . '/' . $name . '.php';
@@ -148,7 +146,7 @@ class CreateCommandTest extends ConsoleTestCase
     {
         $this->expectException(FrameworkException::class);
 
-        $command = new class($this->applicationMock) extends AbstractCreateCommand {
+        $command = new class ($this->applicationMock) extends AbstractCreateCommand {
             public function getStubName(): string
             {
                 return 'invalid';
