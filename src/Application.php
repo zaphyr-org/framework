@@ -24,7 +24,7 @@ class Application implements ApplicationInterface
     /**
      * @const string
      */
-    public const VERSION = '1.0.0-alpha.6';
+    public const VERSION = '1.0.0-alpha.7';
 
     /**
      * @var bool

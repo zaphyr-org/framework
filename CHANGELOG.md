@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 🔥 [v1.0.0-alpha.7](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.6...1.0.0-alpha.7) [2025-06-08]
+
+### New:
+
+* Added cache paths methods to Application class
+* Added `ApplicationRegistry` class
+* Added ApplicationRegistry to ConfigBootProvider
+* Added `CacheServiceProvider` class
+* Added cache usage in service providers
+* Added cache and clear console commands
+* Integrated plugin functionality in ApplicationRegistry class
+
+### Changed:
+
+* Integrated ApplicationRegistry in framework-bootable providers
+* Restructured config settings and improved unit tests
+
 ## 🔥 [v1.0.0-alpha.6](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.5...1.0.0-alpha.6) [2025-05-10]
 
 ### New:
