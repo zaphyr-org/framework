@@ -30,6 +30,7 @@
         "zaphyr-org/http-emitter": "^1.0",
         "zaphyr-org/http-message": "^1.0",
         "zaphyr-org/logger": "^2.2",
+        "zaphyr-org/plugin-installer": "^1.0",
         "zaphyr-org/router": "^1.3",
         "zaphyr-org/session": "^1.1",
         "zaphyr-org/utils": "^2.2"
