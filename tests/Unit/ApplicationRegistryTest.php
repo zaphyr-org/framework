@@ -12,18 +12,26 @@ use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
 use Zaphyr\Framework\ApplicationRegistry;
 use Zaphyr\Framework\Console;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Middleware;
 use Zaphyr\Framework\Providers;
 use Zaphyr\FrameworkTests\TestAssets\Commands\FooCommand;
 use Zaphyr\FrameworkTests\TestAssets\Controllers\TestController;
 use Zaphyr\FrameworkTests\TestAssets\Events\TestEvent;
+use Zaphyr\FrameworkTests\TestAssets\Events\TestEvent2;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerOne;
 use Zaphyr\FrameworkTests\TestAssets\Listeners\TestListenerTwo;
 use Zaphyr\FrameworkTests\TestAssets\Middleware\TestMiddleware;
+use Zaphyr\FrameworkTests\TestAssets\Plugins\TestPlugin;
 use Zaphyr\FrameworkTests\TestAssets\Providers\TestProvider;
 
 class ApplicationRegistryTest extends TestCase
 {
+    /**
+     * @var ApplicationInterface&MockObject
+     */
+    protected ApplicationInterface&MockObject $applicationMock;
+
     /**
      * @var ConfigInterface&MockObject
      */
@@ -96,14 +104,15 @@ class ApplicationRegistryTest extends TestCase
     protected function setUp(): void
     {
         $this->testAssetsPath = dirname(__DIR__) . '/TestAssets';
+        $this->applicationMock = $this->createMock(ApplicationInterface::class);
         $this->configMock = $this->createMock(ConfigInterface::class);
 
-        $this->applicationRegistry = new ApplicationRegistry($this->configMock);
+        $this->applicationRegistry = new ApplicationRegistry($this->applicationMock, $this->configMock);
     }
 
     protected function tearDown(): void
     {
-        unset($this->configMock, $this->applicationRegistry);
+        unset($this->applicationMock, $this->configMock, $this->applicationRegistry);
     }
 
     /* -------------------------------------------------
@@ -113,10 +122,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testProviders(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'services.providers', 'services.providers_ignore' => [],
+                'plugins.classes', 'services.providers', 'services.providers_ignore' => [],
             });
 
         self::assertEquals($this->frameworkProviders, $this->applicationRegistry->providers());
@@ -124,11 +133,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testProvidersWithCustomArrayProvidersAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'services.providers' => [TestProvider::class],
-                'services.providers_ignore' => [],
+                'plugins.classes', 'services.providers_ignore' => [],
             });
 
         self::assertEquals(
@@ -139,11 +148,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testProvidersWithCustomStringPathProvidersAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'services.providers' => $this->testAssetsPath . '/Providers',
-                'services.providers_ignore' => [],
+                'plugins.classes', 'services.providers_ignore' => [],
             });
 
         self::assertEquals(
@@ -154,10 +163,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testProvidersWithIgnoredProviders(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'services.providers' => [],
+                'plugins.classes', 'services.providers' => [],
                 'services.providers_ignore' => [Providers\LoggingServiceProvider::class],
             });
 
@@ -169,15 +178,32 @@ class ApplicationRegistryTest extends TestCase
 
     public function testProvidersIgnoresWrongType(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'services.providers' => false,
-                'services.providers_ignore' => [],
+                'plugins.classes', 'services.providers_ignore' => [],
             });
 
         self::assertEquals(
             $this->frameworkProviders,
+            $this->applicationRegistry->providers()
+        );
+    }
+
+    public function testProvidersWithPluginProviders(): void
+    {
+        $this->configMock->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'plugins.classes' => [
+                    'all' => [TestPlugin::class]
+                ],
+                'services.providers', 'services.providers_ignore' => [],
+            });
+
+        self::assertEquals(
+            array_merge($this->frameworkProviders, [TestProvider::class]),
             $this->applicationRegistry->providers()
         );
     }
@@ -189,10 +215,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testCommands(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'console.commands', 'console.commands_ignore' => [],
+                'plugins.classes', 'console.commands', 'console.commands_ignore' => [],
             });
 
         self::assertEquals($this->frameworkCommands, $this->applicationRegistry->commands());
@@ -200,11 +226,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testCommandsWithCustomArrayCommandsAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'console.commands' => [FooCommand::class],
-                'console.commands_ignore' => [],
+                'plugins.classes', 'console.commands_ignore' => [],
             });
 
         self::assertEquals(
@@ -215,11 +241,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testCommandsWithCustomStringPathCommandsAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'console.commands' => $this->testAssetsPath . '/Commands',
-                'console.commands_ignore' => [],
+                'plugins.classes', 'console.commands_ignore' => [],
             });
 
         self::assertEquals(
@@ -230,10 +256,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testCommandsWithIgnoredCommands(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'console.commands' => [],
+                'plugins.classes', 'console.commands' => [],
                 'console.commands_ignore' => [Console\Commands\App\EnvironmentCommand::class],
             });
 
@@ -245,15 +271,32 @@ class ApplicationRegistryTest extends TestCase
 
     public function testCommandsIgnoresWrongType(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'console.commands' => false,
-                'console.commands_ignore' => [],
+                'plugins.classes', 'console.commands_ignore' => [],
             });
 
         self::assertEquals(
             $this->frameworkCommands,
+            $this->applicationRegistry->commands()
+        );
+    }
+
+    public function testCommandsWithPluginCommands(): void
+    {
+        $this->configMock->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'plugins.classes' => [
+                    'all' => [TestPlugin::class]
+                ],
+                'console.commands', 'console.commands_ignore' => [],
+            });
+
+        self::assertEquals(
+            array_merge($this->frameworkCommands, [FooCommand::class]),
             $this->applicationRegistry->commands()
         );
     }
@@ -265,10 +308,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testControllers(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'routing.controllers', 'routing.controllers_ignore' => [],
+                'plugins.classes', 'routing.controllers', 'routing.controllers_ignore' => [],
             });
 
         self::assertEquals([], $this->applicationRegistry->controllers());
@@ -276,11 +319,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testControllersWithCustomArrayControllersAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'routing.controllers' => [TestController::class],
-                'routing.controllers_ignore' => [],
+                'plugins.classes', 'routing.controllers_ignore' => [],
             });
 
         self::assertEquals(
@@ -291,11 +334,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testControllersWithCustomStringPathControllersAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'routing.controllers' => $this->testAssetsPath . '/Controllers',
-                'routing.controllers_ignore' => [],
+                'plugins.classes', 'routing.controllers_ignore' => [],
             });
 
         self::assertEquals(
@@ -306,9 +349,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testControllersWithIgnoredControllers(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
+                'plugins.classes' => [],
                 'routing.controllers', 'routing.controllers_ignore' => [TestController::class],
             });
 
@@ -317,15 +361,32 @@ class ApplicationRegistryTest extends TestCase
 
     public function testControllersIgnoresWrongType(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'routing.controllers' => false,
-                'routing.controllers_ignore' => [],
+                'plugins.classes', 'routing.controllers_ignore' => [],
             });
 
         self::assertEquals(
             [],
+            $this->applicationRegistry->controllers()
+        );
+    }
+
+    public function testControllersWithPluginControllers(): void
+    {
+        $this->configMock->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'plugins.classes' => [
+                    'all' => [TestPlugin::class]
+                ],
+                'routing.controllers', 'routing.controllers_ignore' => [],
+            });
+
+        self::assertEquals(
+            [TestController::class],
             $this->applicationRegistry->controllers()
         );
     }
@@ -337,10 +398,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testMiddleware(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'routing.middleware', 'routing.middleware_ignore' => [],
+                'plugins.classes', 'routing.middleware', 'routing.middleware_ignore' => [],
             });
 
         self::assertEquals($this->frameworkMiddleware, $this->applicationRegistry->middleware());
@@ -348,11 +409,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testMiddlewareWithCustomArrayMiddlewareAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'routing.middleware' => [TestMiddleware::class],
-                'routing.middleware_ignore' => [],
+                'plugins.classes', 'routing.middleware_ignore' => [],
             });
 
         self::assertEquals(
@@ -363,11 +424,11 @@ class ApplicationRegistryTest extends TestCase
 
     public function testMiddlewareWithCustomStringPathMiddlewareAdded(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'routing.middleware' => $this->testAssetsPath . '/Middleware',
-                'routing.middleware_ignore' => [],
+                'plugins.classes', 'routing.middleware_ignore' => [],
             });
 
         self::assertEquals(
@@ -378,10 +439,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testMiddlewareWithIgnoredMiddleware(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'routing.middleware' => [],
+                'plugins.classes', 'routing.middleware' => [],
                 'routing.middleware_ignore' => [Middleware\CookieMiddleware::class],
             });
 
@@ -393,15 +454,32 @@ class ApplicationRegistryTest extends TestCase
 
     public function testMiddlewareIgnoresWrongType(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'routing.middleware' => false,
-                'routing.middleware_ignore' => [],
+                'plugins.classes', 'routing.middleware_ignore' => [],
             });
 
         self::assertEquals(
             $this->frameworkMiddleware,
+            $this->applicationRegistry->middleware()
+        );
+    }
+
+    public function testMiddlewareWithPluginMiddleware(): void
+    {
+        $this->configMock->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'plugins.classes' => [
+                    'all' => [TestPlugin::class]
+                ],
+                'routing.middleware', 'routing.middleware_ignore' => [],
+            });
+
+        self::assertEquals(
+            array_merge($this->frameworkMiddleware, [TestMiddleware::class]),
             $this->applicationRegistry->middleware()
         );
     }
@@ -413,10 +491,10 @@ class ApplicationRegistryTest extends TestCase
 
     public function testEvents(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
-                'events.listeners', 'events.listeners_ignore' => [],
+                'plugins.classes', 'events.listeners', 'events.listeners_ignore' => [],
             });
 
         self::assertEquals([], $this->applicationRegistry->events());
@@ -431,11 +509,11 @@ class ApplicationRegistryTest extends TestCase
             ],
         ];
 
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'events.listeners' => $events,
-                'events.listeners_ignore' => [],
+                'plugins.classes', 'events.listeners_ignore' => [],
             });
 
         self::assertEquals($events, $this->applicationRegistry->events());
@@ -452,11 +530,11 @@ class ApplicationRegistryTest extends TestCase
             ],
         ];
 
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'events.listeners' => $events,
-                'events.listeners_ignore' => [],
+                'plugins.classes', 'events.listeners_ignore' => [],
             });
 
         self::assertEquals($events, $this->applicationRegistry->events());
@@ -464,7 +542,7 @@ class ApplicationRegistryTest extends TestCase
 
     public function testEventsWithIgnoredListener(): void
     {
-        $this->configMock->expects(self::exactly(2))
+        $this->configMock->expects(self::exactly(3))
             ->method('get')
             ->willReturnCallback(fn($key) => match ($key) {
                 'events.listeners' => [
@@ -479,6 +557,7 @@ class ApplicationRegistryTest extends TestCase
                 'events.listeners_ignore' => [
                     TestEvent::class => [TestListenerOne::class],
                 ],
+                'plugins.classes' => [],
             });
 
         self::assertEquals([
@@ -491,6 +570,58 @@ class ApplicationRegistryTest extends TestCase
         ], $this->applicationRegistry->events());
     }
 
+    public function testEventsWithPluginEvents(): void
+    {
+        $this->configMock->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'events.listeners' => [
+                    TestEvent::class => [
+                        TestListenerOne::class
+                    ],
+                ],
+                'plugins.classes' => [
+                    'all' => [TestPlugin::class],
+                ],
+                'events.listeners_ignore' => [],
+            });
+        self::assertEquals([
+            TestEvent::class => [
+                TestListenerTwo::class,
+                TestListenerOne::class,
+            ],
+            TestEvent2::class => [
+                TestListenerOne::class,
+                TestListenerTwo::class,
+            ],
+        ], $this->applicationRegistry->events());
+    }
+
+    public function testEventsWithPluginEventsAndIgnoredListener(): void
+    {
+        $this->configMock->expects(self::exactly(3))
+            ->method('get')
+            ->willReturnCallback(fn($key) => match ($key) {
+                'events.listeners' => [
+                    TestEvent::class => [
+                        TestListenerOne::class
+                    ],
+                ],
+                'plugins.classes' => [
+                    'all' => [TestPlugin::class],
+                ],
+                'events.listeners_ignore' => [
+                    TestEvent::class => [TestListenerTwo::class],
+                    TestEvent2::class => [TestListenerOne::class, TestListenerTwo::class]
+                ],
+            });
+        self::assertEquals([
+            TestEvent::class => [
+                1 => TestListenerOne::class,
+            ],
+        ], $this->applicationRegistry->events());
+    }
+
     /* -------------------------------------------------
      * CACHE MERGE
      * -------------------------------------------------
@@ -498,7 +629,7 @@ class ApplicationRegistryTest extends TestCase
 
     public function testCacheMerge(): void
     {
-        $class = new class ($this->configMock) extends ApplicationRegistry {
+        $class = new class ($this->applicationMock, $this->configMock) extends ApplicationRegistry {
             public function publicMerge(array $merge, array $remove = []): array
             {
                 return $this->merge($merge, $remove);

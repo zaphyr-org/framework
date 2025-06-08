@@ -8,7 +8,9 @@ use Psr\Http\Server\MiddlewareInterface;
 use Symfony\Component\Console\Command\Command;
 use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Container\Contracts\ServiceProviderInterface;
+use Zaphyr\Framework\Contracts\ApplicationInterface;
 use Zaphyr\Framework\Contracts\ApplicationRegistryInterface;
+use Zaphyr\Framework\Contracts\Plugins\PluginInterface;
 use Zaphyr\Framework\Exceptions\FrameworkException;
 use Zaphyr\Utils\ClassFinder;
 
@@ -78,9 +80,10 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     protected array $cachedItems = [];
 
     /**
-     * @param ConfigInterface $config
+     * @param ApplicationInterface $application
+     * @param ConfigInterface      $config
      */
-    public function __construct(protected ConfigInterface $config)
+    public function __construct(protected ApplicationInterface $application, protected ConfigInterface $config)
     {
     }
 
@@ -91,6 +94,7 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     {
         return $this->merge([
             $this->frameworkProviders,
+            $this->getFromPlugins('providers'),
             $this->config->get('services.providers', []),
         ], $this->config->get('services.providers_ignore', []));
     }
@@ -102,6 +106,7 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     {
         return $this->merge([
             $this->frameworkCommands,
+            $this->getFromPlugins('commands'),
             $this->config->get('console.commands', []),
         ], $this->config->get('console.commands_ignore', []));
     }
@@ -112,6 +117,7 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     public function controllers(): array
     {
         return $this->merge([
+            $this->getFromPlugins('controllers'),
             $this->config->get('routing.controllers', []),
         ], $this->config->get('routing.controllers_ignore', []));
     }
@@ -123,6 +129,7 @@ class ApplicationRegistry implements ApplicationRegistryInterface
     {
         return $this->merge([
             $this->frameworkMiddleware,
+            $this->getFromPlugins('middleware'),
             $this->config->get('routing.middleware', []),
         ], $this->config->get('routing.middleware_ignore', []));
     }
@@ -132,7 +139,9 @@ class ApplicationRegistry implements ApplicationRegistryInterface
      */
     public function events(): array
     {
-        $events = $this->config->get('events.listeners', []);
+        $appEvents = $this->config->get('events.listeners', []);
+        $pluginEvents = $this->getFromPlugins('events');
+        $events = $this->mergeEvents($pluginEvents, $appEvents);
         $ignoreListeners = $this->config->get('events.listeners_ignore', []);
 
         foreach ($events as $event => $listeners) {
@@ -143,9 +152,34 @@ class ApplicationRegistry implements ApplicationRegistryInterface
             }
 
             $events[$event] = $this->processEventListeners($listeners, $ignoreListeners, $event);
+
+            if (empty($events[$event])) {
+                unset($events[$event]);
+            }
         }
 
         return $events;
+    }
+
+    /**
+     * @param array<class-string, class-string[]|array{listener: class-string, priority: int}> $pluginEvents
+     * @param array<class-string, class-string[]|array{listener: class-string, priority: int}> $appEvents
+     *
+     * @return array<class-string, class-string[]|array{listener: class-string, priority: int}>
+     */
+    protected function mergeEvents(array $pluginEvents, array $appEvents): array
+    {
+        $merged = $pluginEvents;
+
+        foreach ($appEvents as $event => $listeners) {
+            if (isset($merged[$event])) {
+                $merged[$event] = array_merge($merged[$event], $listeners);
+            } else {
+                $merged[$event] = $listeners;
+            }
+        }
+
+        return $merged;
     }
 
     /**
@@ -212,5 +246,40 @@ class ApplicationRegistry implements ApplicationRegistryInterface
         $this->cachedItems[$cacheKey] = $results;
 
         return $results;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return array<mixed>
+     */
+    protected function getFromPlugins(string $type): array
+    {
+        $results = [];
+
+        foreach ($this->getPluginClasses() as $pluginClass) {
+            if (class_exists($pluginClass) && method_exists($pluginClass, $type)) {
+                $results += $pluginClass::$type();
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * @return class-string<PluginInterface>[]
+     */
+    protected function getPluginClasses(): array
+    {
+        $classes = $this->config->get('plugins.classes', []);
+
+        if (empty($classes)) {
+            return [];
+        }
+
+        $allPluginClasses = $classes['all'] ?? [];
+        $environmentPluginClasses = $classes[$this->application->getEnvironment()] ?? [];
+
+        return array_merge($allPluginClasses, $environmentPluginClasses);
     }
 }
