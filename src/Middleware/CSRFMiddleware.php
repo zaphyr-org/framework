@@ -8,6 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Cookie\Contracts\CookieManagerInterface;
 use Zaphyr\Encrypt\Contracts\EncryptInterface;
 use Zaphyr\Framework\Contracts\ApplicationInterface;
@@ -27,14 +28,17 @@ class CSRFMiddleware implements MiddlewareInterface
 
     /**
      * @param ApplicationInterface   $application
+     * @param ConfigInterface        $config
      * @param EncryptInterface       $encrypt
      * @param CookieManagerInterface $cookieManager
      */
     public function __construct(
         protected ApplicationInterface $application,
+        protected ConfigInterface $config,
         protected EncryptInterface $encrypt,
         protected CookieManagerInterface $cookieManager
     ) {
+        $this->exclude = $this->config->get('routing.csrf_ignore', []);
     }
 
     /**
@@ -104,7 +108,7 @@ class CSRFMiddleware implements MiddlewareInterface
         $exclude = preg_quote($exclude, '#');
         $exclude = str_replace('\*', '.*', $exclude);
 
-        return preg_match('#^' . $exclude . '\z#u', $uri) === 1;
+        return preg_match('#' . $exclude . '#', $uri) === 1;
     }
 
     /**

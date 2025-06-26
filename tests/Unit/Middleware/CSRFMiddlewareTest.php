@@ -10,6 +10,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use stdClass;
+use Zaphyr\Config\Contracts\ConfigInterface;
 use Zaphyr\Cookie\Contracts\CookieInterface;
 use Zaphyr\Cookie\Contracts\CookieManagerInterface;
 use Zaphyr\Encrypt\Contracts\EncryptInterface;
@@ -25,6 +26,11 @@ class CSRFMiddlewareTest extends TestCase
      * @var ApplicationInterface&MockObject
      */
     protected ApplicationInterface&MockObject $applicationMock;
+
+    /**
+     * @var ConfigInterface&MockObject
+     */
+    protected ConfigInterface&MockObject $configMock;
 
     /**
      * @var EncryptInterface&MockObject
@@ -74,6 +80,7 @@ class CSRFMiddlewareTest extends TestCase
     protected function setUp(): void
     {
         $this->applicationMock = $this->createMock(ApplicationInterface::class);
+        $this->configMock = $this->createMock(ConfigInterface::class);
         $this->encryptMock = $this->createMock(EncryptInterface::class);
         $this->sessionMock = $this->createMock(SessionInterface::class);
         $this->cookieManagerMock = $this->createMock(CookieManagerInterface::class);
@@ -83,8 +90,14 @@ class CSRFMiddlewareTest extends TestCase
         $this->responseMock = $this->createMock(ResponseInterface::class);
         $this->uriMock = $this->createMock(UriInterface::class);
 
+        $this->configMock->expects(self::once())
+            ->method('get')
+            ->with('routing.csrf_ignore', [])
+            ->willReturn([]);
+
         $this->csrfMiddleware = new CSRFMiddleware(
             $this->applicationMock,
+            $this->configMock,
             $this->encryptMock,
             $this->cookieManagerMock
         );
@@ -94,6 +107,7 @@ class CSRFMiddlewareTest extends TestCase
     {
         unset(
             $this->applicationMock,
+            $this->configMock,
             $this->encryptMock,
             $this->sessionMock,
             $this->cookieManagerMock,
@@ -433,6 +447,12 @@ class CSRFMiddlewareTest extends TestCase
 
     public function testExcludeWithFullUrl(): void
     {
+        $configMock = $this->createMock(ConfigInterface::class);
+        $configMock->expects(self::once())
+            ->method('get')
+            ->with('routing.csrf_ignore', [])
+            ->willReturn(['https://example.com/foo']);
+
         $this->uriMock->expects(self::once())
             ->method('__toString')
             ->willReturn('https://example.com/foo');
@@ -452,15 +472,61 @@ class CSRFMiddlewareTest extends TestCase
         $this->serverRequestMock->expects(self::never())
             ->method('getParsedBody');
 
-        $csrfMiddleware = new class ($this->applicationMock, $this->encryptMock, $this->cookieManagerMock) extends CSRFMiddleware {
-            protected array $exclude = ['https://example.com/foo'];
-        };
+        $csrfMiddleware = new CSRFMiddleware(
+            $this->applicationMock,
+            $configMock,
+            $this->encryptMock,
+            $this->cookieManagerMock
+        );
 
         $csrfMiddleware->process($this->serverRequestMock, $this->requestHandlerMock);
     }
 
-    public function testExcludeWithPattern(): void
+    public function testExcludeWithPathUrl(): void
     {
+        $configMock = $this->createMock(ConfigInterface::class);
+        $configMock->expects(self::once())
+            ->method('get')
+            ->with('routing.csrf_ignore', [])
+            ->willReturn(['foo']);
+
+        $this->uriMock->expects(self::once())
+            ->method('__toString')
+            ->willReturn('https://example.com/foo');
+
+        $this->serverRequestMock->expects(self::once())
+            ->method('getUri')
+            ->willReturn($this->uriMock);
+
+        $this->serverRequestMock->expects(self::once())
+            ->method('getMethod')
+            ->willReturn('POST');
+
+        $this->applicationMock->expects(self::once())
+            ->method('isRunningInConsole')
+            ->willReturn(false);
+
+        $this->serverRequestMock->expects(self::never())
+            ->method('getParsedBody');
+
+        $csrfMiddleware = new CSRFMiddleware(
+            $this->applicationMock,
+            $configMock,
+            $this->encryptMock,
+            $this->cookieManagerMock
+        );
+
+        $csrfMiddleware->process($this->serverRequestMock, $this->requestHandlerMock);
+    }
+
+    public function testExcludeWithFullUrlPattern(): void
+    {
+        $configMock = $this->createMock(ConfigInterface::class);
+        $configMock->expects(self::once())
+            ->method('get')
+            ->with('routing.csrf_ignore', [])
+            ->willReturn(['https://example.com/foo/*']);
+
         $this->uriMock->expects(self::once())
             ->method('__toString')
             ->willReturn('https://example.com/foo/bar');
@@ -480,10 +546,49 @@ class CSRFMiddlewareTest extends TestCase
         $this->serverRequestMock->expects(self::never())
             ->method('getParsedBody');
 
-        $csrfMiddleware = new class ($this->applicationMock, $this->encryptMock, $this->cookieManagerMock) extends
-            CSRFMiddleware {
-            protected array $exclude = ['https://example.com/foo/*'];
-        };
+        $csrfMiddleware = new CSRFMiddleware(
+            $this->applicationMock,
+            $configMock,
+            $this->encryptMock,
+            $this->cookieManagerMock
+        );
+
+        $csrfMiddleware->process($this->serverRequestMock, $this->requestHandlerMock);
+    }
+
+    public function testExcludeWithPathUrlPattern(): void
+    {
+        $configMock = $this->createMock(ConfigInterface::class);
+        $configMock->expects(self::once())
+            ->method('get')
+            ->with('routing.csrf_ignore', [])
+            ->willReturn(['foo/*']);
+
+        $this->uriMock->expects(self::once())
+            ->method('__toString')
+            ->willReturn('https://example.com/foo/bar');
+
+        $this->serverRequestMock->expects(self::once())
+            ->method('getUri')
+            ->willReturn($this->uriMock);
+
+        $this->serverRequestMock->expects(self::once())
+            ->method('getMethod')
+            ->willReturn('POST');
+
+        $this->applicationMock->expects(self::once())
+            ->method('isRunningInConsole')
+            ->willReturn(false);
+
+        $this->serverRequestMock->expects(self::never())
+            ->method('getParsedBody');
+
+        $csrfMiddleware = new CSRFMiddleware(
+            $this->applicationMock,
+            $configMock,
+            $this->encryptMock,
+            $this->cookieManagerMock
+        );
 
         $csrfMiddleware->process($this->serverRequestMock, $this->requestHandlerMock);
     }
@@ -492,6 +597,12 @@ class CSRFMiddlewareTest extends TestCase
     {
         $token = 'cSrfToKEn123';
         $encryptedToken = 'eNcrYptEdCsRfToKeN123';
+
+        $configMock = $this->createMock(ConfigInterface::class);
+        $configMock->expects(self::once())
+            ->method('get')
+            ->with('routing.csrf_ignore', [])
+            ->willReturn(['https://example.com/bar/*']);
 
         $this->serverRequestMock->expects(self::once())
             ->method('getMethod')
@@ -551,9 +662,12 @@ class CSRFMiddlewareTest extends TestCase
             ->with($this->serverRequestMock)
             ->willReturn($this->responseMock);
 
-        $csrfMiddleware = new class ($this->applicationMock, $this->encryptMock, $this->cookieManagerMock) extends CSRFMiddleware {
-            protected array $exclude = ['https://example.com/bar/*'];
-        };
+        $csrfMiddleware = new CSRFMiddleware(
+            $this->applicationMock,
+            $configMock,
+            $this->encryptMock,
+            $this->cookieManagerMock
+        );
 
         $csrfMiddleware->process($this->serverRequestMock, $this->requestHandlerMock);
     }
