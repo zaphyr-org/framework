@@ -1,0 +1,23 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %namespace%;
+
+use Zaphyr\Framework\Http\Request;
+use Zaphyr\Framework\Http\Response;
+use Zaphyr\Router\Attributes\Get;
+
+class %class%
+{
+    /**
+     * @param Request $request
+     *
+     * @return Response
+     */
+    #[Get(path: '/single-action', name: 'single-action')]
+    public function __invoke(Request $request): Response
+    {
+        return new Response();
+    }
+}
