@@ -61,7 +61,6 @@ class ApplicationRegistry implements ApplicationRegistryInterface
         Console\Commands\Routes\ClearControllersCommand::class,
         Console\Commands\Routes\ClearMiddlewareCommand::class,
         Console\Commands\Routes\ListCommand::class,
-
     ];
 
     /**
@@ -258,8 +257,8 @@ class ApplicationRegistry implements ApplicationRegistryInterface
         $results = [];
 
         foreach ($this->getPluginClasses() as $pluginClass) {
-            if (class_exists($pluginClass) && method_exists($pluginClass, $type)) {
-                $results += $pluginClass::$type();
+            if (!empty($pluginClass::$type())) {
+                $results = array_merge($results, $pluginClass::$type());
             }
         }
 
