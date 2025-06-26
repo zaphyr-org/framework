@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zaphyr\FrameworkTests\Unit\Http;
 
+use JsonSerializable;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Http\Exceptions\ResponseException;
@@ -29,53 +30,57 @@ class JsonResponseTest extends TestCase
 
     public function testJsonResponseEncodeFlags(): void
     {
-        $response = new JsonResponse('<>\'&"');
+        $response = new JsonResponse(['encoded' => '<>\'&"']);
 
-        $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getBody()->__toString());
+        $this->assertEquals('{"encoded":"\u003C\u003E\u0027\u0026\u0022"}', $response->getBody()->__toString());
     }
 
-    public function testJsonResponseWithObjectToStringMethod(): void
+    public function testJsonResponseWithJsonSerializableData(): void
     {
-        $object = new class {
-            public function __toString(): string
+        $data = new class implements JsonSerializable {
+            public function jsonSerialize(): array
             {
-                return 'foo';
+                return ['test' => 'data'];
             }
         };
 
-        $response = new JsonResponse($object);
+        $response = new JsonResponse($data);
 
-        self::assertEquals('"foo"', $response->getBody()->__toString());
+        self::assertEquals(json_encode(['test' => 'data']), $response->getBody()->__toString());
     }
 
     public function testJsonResponseReturnsJsonContentTypeHeader(): void
     {
-        self::assertEquals('application/json', (new JsonResponse(null))->getHeaderLine('content-type'));
+        self::assertEquals(
+            'application/json; charset=utf-8',
+            (new JsonResponse(['test' => 'data']))->getHeaderLine('content-type')
+        );
     }
 
     public function testJsonResponseWithCustomContentTypeHeader(): void
     {
         self::assertEquals(
             'foo/json',
-            (new JsonResponse(null, headers: ['content-type' => 'foo/json']))->getHeaderLine('content-type')
+            (new JsonResponse(['test' => 'data'], headers: ['content-type' => 'foo/json']))
+                ->getHeaderLine('content-type')
         );
     }
 
     public function testJsonResponseReturnsDefaultStatusCode(): void
     {
-        self::assertEquals(200, (new JsonResponse(null))->getStatusCode());
+        self::assertEquals(200, (new JsonResponse(['test' => 'data']))->getStatusCode());
     }
 
     public function testJsonResponseWithCustomStatusCode(): void
     {
-        self::assertEquals(404, (new JsonResponse(null, statusCode: 404))->getStatusCode());
+        self::assertEquals(404, (new JsonResponse(['test' => 'data'], statusCode: 404))->getStatusCode());
     }
 
     public function testJsonResponseWithHeaders(): void
     {
         self::assertEquals(
             ['foo-bar'],
-            (new JsonResponse(null, headers: ['x-custom' => ['foo-bar']]))->getHeader('x-custom')
+            (new JsonResponse(['test' => 'data'], headers: ['x-custom' => ['foo-bar']]))->getHeader('x-custom')
         );
     }
 
@@ -94,15 +99,15 @@ class JsonResponseTest extends TestCase
     public static function scalarValuesDataProvider(): array
     {
         return [
-            'null' => [null],
-            'false' => [false],
-            'true' => [true],
-            'zero' => [0],
-            'int' => [1],
-            'zero-float' => [0.0],
-            'float' => [1.1],
-            'empty-string' => [''],
-            'string' => ['string'],
+            'null' => [['null' => null]],
+            'false' => [['false' => false]],
+            'true' => [['true' => true]],
+            'zero' => [['zero' => 0]],
+            'int' => [['int' => 1]],
+            'zero-float' => [['zero-float' => 0.0]],
+            'float' => [['float' => 1.1]],
+            'empty-string' => [['empty-string' => '']],
+            'string' => [['string' => 'string']],
         ];
     }
 
@@ -115,13 +120,6 @@ class JsonResponseTest extends TestCase
         self::assertEquals($json, $actual);
     }
 
-    public function testJsonResponseThrowsExceptionOnInvalidResources(): void
-    {
-        $this->expectException(ResponseException::class);
-
-        new JsonResponse(fopen('php://memory', 'r'));
-    }
-
     public function testJsonResponseThrowsExceptionOnBadEmbeddedData(): void
     {
         $this->expectException(ResponseException::class);
@@ -129,22 +127,5 @@ class JsonResponseTest extends TestCase
         new JsonResponse([
             'stream' => fopen('php://memory', 'r'),
         ]);
-    }
-
-    public function testJsonResponseWithObjectWithoutToStringMethodThrowsException(): void
-    {
-        $this->expectException(ResponseException::class);
-
-        new JsonResponse(
-            new class {
-            }
-        );
-    }
-
-    public function testJsonResponseThrowsExceptionOnInvalidJson(): void
-    {
-        $this->expectException(ResponseException::class);
-
-        new JsonResponse("\xB1\x31");
     }
 }

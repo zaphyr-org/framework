@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Zaphyr\Framework\Http;
 
 use JsonException;
+use JsonSerializable;
 use Zaphyr\Framework\Http\Exceptions\ResponseException;
 use Zaphyr\Framework\Http\Utils\HttpUtils;
 use Zaphyr\Framework\Http\Utils\StatusCode;
@@ -16,50 +17,44 @@ use Zaphyr\HttpMessage\Stream;
 class JsonResponse extends Response
 {
     /**
-     * @param mixed                          $data
-     * @param int                            $statusCode
-     * @param array<string, string|string[]> $headers
-     * @param int                            $encodingOptions
+     * @param array<string, mixed>|JsonSerializable $data
+     * @param int                                   $statusCode
+     * @param array<string, string|string[]>        $headers
+     * @param int                                   $encodingOptions
      *
      * @throws ResponseException if the JSON cannot be encoded
      */
     public function __construct(
-        mixed $data,
+        array|JsonSerializable $data,
         int $statusCode = StatusCode::OK,
         array $headers = [],
         int $encodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT
     ) {
         $json = $this->jsonEncode($data, $encodingOptions);
         $body = $this->createBodyFromJson($json);
-        $headers = HttpUtils::injectContentType('application/json', $headers);
+        $headers = HttpUtils::injectContentType('application/json; charset=utf-8', $headers);
 
         parent::__construct($body, $statusCode, $headers);
     }
 
     /**
-     * @param mixed $data
-     * @param int   $encodingOptions
+     * @param array<string, mixed>|JsonSerializable $data
+     * @param int                                   $encodingOptions
      *
      * @throws ResponseException if the JSON cannot be encoded
      * @return string
      */
-    protected function jsonEncode(mixed $data, int $encodingOptions): string
+    protected function jsonEncode(array|JsonSerializable $data, int $encodingOptions): string
     {
-        if (is_object($data)) {
-            if (is_callable([$data, '__toString'])) {
-                $data = (string)$data;
-            } else {
-                throw new ResponseException('Objects must implement __toString() method');
-            }
+        if ($data instanceof JsonSerializable) {
+            $data = $data->jsonSerialize();
         }
 
         try {
-            $data = json_encode($data, JSON_THROW_ON_ERROR | $encodingOptions);
+            return json_encode($data, JSON_THROW_ON_ERROR | $encodingOptions);
         } catch (JsonException $e) {
             throw new ResponseException($e->getMessage(), $e->getCode(), $e);
         }
-
-        return $data;
     }
 
     /**
