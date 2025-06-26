@@ -7,9 +7,6 @@ parameters:
         maximumNumberOfProcesses: 1
     ignoreErrors:
         -
-            message: '%Unable to resolve the template type TXssCleanInput in call to method voku\\helper\\AntiXSS::xss_clean\(\)%'
-            path: 'src/Middleware/XSSMiddleware.php'
-        -
             message: '%Ternary operator condition is always true.%'
             path: 'src/Console/Commands/Config/ListCommand.php'
         -

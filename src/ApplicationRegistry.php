@@ -70,7 +70,6 @@ class ApplicationRegistry implements ApplicationRegistryInterface
         Middleware\CookieMiddleware::class,
         Middleware\SessionMiddleware::class,
         Middleware\CSRFMiddleware::class,
-        Middleware\XSSMiddleware::class,
     ];
 
     /**

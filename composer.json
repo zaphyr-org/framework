@@ -20,7 +20,6 @@
         "filp/whoops": "^2.15",
         "symfony/console": "^6.3",
         "vlucas/phpdotenv": "^5.5",
-        "voku/anti-xss": "^4.1",
         "zaphyr-org/cache": "^1.0",
         "zaphyr-org/config": "^2.3",
         "zaphyr-org/container": "^1.1",
