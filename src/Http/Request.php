@@ -231,7 +231,7 @@ class Request extends BaseRequest implements RequestInterface
      */
     public function isHead(): bool
     {
-        return $this->isMethod('Head');
+        return $this->isMethod('HEAD');
     }
 
     /**

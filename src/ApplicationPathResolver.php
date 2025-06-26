@@ -143,7 +143,7 @@ class ApplicationPathResolver implements ApplicationPathResolverInterface
     protected function joinPaths(string $rootPath, string ...$paths): string
     {
         $filteredPaths = array_map(
-            fn($path) => '/' . trim($path, '/'),
+            static fn($path) => '/' . trim($path, '/'),
             array_filter($paths, static fn($path) => !empty($path))
         );
 
