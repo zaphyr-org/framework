@@ -63,7 +63,7 @@ class ListCommand extends AbstractCommand
     protected function formatValue(mixed $value): string
     {
         return match (true) {
-            is_bool($value) => '<fg=#ef8414;options=bold>' . $value ? 'true' : 'false' . '</>',
+            is_bool($value) => '<fg=#ef8414;options=bold>' . ($value ? 'true' : 'false') . '</>',
             is_null($value) => '<fg=#ef8414;options=bold>null</>',
             is_array($value) => '<fg=#ef8414;options=bold>[]</>',
             is_numeric($value) => '<fg=#ef8414;options=bold>' . $value . '</>',

@@ -5,7 +5,3 @@ parameters:
         - src
     parallel:
         maximumNumberOfProcesses: 1
-    ignoreErrors:
-        -
-            message: '%Ternary operator condition is always true.%'
-            path: 'src/Console/Commands/Config/ListCommand.php'
