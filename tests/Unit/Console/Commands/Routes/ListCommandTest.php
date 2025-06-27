@@ -53,4 +53,25 @@ class ListCommandTest extends ConsoleTestCase
         self::assertDisplayContains('Port: 8080', $command);
         self::assertDisplayContains("Middleware: foo", $command);
     }
+
+    public function testExecuteWithoutMiddlewareAndStandardPort(): void
+    {
+        $route = new Route('/bar', ['GET'], 'bar', [], 'https', 'example.com', 443);
+        $route->setCallable('BarController@bar');
+
+        $this->routerMock->expects(self::once())
+            ->method('getRoutes')
+            ->willReturn([$route]);
+
+        $command = $this->execute(new ListCommand($this->applicationMock, $this->routerMock));
+
+        self::assertDisplayContains('Path: /bar', $command);
+        self::assertDisplayContains('Methods: GET', $command);
+        self::assertDisplayContains('Callable: BarController@bar', $command);
+        self::assertDisplayContains('Name: bar', $command);
+        self::assertDisplayContains('Scheme: https', $command);
+        self::assertDisplayContains('Host: example.com', $command);
+        self::assertDisplayContains('Port: ', $command);
+        self::assertDisplayContains("Middleware: ", $command);
+    }
 }

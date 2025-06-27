@@ -73,10 +73,14 @@ class ListCommand extends AbstractCommand
         $routeMiddleware = $route->getMiddlewareStack();
         $middleware = array_merge($groupMiddleware, $routeMiddleware);
 
-        foreach ($middleware as $key => $item) {
-            $middleware[$key] = is_object($item) ? get_class($item) : $item;
+        if (empty($middleware)) {
+            return '';
         }
 
-        return count($middleware) > 0 ? implode("\n", $middleware) : '';
+        $stringMiddleware = array_map(static function ($item): string {
+            return is_object($item) ? get_class($item) : (string)$item;
+        }, $middleware);
+
+        return implode("\n", $stringMiddleware);
     }
 }

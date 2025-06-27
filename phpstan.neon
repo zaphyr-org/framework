@@ -9,6 +9,3 @@ parameters:
         -
             message: '%Ternary operator condition is always true.%'
             path: 'src/Console/Commands/Config/ListCommand.php'
-        -
-            message: '%Parameter #2 \$array of function implode expects array<string>, array<class-string<Psr\\Http\\Server\\MiddlewareInterface>\|Psr\\Http\\Server\\MiddlewareInterface> given.%'
-            path: src/Console/Commands/Routes/ListCommand.php
