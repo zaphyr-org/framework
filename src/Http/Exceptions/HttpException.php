@@ -7,6 +7,7 @@ namespace Zaphyr\Framework\Http\Exceptions;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Zaphyr\Framework\Contracts\Http\Exceptions\HttpExceptionInterface;
+use Zaphyr\Framework\Http\Response;
 use Zaphyr\Framework\Http\Utils\StatusCode;
 
 /**
@@ -52,9 +53,11 @@ class HttpException extends Exception implements HttpExceptionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildJsonResponse(ResponseInterface $response): ResponseInterface
+    public function buildJsonResponse(?ResponseInterface $response = null): ResponseInterface
     {
         $this->headers['Content-Type'] = 'application/json';
+
+        $response ??= new Response();
 
         foreach ($this->headers as $key => $value) {
             $response = $response->withAddedHeader($key, $value);

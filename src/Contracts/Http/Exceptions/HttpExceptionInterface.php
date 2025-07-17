@@ -23,9 +23,9 @@ interface HttpExceptionInterface extends Throwable
     public function getHeaders(): array;
 
     /**
-     * @param ResponseInterface $response
+     * @param ResponseInterface|null $response
      *
      * @return ResponseInterface
      */
-    public function buildJsonResponse(ResponseInterface $response): ResponseInterface;
+    public function buildJsonResponse(?ResponseInterface $response = null): ResponseInterface;
 }

@@ -191,4 +191,21 @@ class HttpExceptionTest extends TestCase
             self::assertEquals('application/json', $exception->getHeaders()['Content-Type']);
         }
     }
+
+    public function testBuildJsonResponseWithDefaultResponseObject(): void
+    {
+        $statusCode = 404;
+        $message = 'Not Found';
+
+        try {
+            throw new HttpException($statusCode, $message);
+        } catch (HttpExceptionInterface $exception) {
+            $response = $exception->buildJsonResponse();
+
+            self::assertInstanceOf(ResponseInterface::class, $response);
+            self::assertEquals($statusCode, $exception->getStatusCode());
+            self::assertEquals($message, $exception->getMessage());
+            self::assertEquals('application/json', $exception->getHeaders()['Content-Type']);
+        }
+    }
 }
