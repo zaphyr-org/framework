@@ -6,6 +6,7 @@ namespace Zaphyr\Framework\Providers\Bootable;
 
 use Zaphyr\Container\Contracts\BootableServiceProviderInterface;
 use Zaphyr\Framework\Contracts\Exceptions\Handlers\ExceptionHandlerInterface;
+use Zaphyr\Framework\Exceptions\Handlers\ExceptionHandler;
 use Zaphyr\Framework\Providers\AbstractServiceProvider;
 
 /**
@@ -13,6 +14,13 @@ use Zaphyr\Framework\Providers\AbstractServiceProvider;
  */
 class ExceptionBootProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected array $provides = [
+        ExceptionHandlerInterface::class,
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +33,11 @@ class ExceptionBootProvider extends AbstractServiceProvider implements BootableS
      */
     public function boot(): void
     {
-        $this->get(ExceptionHandlerInterface::class)->register();
+        $exceptionHandler = $this->has(ExceptionHandlerInterface::class)
+            ? $this->get(ExceptionHandlerInterface::class)
+            : new ExceptionHandler($this->application);
+
+        $exceptionHandler->register();
 
         if (!$this->application->isTestingEnvironment()) {
             ini_set('display_errors', 'Off');

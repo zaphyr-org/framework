@@ -62,12 +62,27 @@ class ExceptionBootProviderTest extends TestCase
     public function testBoot(): void
     {
         $this->containerMock->expects(self::once())
+            ->method('has')
+            ->with(ExceptionHandlerInterface::class)
+            ->willReturn(true);
+
+        $this->containerMock->expects(self::once())
             ->method('get')
             ->with(ExceptionHandlerInterface::class)
             ->willReturn($this->exceptionHandlerMock);
 
         $this->exceptionHandlerMock->expects(self::once())
             ->method('register');
+
+        $this->exceptionBootProvider->boot();
+    }
+
+    public function testBootWithFallbackExceptionHandler(): void
+    {
+        $this->containerMock->expects(self::once())
+            ->method('has')
+            ->with(ExceptionHandlerInterface::class)
+            ->willReturn(false);
 
         $this->exceptionBootProvider->boot();
     }
