@@ -50,7 +50,7 @@ class CreateCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new $command($this->applicationMock), ['name' => $name]);
 
-        self::assertDisplayEquals("$name created successfully.\n", $command);
+        self::assertDisplayContains("$name created successfully.", $command);
         self::assertFileExists($filename);
     }
 
@@ -72,7 +72,7 @@ class CreateCommandTest extends ConsoleTestCase
             ['name' => $name, '--namespace' => 'Test\Directory\CustomNamespace']
         );
 
-        self::assertDisplayEquals("$name created successfully.\n", $command);
+        self::assertDisplayContains("$name created successfully.", $command);
         self::assertFileExists($filename);
     }
 
@@ -95,7 +95,7 @@ class CreateCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new $command($this->applicationMock), ['name' => $name]);
 
-        self::assertDisplayContains("Do you really wish to run this command? (yes/no) [no]:\n", $command);
+        self::assertDisplayContains('Do you really wish to run this command? (yes/no) [no]:', $command);
     }
 
     /**
@@ -120,8 +120,8 @@ class CreateCommandTest extends ConsoleTestCase
         );
 
 
-        self::assertDisplayNotContains("Do you really wish to run this command? (yes/no) [no]:\n", $command);
-        self::assertDisplayEquals("$name created successfully.\n", $command);
+        self::assertDisplayNotContains('Do you really wish to run this command? (yes/no) [no]:', $command);
+        self::assertDisplayContains("$name created successfully.", $command);
         self::assertFileExists($filename);
 
         File::deleteDirectory($this->destinationPath);

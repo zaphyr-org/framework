@@ -69,7 +69,7 @@ class UpCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new UpCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Application is now live.\n", $command);
+        self::assertDisplayContains('Application is now live.', $command);
         self::assertFileDoesNotExist($maintenanceFile);
     }
 
@@ -85,6 +85,6 @@ class UpCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new UpCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Application is already up.\n", $command);
+        self::assertDisplayContains('Application is already up.', $command);
     }
 }

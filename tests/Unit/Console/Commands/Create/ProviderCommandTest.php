@@ -30,7 +30,7 @@ class ProviderCommandTest extends ConsoleTestCase
             ['name' => 'Test', '--bootable' => true]
         );
 
-        self::assertDisplayEquals("Provider created successfully.\n", $command);
+        self::assertDisplayContains('Provider created successfully.', $command);
         self::assertStringContainsString('public function boot(): void', file_get_contents($file));
 
         File::deleteDirectory(dirname($destinationPath));

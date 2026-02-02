@@ -1,6 +1,6 @@
 <?php
 
-namespace Unit\Plugins;
+namespace Zaphyr\FrameworkTests\Unit\Plugins;
 
 use PHPUnit\Framework\TestCase;
 use Zaphyr\Framework\Plugins\AbstractPlugin;

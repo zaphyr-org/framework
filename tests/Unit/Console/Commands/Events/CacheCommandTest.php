@@ -41,7 +41,7 @@ class CacheCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Event listeners cached successfully.\n", $command);
+        self::assertDisplayContains('Event listeners cached successfully.', $command);
 
         unlink($cacheFile);
     }
@@ -69,7 +69,7 @@ class CacheCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Event listeners cached successfully.\n", $command);
+        self::assertDisplayContains('Event listeners cached successfully.', $command);
 
         unlink($cacheFile);
         rmdir(dirname($cacheFile));

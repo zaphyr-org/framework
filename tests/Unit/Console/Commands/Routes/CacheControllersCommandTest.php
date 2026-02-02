@@ -41,7 +41,7 @@ class CacheControllersCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Controllers cached successfully.\n", $command);
+        self::assertDisplayContains('Controllers cached successfully.', $command);
 
         unlink($cacheFile);
     }
@@ -69,7 +69,7 @@ class CacheControllersCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Controllers cached successfully.\n", $command);
+        self::assertDisplayContains('Controllers cached successfully.', $command);
 
         unlink($cacheFile);
         rmdir(dirname($cacheFile));

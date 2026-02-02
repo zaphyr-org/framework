@@ -1,11 +1,11 @@
 > [!WARNING]
 > The framework does not yet have a stable version. It is still under development.
 
-![License](https://img.shields.io/github/license/zaphyr-org/framework?style=for-the-badge)
-![Version](https://img.shields.io/packagist/v/zaphyr-org/framework?style=for-the-badge)
-![Downloads](https://img.shields.io/packagist/dt/zaphyr-org/framework?style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/zaphyr-org/framework?style=for-the-badge)
-![Issues](https://img.shields.io/github/issues/zaphyr-org/framework?style=for-the-badge)
+![License](https://img.shields.io/github/license/zaphyr-org/framework)
+![Version](https://img.shields.io/packagist/v/zaphyr-org/framework)
+![Issues](https://img.shields.io/github/issues/zaphyr-org/framework)
+![Tests](https://github.com/zaphyr-org/framework/actions/workflows/tests.yml/badge.svg)
+[![Codecov](https://codecov.io/gh/zaphyr-org/framework/graph/badge.svg?token=2STP40KC71)](https://codecov.io/gh/zaphyr-org/framework)
 
 # Framework
 
@@ -13,7 +13,15 @@ A PHP framework based on ZAPHYR repositories.
 
 ## System Requirements
 
-You need `PHP => 8.1.0` but the latest stable version of PHP is recommended.
+You need `PHP => 8.1` but the latest stable version of PHP is recommended.
+
+The framework is continuously tested on the following PHP versions:
+
+- PHP 8.1
+- PHP 8.2
+- PHP 8.3
+- PHP 8.4
+- PHP 8.5
 
 ## Installation
 

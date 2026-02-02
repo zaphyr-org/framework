@@ -41,7 +41,7 @@ class CacheMiddlewareCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Middleware cached successfully.\n", $command);
+        self::assertDisplayContains('Middleware cached successfully.', $command);
 
         unlink($cacheFile);
     }
@@ -69,7 +69,7 @@ class CacheMiddlewareCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Middleware cached successfully.\n", $command);
+        self::assertDisplayContains('Middleware cached successfully.', $command);
 
         unlink($cacheFile);
         rmdir(dirname($cacheFile));

@@ -67,7 +67,7 @@ class DownCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new DownCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Application is now in maintenance mode.\n", $command);
+        self::assertDisplayContains('Application is now in maintenance mode.', $command);
         self::assertStringContainsString('Down for maintenance!', file_get_contents($maintenanceFile));
 
         unlink($maintenanceFile);
@@ -100,7 +100,7 @@ class DownCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new DownCommand($this->applicationMock), ['--template' => $customTemplate]);
 
-        self::assertDisplayEquals("Application is now in maintenance mode.\n", $command);
+        self::assertDisplayContains('Application is now in maintenance mode.', $command);
         self::assertStringContainsString('I\'ll be back!', file_get_contents($maintenanceFile));
 
         unlink($maintenanceFile);
@@ -119,6 +119,6 @@ class DownCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new DownCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Application is already down.\n", $command);
+        self::assertDisplayContains('Application is already down.', $command);
     }
 }

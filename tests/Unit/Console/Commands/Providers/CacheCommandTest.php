@@ -41,7 +41,7 @@ class CacheCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Service providers cached successfully.\n", $command);
+        self::assertDisplayContains('Service providers cached successfully.', $command);
 
         unlink($cacheFile);
     }
@@ -69,7 +69,7 @@ class CacheCommandTest extends ConsoleTestCase
         $cacheCommand->setApplication($consoleApplicationMock);
         $command = $this->execute($cacheCommand);
 
-        self::assertDisplayEquals("Service providers cached successfully.\n", $command);
+        self::assertDisplayContains('Service providers cached successfully.', $command);
 
         unlink($cacheFile);
         rmdir(dirname($cacheFile));

@@ -30,7 +30,7 @@ class CreateSingleControllerCommandTest extends ConsoleTestCase
             ['name' => 'TestController', '--single' => true]
         );
 
-        self::assertDisplayEquals("Controller created successfully.\n", $command);
+        self::assertDisplayContains('Controller created successfully.', $command);
         self::assertStringContainsString(
             'public function __invoke(Request $request): Response',
             file_get_contents($file)

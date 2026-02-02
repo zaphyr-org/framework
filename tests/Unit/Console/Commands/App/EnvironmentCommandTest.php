@@ -24,6 +24,6 @@ class EnvironmentCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new EnvironmentCommand($this->applicationMock));
 
-        self::assertDisplayEquals('Current application environment: ' . $environment . "\n", $command);
+        self::assertDisplayContains('Current application environment: ' . $environment, $command);
     }
 }

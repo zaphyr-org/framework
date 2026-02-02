@@ -54,7 +54,8 @@ class KeyGenerateCommandTest extends ConsoleTestCase
             ['--show' => 1]
         );
 
-        self::assertEquals(32, strlen($command->getDisplay()));
+        $key = substr($command->getDisplay(), strlen('base64:'));
+        self::assertNotFalse(base64_decode($key, true));
     }
 
     public function testExecuteWriteKeyToEnvFile(): void

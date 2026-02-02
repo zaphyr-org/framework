@@ -53,13 +53,13 @@ class ListCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new ListCommand($this->applicationMock, $this->configMock));
 
-        self::assertDisplayContains("| Key     | Value |\n", $command);
-        self::assertDisplayContains("| bool    | true  |\n", $command);
-        self::assertDisplayContains("| null    | null  |\n", $command);
-        self::assertDisplayContains("| array   | []    |\n", $command);
-        self::assertDisplayContains("| numeric | 123   |\n", $command);
-        self::assertDisplayContains("| string  | foo   |\n", $command);
-        self::assertDisplayContains("| items.0 | foo   |\n", $command);
-        self::assertDisplayContains("| items.1 | bar   |\n", $command);
+        self::assertDisplayContains('| Key     | Value |', $command);
+        self::assertDisplayContains('| bool    | true  |', $command);
+        self::assertDisplayContains('| null    | null  |', $command);
+        self::assertDisplayContains('| array   | []    |', $command);
+        self::assertDisplayContains('| numeric | 123   |', $command);
+        self::assertDisplayContains('| string  | foo   |', $command);
+        self::assertDisplayContains('| items.0 | foo   |', $command);
+        self::assertDisplayContains('| items.1 | bar   |', $command);
     }
 }

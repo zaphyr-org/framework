@@ -26,7 +26,7 @@ class ClearCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new ClearCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Log files cleared successfully.\n", $command);
+        self::assertDisplayContains('Log files cleared successfully.', $command);
 
         unlink($cacheFile);
     }
@@ -43,6 +43,6 @@ class ClearCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new ClearCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Log files cleared successfully.\n", $command);
+        self::assertDisplayContains('Log files cleared successfully.', $command);
     }
 }

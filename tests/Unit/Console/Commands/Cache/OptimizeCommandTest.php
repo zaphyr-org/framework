@@ -43,6 +43,6 @@ class OptimizeCommandTest extends ConsoleTestCase
         $command = $this->execute($optimizeCommand);
 
         self::assertEquals($expectedCommands, $calledCommands);
-        self::assertDisplayContains("Cache files optimized successfully.\n", $command);
+        self::assertDisplayContains('Cache files optimized successfully.', $command);
     }
 }

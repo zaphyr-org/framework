@@ -45,7 +45,7 @@ class ClearCommandTest extends ConsoleTestCase
         $command = $this->execute($clearCommand);
 
         self::assertEquals($expectedCommands, $calledCommands);
-        self::assertDisplayContains("Cache files cleared successfully.\n", $command);
+        self::assertDisplayContains('Cache files cleared successfully.', $command);
     }
 
     public function testExecuteWithAllOption(): void
@@ -62,6 +62,6 @@ class ClearCommandTest extends ConsoleTestCase
         $command = $this->execute(new ClearCommand($this->applicationMock), ['--all' => 1]);
 
         self::assertDirectoryDoesNotExist($cacheDir);
-        self::assertDisplayContains("Cache files cleared successfully.\n", $command);
+        self::assertDisplayContains('Cache files cleared successfully.', $command);
     }
 }

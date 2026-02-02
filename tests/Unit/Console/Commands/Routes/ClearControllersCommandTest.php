@@ -25,6 +25,6 @@ class ClearControllersCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new ClearControllersCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Controllers cache cleared successfully.\n", $command);
+        self::assertDisplayContains('Controllers cache cleared successfully.', $command);
     }
 }

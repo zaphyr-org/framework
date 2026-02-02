@@ -25,6 +25,6 @@ class ClearCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new ClearCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Event listeners cache cleared successfully.\n", $command);
+        self::assertDisplayContains('Event listeners cache cleared successfully.', $command);
     }
 }

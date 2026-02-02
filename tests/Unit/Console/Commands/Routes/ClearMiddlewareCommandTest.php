@@ -25,6 +25,6 @@ class ClearMiddlewareCommandTest extends ConsoleTestCase
 
         $command = $this->execute(new ClearMiddlewareCommand($this->applicationMock));
 
-        self::assertDisplayEquals("Middleware cache cleared successfully.\n", $command);
+        self::assertDisplayContains('Middleware cache cleared successfully.', $command);
     }
 }

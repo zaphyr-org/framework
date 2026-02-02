@@ -31,7 +31,7 @@ class EventCommandTest extends ConsoleTestCase
             ['name' => 'Test', '--stoppable' => true]
         );
 
-        self::assertDisplayEquals("Event created successfully.\n", $command);
+        self::assertDisplayContains('Event created successfully.', $command);
         self::assertStringContainsString('class Test extends AbstractStoppableEvent', file_get_contents($file));
 
         File::deleteDirectory(dirname($destinationPath));

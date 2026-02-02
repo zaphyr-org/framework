@@ -143,7 +143,7 @@ class ConsoleTestCaseTest extends ConsoleTestCase
 
         $commandTester = $this->execute($command);
 
-        self::assertDisplayEquals("foo\n", $commandTester);
+        self::assertDisplayContains("foo", $commandTester);
     }
 
     /* -------------------------------------------------

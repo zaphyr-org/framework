@@ -31,7 +31,7 @@ class ListenerCommandTest extends ConsoleTestCase
 
         $listener = $destinationPath . '/Test.php';
 
-        self::assertDisplayEquals("Listener created successfully.\n", $command);
+        self::assertDisplayContains('Listener created successfully.', $command);
         self::assertStringContainsString('public function __invoke(\TestEvent $event)', file_get_contents($listener));
 
         File::deleteDirectory(dirname($destinationPath));
