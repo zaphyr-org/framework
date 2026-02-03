@@ -60,24 +60,11 @@ abstract class AbstractTestCase extends TestCase
 
     protected static function bindImportantInterfaces(): void
     {
-        if (static::$application !== null) {
-            static::$application->getContainer()->bindSingleton(
-                HttpKernelInterface::class,
-                $_ENV['HTTP_KERNEL'] ?? HttpKernel::class
-            );
-            static::$application->getContainer()->bindSingleton(
-                ConsoleKernelInterface::class,
-                $_ENV['CONSOLE_KERNEL'] ?? ConsoleKernel::class
-            );
-            static::$application->getContainer()->bindSingleton(
-                ExceptionHandlerInterface::class,
-                $_ENV['EXCEPTION_HANDLER'] ?? ExceptionHandler::class
-            );
-            static::$application->getContainer()->bindSingleton(
-                EmitterInterface::class,
-                $_ENV['EMITTER'] ?? SapiEmitter::class
-            );
-        }
+        static::$application?->getContainer()
+            ->bindSingleton(HttpKernelInterface::class, $_ENV['HTTP_KERNEL'] ?? HttpKernel::class)
+            ->bindSingleton(ConsoleKernelInterface::class, $_ENV['CONSOLE_KERNEL'] ?? ConsoleKernel::class)
+            ->bindSingleton(ExceptionHandlerInterface::class, $_ENV['EXCEPTION_HANDLER'] ?? ExceptionHandler::class)
+            ->bindSingleton(EmitterInterface::class, $_ENV['EMITTER'] ?? SapiEmitter::class);
     }
 
     /**
