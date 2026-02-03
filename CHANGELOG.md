@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 🔥 [v1.0.0-alpha.8](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.7...1.0.0-alpha.8) [2026-02-03]
+
+### New:
+
+* Added `--single` option to `create:controller` command for single action controllers
+* Added ignore paths to CSRFMiddleware
+* Added default fallback ExceptionHandler instance to ExceptionBootProvider
+* Added unit tests for AbstractPlugin class
+* Added GitHub Actions workflow
+
+### Changed:
+
+* Type-hinted JsonResponse data to `array` and `JsonSerializable`
+* Improved routes list command
+* Added default Response object to HttpException::buildJsonResponse
+* Updated zaphyr-org/utils to v2.3
+
+### Removed:
+
+* Removed XSSMiddleware
+
+### Fixed:
+
+* Fixed merging for plugin class types
+* Fixed ignore logging report config in ExceptionHandler
+* Fixed format bool value in config list command
+
 ## 🔥 [v1.0.0-alpha.7](https://github.com/zaphyr-org/framework/compare/1.0.0-alpha.6...1.0.0-alpha.7) [2025-06-08]
 
 ### New:
